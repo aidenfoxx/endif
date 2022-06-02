@@ -1,11 +1,11 @@
-import { initContext } from './core/context';
-import { initApp } from './app/app';
+import { contextInit } from './core/context';
+import { appInit } from './app/app';
 
 const window = document.getElementById('window');
 
 if (!(window instanceof HTMLCanvasElement)) {
-  throw new Error('Unable to find valid render window.');
+  throw new Error('Unable to find valid render window');
 }
 
-initContext(window);
-initApp();
+contextInit(window);
+appInit();

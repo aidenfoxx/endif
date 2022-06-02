@@ -1,3 +1,3 @@
-export function initApp() {
-  console.log('Init app');
+export function appInit() {
+  console.log('Initialize app...');
 }

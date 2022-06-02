@@ -1,5 +1,5 @@
 /**
- * A basic mathamatics library for programming computer graphics.
+ * A basic math library for programming computer graphics.
  */
 
 // Types

@@ -3,7 +3,8 @@ import {
   Mat4,
   mat4Multiply,
   mat4RotationEuler,
-  mat4Translation
+  mat4Translation,
+  vec3Add
  } from '../utils/math';
 
 interface Camera {
@@ -13,18 +14,22 @@ interface Camera {
   readonly view: Mat4;
 }
 
-export function initCamera(camera: Camera): Camera;
-export function initCamera(position: Vec3, rotation: Vec3, projection: Mat4): Camera;
-export function initCamera(position: Camera | Vec3, rotation?: Vec3, projection?: Mat4): Camera {
+function generateViewMatrix(position: Vec3, rotation: Vec3) {
+  return mat4Multiply(
+    mat4Translation(position),
+    mat4RotationEuler(rotation)
+  );
+};
+
+export function cameraInit(camera: Camera): Camera;
+export function cameraInit(position: Vec3, rotation: Vec3, projection: Mat4): Camera;
+export function cameraInit(position: Camera | Vec3, rotation?: Vec3, projection?: Mat4): Camera {
   if (position instanceof Array) {
     return {
       position,
       rotation: rotation!,
       projection: projection!,
-      view: mat4Multiply(
-        mat4Translation(position),
-        mat4RotationEuler(rotation!)
-      )
+      view: generateViewMatrix(position, rotation!)
     };
   } else {
     return {
@@ -33,6 +38,26 @@ export function initCamera(position: Camera | Vec3, rotation?: Vec3, projection?
       projection: [...position.projection],
       view: [...position.view]
     };
+  }
+}
+
+export function cameraTranslate(camera: Camera, translation: Vec3) {
+  const nextPosition = vec3Add(camera.position, translation);
+  return {
+    position: nextPosition,
+    rotation: camera.rotation,
+    projection: camera.projection,
+    view: generateViewMatrix(camera.position, nextPosition)
+  }
+}
+
+export function cameraRotate(camera: Camera, rotation: Vec3) {
+  const nextRotation = vec3Add(camera.rotation, rotation);
+  return {
+    position: camera.position,
+    rotation: nextRotation,
+    projection: camera.projection,
+    view: generateViewMatrix(camera.position, nextRotation)
   }
 }
 

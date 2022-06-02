@@ -1,4 +1,4 @@
-import Mesh, { initMesh } from '../assets/mesh';
+import Mesh, { meshInit } from '../assets/mesh';
 import { Vec3, Vec2 } from '../utils/math';
 import { ObjParseException } from '../expcetions';
 
@@ -7,7 +7,7 @@ const UV_MATCH = /^vt (-?\d+\.?\d*) (-?\d+\.?\d*)$/;
 const NORMAL_MATCH = /^vn (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*)$/;
 const FACE_MATCH = /^f (\d+)\/?(\d*)\/?(\d*) (\d+)\/?(\d*)\/?(\d*) (\d+)\/?(\d*)\/?(\d*)$/;
 
-export function parseObj(data: string): Mesh {
+export function objParse(data: string): Mesh {
   const lines = data.split(/\r\n|\n/g);
   
   const vertices: Vec3[] = [];
@@ -17,7 +17,7 @@ export function parseObj(data: string): Mesh {
 
   // Parse obj data
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
+    const line = lines[i].trim();
 
     if (line[0] === 'v') {
       if (line[1] === ' ') {
@@ -82,6 +82,7 @@ export function parseObj(data: string): Mesh {
         throw new ObjParseException(`Vertex index out-of-bounds`);
       }
 
+      // TODO: This isn't as efficient as it could be
       setIndexedValue(indexedVertices, vertices[vertexIndex], index);
       
       if (point[1]) {
@@ -89,7 +90,7 @@ export function parseObj(data: string): Mesh {
           throw new ObjParseException('UV index out-of-bounds');
         }
 
-        setIndexedValue(indexedUVs, uvs[vertexIndex], index);
+        setIndexedValue(indexedUVs, uvs[uvIndex], index);
       }
 
       if (point[2]) {
@@ -97,7 +98,7 @@ export function parseObj(data: string): Mesh {
           throw new ObjParseException('Normal index out-of-bounds');
         }
 
-        setIndexedValue(indexedNormals, normals[vertexIndex], index);
+        setIndexedValue(indexedNormals, normals[normalIndex], index);
       }
 
       if (!indexCache[vertexIndex]) {
@@ -116,5 +117,5 @@ export function parseObj(data: string): Mesh {
     }
   }
 
-  return initMesh(indexedVertices, indexedUVs, indexedNormals, indices);
+  return meshInit(indexedVertices, indexedUVs, indexedNormals, indices);
 }
