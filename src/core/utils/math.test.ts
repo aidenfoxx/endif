@@ -1,33 +1,32 @@
 import * as math from './math';
 
-// TODO: Use better test numbers than [2, 2, 2, 2] which doesn't test well the second vec parts
 describe('math', () => {
   describe('Vec2', () => {
     test('should add', () => {
-      const result = math.vec2Add([1, 2], [2, 2]);
+      const result = math.vec2Add([1, 2], [3, 4]);
 
-      expect(result).toEqual([3, 4]);
+      expect(result).toEqual([4, 6]);
     });
 
     test('should subtract', () => {
       const result = math.vec2Subtract(
         [1, 2],
-        [2, 2]
+        [-3, -4]
       );
 
-      expect(result).toEqual([-1, 0]);
+      expect(result).toEqual([4, 6]);
     });
 
     test('should multiply', () => {
-      const result = math.vec2Multiply([1, 2], [2, 2]);
+      const result = math.vec2Multiply([1, 2], [3, 4]);
 
-      expect(result).toEqual([2, 4]);
+      expect(result).toEqual([3, 8]);
     });
 
     test('should divide', () => {
-      const result = math.vec2Divide([1, 2], [2, 2]);
+      const result = math.vec2Divide([1, 2], [3, 4]);
 
-      expect(result).toEqual([.5, 1]);
+      expect(result).toEqual([0.3333333333333333, .5]);
     });
 
     test('should invert', () => {
@@ -48,27 +47,27 @@ describe('math', () => {
 
   describe('Vec3', () => {
     test('should add', () => {
-      const result = math.vec3Add([1, 2, 3], [2, 2, 2]);
+      const result = math.vec3Add([1, 2, 3], [4, 5, 6]);
 
-      expect(result).toEqual([3, 4, 5]);
+      expect(result).toEqual([5, 7, 9]);
     });
 
     test('should subtract', () => {
-      const result = math.vec3Subtract([1, 2, 3], [2, 2, 2]);
+      const result = math.vec3Subtract([1, 2, 3], [-4, -5, -6]);
 
-      expect(result).toEqual([-1, 0, 1]);
+      expect(result).toEqual([5, 7, 9]);
     });
 
     test('should multiply', () => {
-      const result = math.vec3Multiply([1, 2, 3], [2, 2, 2]);
+      const result = math.vec3Multiply([1, 2, 3], [4, 5, 6]);
 
-      expect(result).toEqual([2, 4, 6]);
+      expect(result).toEqual([4, 10, 18]);
     });
 
     test('should divide', () => {
-      const result = math.vec3Divide([1, 2, 3], [2, 2, 2]);
+      const result = math.vec3Divide([1, 2, 3], [4, 5, 6]);
 
-      expect(result).toEqual([.5, 1, 1.5]);
+      expect(result).toEqual([.25, .4, .5]);
     });
 
     test('should invert', () => {
@@ -88,35 +87,40 @@ describe('math', () => {
     });
 
     test('should calculate cross product', () => {
-      const result = math.vec3CrossProduct([1, 2, 3], [2, 2, 2]);
+      const result = math.vec3CrossProduct([1, 2, 3], [4, 5, 6]);
 
-      expect(result).toEqual([-2, 4, -2]);
+      expect(result).toEqual([-3, 6, -3]);
     });
   });
 
   describe('Vec4', () => {
     test('should add', () => {
-      const result = math.vec4Add([1, 2, 3, 4], [2, 2, 2, 2]);
+      const result = math.vec4Add([1, 2, 3, 4], [5, 6, 7, 8]);
 
-      expect(result).toEqual([3, 4, 5, 6]);
+      expect(result).toEqual([6, 8, 10, 12]);
     });
 
     test('should subtract', () => {
-      const result = math.vec4Subtract([1, 2, 3, 4], [2, 2, 2, 2]);
+      const result = math.vec4Subtract([1, 2, 3, 4], [-5, -6, -7, -8]);
 
-      expect(result).toEqual([-1, 0, 1, 2]);
+      expect(result).toEqual([6, 8, 10, 12]);
     });
 
     test('should multiply', () => {
-      const result = math.vec4Multiply([1, 2, 3, 4] ,[2, 2, 2, 2]);
+      const result = math.vec4Multiply([1, 2, 3, 4] ,[5, 6, 7, 8]);
 
-      expect(result).toEqual([2, 4, 6, 8]);
+      expect(result).toEqual([5, 12, 21, 32]);
     });
 
     test('should divide', () => {
-      const result = math.vec4Divide([1, 2, 3, 4], [2, 2, 2, 2]);
+      const result = math.vec4Divide([1, 2, 3, 4], [5, 6, 7, 8]);
 
-      expect(result).toEqual([.5, 1, 1.5, 2]);
+      expect(result).toEqual([
+        .2,
+        0.3333333333333333,
+        0.42857142857142855,
+        .5
+      ]);
     });
 
     test('should invert', () => {
@@ -229,9 +233,9 @@ describe('math', () => {
       const result = math.mat4RotationEuler([1, 2, 3]);
 
       expect(result).toEqual([
-        0.411982245665683, 0.05872664492762098, 0.9092974268256817, 0,
-        -0.6812427202564033, -0.642872836134547, 0.35017548837401463, 0,
-        0.6051272472413687,  -0.7637183366502791, -0.2248450953661529, 0,
+        0.411982245665683,  -0.6812427202564033, 0.6051272472413687, 0,
+        0.05872664492762098, -0.642872836134547, -0.7637183366502791, 0,
+        0.9092974268256817, 0.35017548837401463, -0.2248450953661529, 0,
         0, 0, 0, 1
       ]);
     });
@@ -240,9 +244,9 @@ describe('math', () => {
       const result = math.mat4RotationQuat([1, 2, 3, 4]);
 
       expect(result).toEqual([
-        0.13333333333333353, -0.6666666666666666, 0.7333333333333332, 0,
-        0.9333333333333332, 0.3333333333333335, 0.13333333333333336, 0,
-        -0.33333333333333326,  0.6666666666666665, 0.6666666666666667, 0,
+        0.13333333333333353, 0.9333333333333332, -0.33333333333333326, 0,
+        -0.6666666666666666, 0.3333333333333335, 0.6666666666666665, 0,
+        0.7333333333333332, 0.13333333333333336, 0.6666666666666667, 0,
         0, 0, 0, 1
       ]);
     });
@@ -264,10 +268,10 @@ describe('math', () => {
       );
 
       expect(result).toEqual([
-        80, 70, 60, 50,
-        240, 214, 188, 162,
-        400, 358, 316, 274,
-        560, 502, 444, 386
+        386, 444, 502, 560,
+        274, 316, 358, 400,
+        162, 188, 214, 240,
+        50, 60, 70, 80
       ]);
     });
 
@@ -287,8 +291,8 @@ describe('math', () => {
       ]);
     });
 
-    test('should calculate inverse', () => {
-      const result = math.mat4Inverse([
+    test('should invert', () => {
+      const result = math.mat4Invert([
         1, 2, 3, 4,
         0, 2, 0, 0,
         0, 2, 3, 0,
