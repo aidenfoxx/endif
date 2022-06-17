@@ -1,19 +1,18 @@
 export enum TextureFormat {
   RGB,
   RGBA,
-  RGBA_5_5_5_1,
   DXT1,
   DXT3,
   DXT5
 }
 
 export interface Texture {
-  format: TextureFormat;
-  data: Uint8Array;
-  width: number;
-  height: number;
-  bitsPerPixel: number;
-  mipmaps: number;
+  readonly format: TextureFormat;
+  readonly data: Uint8Array;
+  readonly width: number;
+  readonly height: number;
+  readonly bitsPerPixel: number;
+  readonly mipmaps: Uint8Array[];
 }
 
 export function textureInit(
@@ -22,14 +21,14 @@ export function textureInit(
   height: number,
   format: TextureFormat = TextureFormat.RGB,
   bitsPerPixel: number = 24,
-  mipmaps: number = 0
+  mipmaps?: Uint8Array[]
 ) {
   return {
-    format,
-    data,
+    data: new Uint8Array(data),
     width,
     height,
+    format,
     bitsPerPixel,
-    mipmaps
+    mipmaps: mipmaps ? mipmaps.map(mipmap => new Uint8Array(mipmap)) : []
   };
 }

@@ -100,9 +100,9 @@ describe('obj', () => {
         -0.5, -0.5, 0,
         0.5, -0.5, 0
       ],
-      expect.any(Object),
-      expect.any(Object),
-      expect.any(Object)
+      expect.any(Array),
+      expect.any(Array),
+      expect.any(Array)
     );
   });
 
@@ -120,14 +120,14 @@ describe('obj', () => {
     `);
 
     expect(meshInit).toHaveBeenCalledWith(
-      expect.any(Object),
+      expect.any(Array),
       [
         0.5, 1,
         1, 0.25,
         0, 0.25
       ],
-      expect.any(Object),
-      expect.any(Object)
+      expect.any(Array),
+      expect.any(Array)
     );
   });
 
@@ -145,14 +145,14 @@ describe('obj', () => {
     `);
 
     expect(meshInit).toHaveBeenCalledWith(
-      expect.any(Object),
-      expect.any(Object),
+      expect.any(Array),
+      expect.any(Array),
       [
         0, 0.5, -0.5,
         -0.5, -0.5, -0.5,
         0.5, -0.5, -0.5
       ],
-      expect.any(Object)
+      expect.any(Array)
     );
   });
 
@@ -174,8 +174,8 @@ describe('obj', () => {
         0.5, -0.5, 0,
         1.0, 0.5, 0.0
       ],
-      expect.any(Object),
-      expect.any(Object),
+      expect.any(Array),
+      expect.any(Array),
       [0, 1, 2, 0, 2, 3]
     );
   });

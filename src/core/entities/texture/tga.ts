@@ -4,7 +4,7 @@ import { TgaParseException } from '../../expcetions/TgaParseException';
 const TGA_HEADER_SIZE = 0x12;
 const TGA_RGB_FORMAT = 2;
 
-export function parseTga(buffer: ArrayBuffer): Texture {
+export function tgaParse(buffer: ArrayBuffer): Texture {
   const data = new Uint8Array(buffer);
 
   const idLength = data[0];
@@ -21,10 +21,6 @@ export function parseTga(buffer: ArrayBuffer): Texture {
   let format: TextureFormat | undefined;
 
   switch (bitsPerPixel) {
-    case 16:
-      format = TextureFormat.RGBA_5_5_5_1;
-      break;
-
     case 24:
       format = TextureFormat.RGB;
       break;
@@ -45,15 +41,8 @@ export function parseTga(buffer: ArrayBuffer): Texture {
   // Convert to RGB
   for (let i = 0; i < textureSize; i += bytesPerPixel) {
     const colorSwap = textureData[i];
-
-    if (bytesPerPixel === 2) {
-      // Byte format: GGGBBBBB ARRRRRGG
-      textureData[i] = (textureData[i] << 1) + (textureData[i + 1] & 0x80 ? 1 : 0);
-      textureData[i + 1] = (textureData[i + 1] << 1) + (colorSwap & 0x80 ? 1 : 0);
-    } else {
-      textureData[i] = textureData[i + 2];
-      textureData[i + 2] = colorSwap;
-    }
+    textureData[i] = textureData[i + 2];
+    textureData[i + 2] = colorSwap;
   }
 
   return textureInit(

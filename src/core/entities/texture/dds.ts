@@ -7,7 +7,7 @@ const DDS_FORMAT_DXT1 = 0x31545844;
 const DDS_FORMAT_DXT3 = 0x33545844;
 const DDS_FORMAT_DXT5 = 0x35545844;
 
-export function parseDds(buffer: ArrayBuffer): Texture {
+export function ddsParse(buffer: ArrayBuffer): Texture {
   const data = new Uint8Array(buffer);
   const headers = new Uint32Array(buffer.slice(0, DDS_HEADER_SIZE));
 
@@ -17,11 +17,12 @@ export function parseDds(buffer: ArrayBuffer): Texture {
 
   const width = headers[4];
   const height = headers[3];
-  const mipmaps = headers[7];
+  const mipmapCount = headers[7];
   const pixelFormat = headers[21];
 
   let format: TextureFormat | undefined;
   let bitsPerPixel: number | undefined;
+  let swapBGR = false;
 
   switch (pixelFormat) {
     case DDS_FORMAT_DXT1:
@@ -44,15 +45,17 @@ export function parseDds(buffer: ArrayBuffer): Texture {
       const gBits = headers[24];
       const bBits = headers[25];
 
-      if (rBits === 0xFF0000 && gBits === 0xFF00 && bBits === 0xFF) {
+      swapBGR = rBits === 0xFF0000 && bBits === 0xFF;
+
+      if ((swapBGR || rBits === 0xFF && bBits === 0xFF0000) && gBits === 0xFF00) {
         const aBits = headers[26];
 
-        if (aBits === 0xFF000000) {
-          format = TextureFormat.RGBA;
-          bitsPerPixel = 32;
-        } else if (!aBits) {
+        if (!aBits) {
           format = TextureFormat.RGB;
           bitsPerPixel = 24;
+        } else if (aBits === 0xFF000000) {
+          format = TextureFormat.RGBA;
+          bitsPerPixel = 32;
         }
       }
       break;
@@ -64,24 +67,35 @@ export function parseDds(buffer: ArrayBuffer): Texture {
 
   const bytesPerPixel = bitsPerPixel! / 8;
 
-  let textureSize = 0;
-  let mipmapWidth = width;
-  let mipmapHeight = height;
-
-  for (let i = 0; i < mipmaps; i++) {
-    textureSize += mipmapWidth * mipmapHeight * bytesPerPixel;
-    mipmapWidth /= 2;
-    mipmapHeight /= 2;
+  if (swapBGR) {
+    // Convert to RGB
+    for (let i = DDS_HEADER_SIZE; i < data.length; i += bytesPerPixel) {
+      const colorSwap = data[i];
+      data[i] = data[i + 2];
+      data[i + 2] = colorSwap;
+    }
   }
 
-  const textureData = data.slice(DDS_HEADER_SIZE, DDS_HEADER_SIZE + textureSize)
+  // DXT data cannot be smaller than 4x4 pixels
+  const minSize = format === TextureFormat.DXT1 || format === TextureFormat.DXT3 || format === TextureFormat.DXT5 ? 4 : 1;
+  const textureSize = Math.max(width, minSize) * Math.max(height, minSize) * bytesPerPixel;
+  const textureData = data.slice(DDS_HEADER_SIZE, DDS_HEADER_SIZE + textureSize);
+  const mipmaps = [];
 
-  if (format === TextureFormat.RGB || format === TextureFormat.RGBA) {
-    // Convert to RGB
-    for (let i = 0; i < textureSize; i += bitsPerPixel!) {
-      const colorSwap = textureData[i];
-      textureData[i] = textureData[i + 2];
-      textureData[i + 2] = colorSwap;
+  if (mipmapCount > 1) {
+    let mipmapWidth = width / 2;
+    let mipmapHeight = height / 2;
+    let mipmapOffset = DDS_HEADER_SIZE + textureSize;
+
+    for (let i = 0; i < mipmapCount - 1; i++) {
+      const mipmapSize = Math.max(mipmapWidth, minSize) * Math.max(mipmapHeight, minSize) * bytesPerPixel;
+      const mipmapData = data.slice(mipmapOffset, mipmapOffset + mipmapSize);
+
+      mipmaps.push(mipmapData);
+
+      mipmapWidth /= 2;
+      mipmapHeight /= 2;
+      mipmapOffset += mipmapSize;
     }
   }
 
