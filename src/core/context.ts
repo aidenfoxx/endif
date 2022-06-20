@@ -1,7 +1,7 @@
-export function contextInit(canvas: HTMLCanvasElement): WebGL2RenderingContext {
-  const gl = canvas.getContext('webgl2');
+export function contextInit(viewport: HTMLCanvasElement): WebGL2RenderingContext {
+  const gl = viewport.getContext('webgl2');
 
-  if (gl === null) {    
+  if (gl === null) {
     throw new Error('Unable to initialize WebGL 2.0');
   }
 

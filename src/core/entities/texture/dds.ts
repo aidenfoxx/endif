@@ -66,41 +66,37 @@ export function ddsParse(buffer: ArrayBuffer): Texture {
   }
 
   const bytesPerPixel = bitsPerPixel! / 8;
-
-  if (swapBGR) {
-    // Convert to RGB
-    for (let i = DDS_HEADER_SIZE; i < data.length; i += bytesPerPixel) {
-      const colorSwap = data[i];
-      data[i] = data[i + 2];
-      data[i + 2] = colorSwap;
-    }
-  }
-
   // DXT data cannot be smaller than 4x4 pixels
   const minSize = format === TextureFormat.DXT1 || format === TextureFormat.DXT3 || format === TextureFormat.DXT5 ? 4 : 1;
-  const textureSize = Math.max(width, minSize) * Math.max(height, minSize) * bytesPerPixel;
-  const textureData = data.slice(DDS_HEADER_SIZE, DDS_HEADER_SIZE + textureSize);
   const mipmaps = [];
 
-  if (mipmapCount > 1) {
-    let mipmapWidth = width / 2;
-    let mipmapHeight = height / 2;
-    let mipmapOffset = DDS_HEADER_SIZE + textureSize;
+  let mipmapWidth = width;
+  let mipmapHeight = height;
+  let mipmapOffset = DDS_HEADER_SIZE;
+  let i = 0;
 
-    for (let i = 0; i < mipmapCount - 1; i++) {
-      const mipmapSize = Math.max(mipmapWidth, minSize) * Math.max(mipmapHeight, minSize) * bytesPerPixel;
-      const mipmapData = data.slice(mipmapOffset, mipmapOffset + mipmapSize);
+  do {
+    const mipmapSize = Math.max(mipmapWidth, minSize) * Math.max(mipmapHeight, minSize) * bytesPerPixel;
+    const mipmapData = data.slice(mipmapOffset, mipmapOffset + mipmapSize);
 
-      mipmaps.push(mipmapData);
-
-      mipmapWidth /= 2;
-      mipmapHeight /= 2;
-      mipmapOffset += mipmapSize;
+    if (swapBGR) {
+      // Convert to RGB
+      for (let i = 0; i < mipmapSize; i += bytesPerPixel) {
+        const colorSwap = mipmapData[i];
+        mipmapData[i] = mipmapData[i + 2];
+        mipmapData[i + 2] = colorSwap;
+      }
     }
-  }
+
+    mipmaps.push(mipmapData);
+
+    mipmapWidth /= 2;
+    mipmapHeight /= 2;
+    mipmapOffset += mipmapSize;
+  } while (++i < mipmapCount);
 
   return textureInit(
-    textureData,
+    mipmaps.shift()!,
     width,
     height,
     format,

@@ -1,4 +1,4 @@
-import { Vec2 } from './utils/math';
+import { Vec2 } from '../core/utils/math';
 
 export enum ButtonState {
   BUTTON_UP,
@@ -21,7 +21,7 @@ interface InputState {
   mouseX: number;
   mouseY: number;
   mouseButtonStates: ButtonState[];
-  keyStates: Record<string, KeyState>
+  keyStates: Dictionary<string, KeyState>
 }
 
 const inputState: InputState = {

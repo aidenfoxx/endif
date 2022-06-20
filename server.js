@@ -6,18 +6,18 @@ const PORT = 8080;
 const HOST = '127.0.0.1';
 const PATH_BASE = path.resolve(`${process.cwd()}/public`);
 
-const server = http.createServer(function (req, res) {  
+const server = http.createServer(function (req, res) {
   if (req.url === '/') {
     res.writeHead(200);
     res.end(fs.readFileSync(`${PATH_BASE}/index.html`));
     return;
   }
-  
+
   const filename = path.resolve(`${PATH_BASE}${req.url}`);
 
   if (fs.existsSync(filename)) {
     const extname = path.extname(filename);
-  
+
     switch (extname) {
       case '.js':
         res.setHeader("Content-Type", 'text/javascript');
@@ -34,5 +34,5 @@ const server = http.createServer(function (req, res) {
 });
 
 server.listen(PORT, HOST, () => {
-    console.log(`Server is running on http://${HOST}:${PORT}`);
+  console.log(`Server is running on http://${HOST}:${PORT}`);
 });

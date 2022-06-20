@@ -1,4 +1,4 @@
-import { 
+import {
   Vec3,
   Mat4,
   mat4Multiply,
@@ -6,9 +6,9 @@ import {
   mat4Translation,
   vec3Add,
   vec3Multiply,
- } from '../utils/math';
+} from '../utils/math';
 
-interface Camera {
+export interface Camera {
   readonly position: Vec3;
   readonly rotation: Vec3;
   readonly projection: Mat4;
@@ -39,9 +39,9 @@ export function cameraTranslate(camera: Camera, translation: Vec3) {
   const translateY: Vec3 = [translation[1], translation[1], translation[1]];
   const translateZ: Vec3 = [translation[2], translation[2], translation[2]];
 
-	let nextPosition = vec3Add(camera.position, vec3Multiply(axisX, translateX));
-	nextPosition = vec3Add(nextPosition, vec3Multiply(axisY, translateY));
-	nextPosition = vec3Add(nextPosition, vec3Multiply(axisZ, translateZ));
+  let nextPosition = vec3Add(camera.position, vec3Multiply(axisX, translateX));
+  nextPosition = vec3Add(nextPosition, vec3Multiply(axisY, translateY));
+  nextPosition = vec3Add(nextPosition, vec3Multiply(axisZ, translateZ));
 
   return {
     position: nextPosition,
@@ -67,5 +67,3 @@ export function cameraRotate(camera: Camera, rotation: Vec3) {
     )
   }
 }
-
-export default Camera;

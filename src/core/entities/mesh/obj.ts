@@ -4,6 +4,18 @@ import { ObjParseException } from '../../expcetions';
 
 const POINT_MATCH = /^(-?\d+)\/?(-?\d*)\/?(-?\d*)$/;
 
+function indexAttribute(index: number, src: Vec2 | Vec3 | undefined, dest: number[]): void {
+  if (src === undefined) {
+    throw new ObjParseException(`Attribute index out-of-bounds`);
+  }
+
+  const offset = index * src.length;
+
+  for (let i = 0; i < src.length; i++) {
+    dest[offset + i] = src[i];
+  }
+}
+
 export function objParse(data: string): Mesh {
   const lines = data.split(/\r\n|\n/g);
 
@@ -55,7 +67,7 @@ export function objParse(data: string): Mesh {
   const indexedNormals = [];
   const indices = [];
 
-  const indexCache: Record<any, Record<any, Record<any, number>>> = {};
+  const indexCache: Dictionary<any, Dictionary<any, Dictionary<any, number>>> = {};
 
   for (let i = 0, index = 0; i < points.length; i++) {
     const point = points[i];
@@ -63,8 +75,9 @@ export function objParse(data: string): Mesh {
     const vertexIndex = point[0] < 0 ? vertices.length + point[0] : point[0] - 1;
     const uvIndex = point[1] < 0 ? uvs.length + point[1] : point[1] - 1;
     const normalIndex = point[2] < 0 ? normals.length + point[2] : point[2] - 1;
+    const pointIndex = indexCache[vertexIndex]?.[uvIndex]?.[normalIndex];
 
-    if (indexCache[vertexIndex]?.[uvIndex]?.[normalIndex] === undefined) {
+    if (pointIndex === undefined) {
       // Index point
       if (vertices[vertexIndex] === undefined) {
         throw new ObjParseException(`Vertex index out-of-bounds`);
@@ -104,16 +117,18 @@ export function objParse(data: string): Mesh {
         indexCache[vertexIndex] = {};
       }
 
-      if (!indexCache[vertexIndex][uvIndex]) {
-        indexCache[vertexIndex][uvIndex] = {};
+      // NOTE: Typescript has issues with sub-indexes
+      if (!indexCache[vertexIndex]![uvIndex]) {
+        indexCache[vertexIndex]![uvIndex] = {};
       }
 
       indices[i] = index;
-      indexCache[vertexIndex][uvIndex][normalIndex] = index;
+      // NOTE: Typescript has issues with sub-indexes
+      indexCache[vertexIndex]![uvIndex]![normalIndex] = index;
       index++;
     } else {
       // Re-use indexed point
-      indices[i] = indexCache[vertexIndex][uvIndex][normalIndex];
+      indices[i] = pointIndex;
     }
   }
 
