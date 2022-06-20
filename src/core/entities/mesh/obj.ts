@@ -4,18 +4,6 @@ import { ObjParseException } from '../../expcetions';
 
 const POINT_MATCH = /^(-?\d+)\/?(-?\d*)\/?(-?\d*)$/;
 
-function indexAttribute(index: number, src: Vec2 | Vec3 | undefined, dest: number[]): void {
-  if (src === undefined) {
-    throw new ObjParseException(`Attribute index out-of-bounds`);
-  }
-
-  const offset = index * src.length;
-
-  for (let i = 0; i < src.length; i++) {
-    dest[offset + i] = src[i];
-  }
-}
-
 export function objParse(data: string): Mesh {
   const lines = data.split(/\r\n|\n/g);
 
