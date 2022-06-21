@@ -7,10 +7,10 @@ const POINT_MATCH = /^(-?\d+)\/?(-?\d*)\/?(-?\d*)$/;
 export function objParse(data: string): Mesh {
   const lines = data.split(/\r\n|\n/g);
 
-  const vertices: Vec3[] = [];
-  const uvs: Vec2[] = [];
-  const normals: Vec3[] = [];
-  const points: Vec3[] = [];
+  const vertices: Array<Vec3> = [];
+  const uvs: Array<Vec2> = [];
+  const normals: Array<Vec3> = [];
+  const points: Array<Vec3> = [];
 
   // Parse obj
   for (let i = 0; i < lines.length; i++) {
@@ -51,11 +51,11 @@ export function objParse(data: string): Mesh {
 
   // Index mesh
   const indexedVertices = [];
-  const indexedUVs = []
+  const indexedUVs = [];
   const indexedNormals = [];
   const indices = [];
 
-  const indexCache: Dictionary<any, Dictionary<any, Dictionary<any, number>>> = {};
+  const indexCache: Map<number, Map<number, Map<number, number>>> = new Map();
 
   for (let i = 0, index = 0; i < points.length; i++) {
     const point = points[i];
@@ -63,7 +63,7 @@ export function objParse(data: string): Mesh {
     const vertexIndex = point[0] < 0 ? vertices.length + point[0] : point[0] - 1;
     const uvIndex = point[1] < 0 ? uvs.length + point[1] : point[1] - 1;
     const normalIndex = point[2] < 0 ? normals.length + point[2] : point[2] - 1;
-    const pointIndex = indexCache[vertexIndex]?.[uvIndex]?.[normalIndex];
+    const pointIndex = indexCache.get(vertexIndex)?.get(uvIndex)?.get(normalIndex);
 
     if (pointIndex === undefined) {
       // Index point
@@ -101,18 +101,18 @@ export function objParse(data: string): Mesh {
       }
 
       // Cached indexed point
-      if (!indexCache[vertexIndex]) {
-        indexCache[vertexIndex] = {};
+      if (!indexCache.get(vertexIndex)) {
+        indexCache.set(vertexIndex, new Map());
       }
 
       // NOTE: Typescript has issues with sub-indexes
-      if (!indexCache[vertexIndex]![uvIndex]) {
-        indexCache[vertexIndex]![uvIndex] = {};
+      if (!indexCache.get(vertexIndex)!.get(uvIndex)) {
+        indexCache.get(vertexIndex)!.set(uvIndex, new Map());
       }
 
       indices[i] = index;
       // NOTE: Typescript has issues with sub-indexes
-      indexCache[vertexIndex]![uvIndex]![normalIndex] = index;
+      indexCache.get(vertexIndex)!.get(uvIndex)!.set(normalIndex, index);
       index++;
     } else {
       // Re-use indexed point
