@@ -1,5 +1,5 @@
 import { Mesh } from '../../core/entities/mesh';
-import { objParse } from '../../core/entities/mesh/obj';
+import { objParse } from '../../core/utils/mesh/obj';
 import { RefCounter } from '../types';
 import { resolvePath } from '../utils/resolve-path';
 

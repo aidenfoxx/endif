@@ -1,4 +1,4 @@
-import { Texture, TextureFormat, textureInit } from '../texture';
+import { Texture, TextureFormat, textureInit } from '../../entities/texture';
 import { TgaParseException } from '../../expcetions/TgaParseException';
 
 const TGA_HEADER_SIZE = 0x12;

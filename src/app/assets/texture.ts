@@ -1,6 +1,6 @@
 import { Texture, TextureFormat } from '../../core/entities/texture';
-import { ddsParse } from '../../core/entities/texture/dds';
-import { tgaParse } from '../../core/entities/texture/tga';
+import { ddsParse } from '../../core/utils/texture/dds';
+import { tgaParse } from '../../core/utils/texture/tga';
 import { RefCounter } from '../types';
 import { resolvePath } from '../utils/resolve-path';
 

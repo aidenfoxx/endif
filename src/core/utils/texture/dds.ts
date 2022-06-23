@@ -1,4 +1,4 @@
-import { Texture, TextureFormat, textureInit } from '../texture';
+import { Texture, TextureFormat, textureInit } from '../../entities/texture';
 import { DdsParseException } from '../../expcetions';
 
 const DDS_HEADER_SIZE = 0x80;

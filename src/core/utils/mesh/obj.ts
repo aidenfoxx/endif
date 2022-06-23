@@ -1,4 +1,4 @@
-import { Mesh, meshInit } from '../mesh';
+import { Mesh, meshInit } from '../../entities/mesh';
 import { ObjParseException } from '../../expcetions';
 
 const POINT_MATCH = /^(-?\d+)\/?(-?\d*)\/?(-?\d*)$/;

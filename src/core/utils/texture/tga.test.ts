@@ -1,4 +1,4 @@
-import { TextureFormat, textureInit } from '../texture';
+import { TextureFormat, textureInit } from '../../entities/texture';
 import { tgaParse } from './tga';
 
 jest.mock('../texture', () => ({

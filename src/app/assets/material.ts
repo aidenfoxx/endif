@@ -1,5 +1,5 @@
 import { Material } from '../../core/entities/material';
-import { mtlParse } from '../../core/entities/material/mtl';
+import { mtlParse } from '../../core/utils/material/mtl';
 import { RefCounter } from '../types';
 import { resolvePath } from '../utils/resolve-path';
 

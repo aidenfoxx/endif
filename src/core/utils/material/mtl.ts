@@ -1,4 +1,4 @@
-import { Material, materialInit } from '../material';
+import { Material, materialInit } from '../../entities/material';
 import { Vec3 } from '../../utils/math';
 import { MtlParseException } from '../../expcetions';
 

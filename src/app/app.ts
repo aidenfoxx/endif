@@ -16,11 +16,11 @@ const CANVAS_HEIGHT = 900;
 
 interface AppState {
   readonly gl: WebGL2RenderingContext;
-  readonly scene: Scene,
+  readonly scene: Scene;
   readonly input: {
     readonly timestep: Timestep;
-    readonly previousMouseX: number,
-    readonly previousMouseY: number
+    readonly previousMouseX: number;
+    readonly previousMouseY: number;
   }
 }
 

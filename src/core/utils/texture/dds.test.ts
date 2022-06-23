@@ -1,7 +1,7 @@
 import { ddsParse } from './dds';
-import { TextureFormat, textureInit } from '../texture';
+import { TextureFormat, textureInit } from '../../entities/texture';
 
-jest.mock('../texture', () => ({
+jest.mock('../../entities/texture', () => ({
   ...jest.requireActual('../texture'),
   textureInit: jest.fn()
 }))
