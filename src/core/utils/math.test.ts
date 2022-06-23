@@ -35,6 +35,8 @@ describe('math', () => {
       expect(result).toEqual([-1, -2]);
     });
 
+    // TODO: Add test for mat4 multiply
+
     test('should normalize', () => {
       const result = math.vec2Normalize([1, 2]);
 
@@ -76,6 +78,8 @@ describe('math', () => {
       expect(result).toEqual([-1, -2, -3]);
     });
 
+    // TODO: Add test for mat4 multiply
+
     test('should normalize', () => {
       const result = math.vec3Normalize([1, 2, 3]);
 
@@ -107,7 +111,7 @@ describe('math', () => {
     });
 
     test('should multiply', () => {
-      const result = math.vec4Multiply([1, 2, 3, 4] ,[5, 6, 7, 8]);
+      const result = math.vec4Multiply([1, 2, 3, 4], [5, 6, 7, 8]);
 
       expect(result).toEqual([5, 12, 21, 32]);
     });
@@ -128,6 +132,8 @@ describe('math', () => {
 
       expect(result).toEqual([-1, -2, -3, -4]);
     });
+
+    // TODO: Add test for mat4 multiply
 
     test('should normalize', () => {
       const result = math.vec4Normalize([1, 2, 3, 4]);
@@ -233,7 +239,7 @@ describe('math', () => {
       const result = math.mat4RotationEuler([1, 2, 3]);
 
       expect(result).toEqual([
-        0.411982245665683,  -0.6812427202564033, 0.6051272472413687, 0,
+        0.411982245665683, -0.6812427202564033, 0.6051272472413687, 0,
         0.05872664492762098, -0.642872836134547, -0.7637183366502791, 0,
         0.9092974268256817, 0.35017548837401463, -0.2248450953661529, 0,
         0, 0, 0, 1
@@ -301,8 +307,8 @@ describe('math', () => {
 
       expect(result).toEqual([
         1, 1, -1, -1,
-        0,  0.5, 0, 0,
-        0, -0.3333333333333333,  0.3333333333333333, 0,
+        0, 0.5, 0, 0,
+        0, -0.3333333333333333, 0.3333333333333333, 0,
         0, -0.25, 0, 0.25
       ]);
     });
@@ -324,7 +330,7 @@ describe('math', () => {
       expect(result).toEqual([
         -0.7071067811865475, -0.40824829046386296, -0.5773502691896257, 0,
         0, 0.8164965809277259, -0.5773502691896257, 0,
-        0.7071067811865475, -0.40824829046386296, -0.5773502691896257, 0, 
+        0.7071067811865475, -0.40824829046386296, -0.5773502691896257, 0,
         -1.414213562373095, -0, 3.4641016151377544, 1,
       ]);
     });

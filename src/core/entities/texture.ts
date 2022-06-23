@@ -8,20 +8,20 @@ export enum TextureFormat {
 
 export interface Texture {
   readonly format: TextureFormat;
-  readonly data: Uint8Array;
+  readonly data: ReadonlyUint8Array;
   readonly width: number;
   readonly height: number;
   readonly bitsPerPixel: number;
-  readonly mipmaps: Uint8Array[];
+  readonly mipmaps: ReadonlyArray<ReadonlyUint8Array>;
 }
 
 export function textureInit(
-  data: Uint8Array,
+  data: ReadonlyUint8Array,
   width: number,
   height: number,
   format: TextureFormat = TextureFormat.RGB,
   bitsPerPixel: number = 24,
-  mipmaps?: Uint8Array[]
+  mipmaps: ReadonlyArray<ReadonlyUint8Array> = []
 ) {
   return {
     data: new Uint8Array(data),
@@ -29,6 +29,6 @@ export function textureInit(
     height,
     format,
     bitsPerPixel,
-    mipmaps: mipmaps ? mipmaps.map(mipmap => new Uint8Array(mipmap)) : []
+    mipmaps: mipmaps.map(mipmap => new Uint8Array(mipmap))
   };
 }

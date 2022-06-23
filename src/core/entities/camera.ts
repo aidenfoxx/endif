@@ -15,15 +15,19 @@ export interface Camera {
   readonly view: Mat4;
 }
 
+function _calculateViewMatrix(position: Vec3, rotation: Vec3): Mat4 {
+  return mat4Multiply(
+    mat4RotationEuler(rotation),
+    mat4Translation(position)
+  );
+}
+
 export function cameraInit(position: Vec3, rotation: Vec3, projection: Mat4): Camera {
   return {
     position,
     rotation: rotation,
     projection: projection,
-    view: mat4Multiply(
-      mat4RotationEuler(rotation),
-      mat4Translation(position)
-    )
+    view: _calculateViewMatrix(position, rotation)
   };
 }
 
@@ -44,9 +48,8 @@ export function cameraTranslate(camera: Camera, translation: Vec3) {
   nextPosition = vec3Add(nextPosition, vec3Multiply(axisZ, translateZ));
 
   return {
+    ...camera,
     position: nextPosition,
-    rotation: camera.rotation,
-    projection: camera.projection,
     view: mat4Multiply(
       rotationMatrix,
       mat4Translation(nextPosition)
@@ -54,16 +57,28 @@ export function cameraTranslate(camera: Camera, translation: Vec3) {
   }
 }
 
+export function cameraSetPosition(camera: Camera, position: Vec3): Camera {
+  return {
+    ...camera,
+    position,
+    view: _calculateViewMatrix(position, camera.rotation)
+  }
+}
+
 export function cameraRotate(camera: Camera, rotation: Vec3) {
   const nextRotation = vec3Add(camera.rotation, rotation);
 
   return {
-    position: camera.position,
+    ...camera,
     rotation: nextRotation,
-    projection: camera.projection,
-    view: mat4Multiply(
-      mat4RotationEuler(nextRotation),
-      mat4Translation(camera.position)
-    )
+    view: _calculateViewMatrix(camera.position, nextRotation)
+  }
+}
+
+export function cameraSetRotation(camera: Camera, rotation: Vec3): Camera {
+  return {
+    ...camera,
+    rotation,
+    view: _calculateViewMatrix(camera.position, rotation)
   }
 }

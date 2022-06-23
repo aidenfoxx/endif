@@ -3,18 +3,18 @@
  */
 
 // Types
-export type Vec2 = readonly [number, number];
+export type Vec2 = Readonly<[number, number]>;
 
-export type Vec3 = readonly [number, number, number];
+export type Vec3 = Readonly<[number, number, number]>;
 
-export type Vec4 = readonly [number, number, number, number];
+export type Vec4 = Readonly<[number, number, number, number]>;
 
-export type Mat4 = readonly [
+export type Mat4 = Readonly<[
   number, number, number, number,
   number, number, number, number,
   number, number, number, number,
   number, number, number, number
-];
+]>;
 
 // Vector functions
 export function vec2Add(vec1: Vec2, vec2: Vec2): Vec2 {
@@ -134,6 +134,30 @@ export function vec4Inverse(vec: Vec4): Vec4 {
     -vec[1],
     -vec[2],
     -vec[3]
+  ];
+}
+
+export function vec2MultiplyMat4(vec: Vec2, mat: Mat4): Vec2 {
+  return [
+    (vec[0] * mat[0]) + (vec[1] * mat[4]),
+    (vec[0] * mat[1]) + (vec[1] * mat[5])
+  ];
+}
+
+export function vec3MultiplyMat4(vec: Vec3, mat: Mat4): Vec3 {
+  return [
+    (vec[0] * mat[0]) + (vec[1] * mat[4]) + (vec[2] * mat[8]),
+    (vec[0] * mat[1]) + (vec[1] * mat[5]) + (vec[2] * mat[9]),
+    (vec[0] * mat[2]) + (vec[1] * mat[6]) + (vec[2] * mat[10])
+  ];
+}
+
+export function vec4MultiplyMat4(vec: Vec4, mat: Mat4): Vec4 {
+  return [
+    (vec[0] * mat[0]) + (vec[1] * mat[4]) + (vec[2] * mat[8]) + (vec[3] * mat[12]),
+    (vec[0] * mat[1]) + (vec[1] * mat[5]) + (vec[2] * mat[9]) + (vec[3] * mat[13]),
+    (vec[0] * mat[2]) + (vec[1] * mat[6]) + (vec[2] * mat[10]) + (vec[3] * mat[14]),
+    (vec[0] * mat[3]) + (vec[1] * mat[7]) + (vec[2] * mat[11]) + (vec[3] * mat[15])
   ];
 }
 

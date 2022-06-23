@@ -1,4 +1,4 @@
-import { TextureFormat } from '../../core/entities/texture';
+import { Texture, TextureFormat } from '../../core/entities/texture';
 import { ddsParse } from '../../core/entities/texture/dds';
 import { tgaParse } from '../../core/entities/texture/tga';
 import { RefCounter } from '../types';
@@ -6,15 +6,16 @@ import { resolvePath } from '../utils/resolve-path';
 
 export interface TextureRef {
   readonly path: string;
-  readonly texture: WebGLTexture;
+  readonly tbo: WebGLTexture;
+  readonly texture: Texture;
 }
 
 const EXTENSION_DDS = 'dds';
 const EXTENSION_TGA = 'tga';
 
-const textureCache: Dictionary<string, RefCounter<TextureRef>> = {};
+const _textureCache: Map<string, RefCounter<TextureRef>> = new Map();
 
-function resolveTextureFormat(gl: WebGL2RenderingContext, format: TextureFormat): number {
+function _mapTextureFormat(gl: WebGL2RenderingContext, format: TextureFormat): number {
   const ext = gl.getExtension('WEBGL_compressed_texture_s3tc');
 
   if (!ext) {
@@ -44,7 +45,7 @@ function resolveTextureFormat(gl: WebGL2RenderingContext, format: TextureFormat)
 export async function textureFetch(gl: WebGL2RenderingContext, path: string): Promise<TextureRef> {
   path = resolvePath(path);
 
-  const refCounter = textureCache[path];
+  const refCounter = _textureCache.get(path);
 
   if (refCounter) {
     refCounter.refs++;
@@ -83,7 +84,7 @@ export async function textureFetch(gl: WebGL2RenderingContext, path: string): Pr
   gl.bindTexture(gl.TEXTURE_2D, buffer);
 
   const isCompressed = texture.format === TextureFormat.DXT1 || texture.format === TextureFormat.DXT3 || texture.format === TextureFormat.DXT5;
-  const glTextureFormat = resolveTextureFormat(gl, texture.format);
+  const glTextureFormat = _mapTextureFormat(gl, texture.format);
 
   if (isCompressed) {
     gl.compressedTexImage2D(gl.TEXTURE_2D, 0, glTextureFormat, texture.width, texture.height, 0, texture.data);
@@ -118,16 +119,16 @@ export async function textureFetch(gl: WebGL2RenderingContext, path: string): Pr
   gl.bindTexture(gl.TEXTURE_2D, null);
 
   // Cache and return asset
-  const textureRef = { path, texture: buffer };
+  const textureRef = { path, texture, tbo: buffer };
 
-  textureCache[path] = { refs: 1, resource: textureRef };
+  _textureCache.set(path, { refs: 1, resource: textureRef });
 
   return textureRef;
 }
 
 export function textureDestroy(gl: WebGL2RenderingContext, textureRef: TextureRef): void {
   const { path } = textureRef;
-  const refCounter = textureCache[path];
+  const refCounter = _textureCache.get(path);
 
   if (!refCounter) {
     console.warn(`Texture could not be destroyed. Not defined: ${path}`);
@@ -136,7 +137,7 @@ export function textureDestroy(gl: WebGL2RenderingContext, textureRef: TextureRe
 
   if (refCounter.refs === 1) {
     gl.deleteTexture(refCounter.resource.texture);
-    textureCache[path] = undefined;
+    _textureCache.delete(path);
   } else {
     refCounter.refs--;
   }

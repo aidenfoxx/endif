@@ -20,15 +20,12 @@ export interface Material extends MaterialValues, MaterialTextures {
 
 export function materialInit(
   diffuse: Vec3,
-  values?: Partial<MaterialValues>,
-  textures?: Partial<MaterialTextures>
+  values: MaterialValues = {},
+  textures: MaterialTextures = {}
 ): Material {
-  const materialValues = values ?? {};
-  const materialTextures = textures ?? {};
-
   return {
     diffuse,
-    ...materialValues,
-    ...materialTextures
+    ...values,
+    ...textures
   }
 }

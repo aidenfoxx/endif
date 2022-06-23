@@ -1,3 +1,4 @@
+import { Mesh } from '../../core/entities/mesh';
 import { objParse } from '../../core/entities/mesh/obj';
 import { RefCounter } from '../types';
 import { resolvePath } from '../utils/resolve-path';
@@ -5,14 +6,14 @@ import { resolvePath } from '../utils/resolve-path';
 export interface MeshRef {
   readonly path: string;
   readonly vao: WebGLVertexArrayObject;
-  readonly elements: number;
+  readonly mesh: Mesh;
 }
 
 const EXTENSION_OBJ = 'obj';
 
-const meshCache: Dictionary<string, RefCounter<MeshRef>> = {};
+const _meshCache: Map<string, RefCounter<MeshRef>> = new Map();
 
-function createAttribBuffer(gl: WebGL2RenderingContext, data: number[], attrib: number, stride: number): WebGLBuffer {
+function _createAttribBuffer(gl: WebGL2RenderingContext, data: ReadonlyArray<number>, attrib: number, stride: number): WebGLBuffer {
   const buffer = gl.createBuffer();
 
   if (!buffer) {
@@ -30,7 +31,7 @@ function createAttribBuffer(gl: WebGL2RenderingContext, data: number[], attrib: 
 export async function meshFetch(gl: WebGL2RenderingContext, path: string): Promise<MeshRef> {
   path = resolvePath(path);
 
-  const refCounter = meshCache[path];
+  const refCounter = _meshCache.get(path);
 
   if (refCounter) {
     refCounter.refs++;
@@ -53,9 +54,9 @@ export async function meshFetch(gl: WebGL2RenderingContext, path: string): Promi
 
   gl.bindVertexArray(vao);
 
-  const vertexBuffer = createAttribBuffer(gl, mesh.vertices, 0, 3);
-  const uvBuffer = createAttribBuffer(gl, mesh.uvs, 1, 2);
-  const normalBuffer = createAttribBuffer(gl, mesh.normals, 2, 3);
+  const vertexBuffer = _createAttribBuffer(gl, mesh.vertices, 0, 3);
+  const uvBuffer = _createAttribBuffer(gl, mesh.uvs, 1, 2);
+  const normalBuffer = _createAttribBuffer(gl, mesh.normals, 2, 3);
   const indexBuffer = gl.createBuffer();
 
   if (!indexBuffer) {
@@ -73,17 +74,16 @@ export async function meshFetch(gl: WebGL2RenderingContext, path: string): Promi
   gl.deleteBuffer(normalBuffer);
   gl.deleteBuffer(indexBuffer);
 
-  // Cache and return asset
-  const meshRef = { path, vao, elements: mesh.indices.length };
+  const meshRef = { path, mesh, vao };
 
-  meshCache[path] = { refs: 1, resource: meshRef };
+  _meshCache.set(path, { refs: 1, resource: meshRef });
 
   return meshRef;
 }
 
 export function meshDestroy(gl: WebGL2RenderingContext, meshRef: MeshRef): void {
   const { path } = meshRef;
-  const refCounter = meshCache[path];
+  const refCounter = _meshCache.get(path);
 
   if (!refCounter) {
     console.warn(`Mesh could not be destroyed. Not defined: ${path}`);
@@ -92,7 +92,7 @@ export function meshDestroy(gl: WebGL2RenderingContext, meshRef: MeshRef): void 
 
   if (refCounter.refs === 1) {
     gl.deleteVertexArray(refCounter.resource.vao);
-    meshCache[path] = undefined;
+    _meshCache.delete(path);
   } else {
     refCounter.refs--;
   }

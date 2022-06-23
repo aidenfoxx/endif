@@ -7,9 +7,9 @@ export interface ShaderRef {
   readonly program: WebGLProgram;
 }
 
-const shaderCache: Dictionary<string, Dictionary<string, RefCounter<ShaderRef>>> = {};
+const _shaderCache = new Map<string, Map<string, RefCounter<ShaderRef>>>();
 
-async function createShader(gl: WebGL2RenderingContext, path: string, type: number): Promise<WebGLShader> {
+async function _createShader(gl: WebGL2RenderingContext, path: string, type: number): Promise<WebGLShader> {
   const shader = gl.createShader(type);
 
   if (!shader) {
@@ -33,22 +33,23 @@ export async function shaderFetch(gl: WebGL2RenderingContext, vertexPath: string
   vertexPath = resolvePath(vertexPath);
   fragmentPath = resolvePath(fragmentPath);
 
-  const refCounter = shaderCache[vertexPath]?.[fragmentPath];
+  const refCounter = _shaderCache.get(vertexPath)?.get(fragmentPath);
 
   if (refCounter) {
     refCounter.refs++;
     return refCounter.resource;
   }
 
-  const [vertexShader, fragmentShader] = await Promise.all([
-    createShader(gl, vertexPath, gl.VERTEX_SHADER),
-    createShader(gl, fragmentPath, gl.FRAGMENT_SHADER)
-  ]);
   const program = gl.createProgram();
 
   if (!program) {
     throw new Error(`Failed to create shader program`);
   }
+
+  const [vertexShader, fragmentShader] = await Promise.all([
+    _createShader(gl, vertexPath, gl.VERTEX_SHADER),
+    _createShader(gl, fragmentPath, gl.FRAGMENT_SHADER)
+  ]);
 
   gl.attachShader(program, vertexShader);
   gl.attachShader(program, fragmentShader);
@@ -61,22 +62,20 @@ export async function shaderFetch(gl: WebGL2RenderingContext, vertexPath: string
     throw new Error('Failed to link shader');
   }
 
-  // Cache and return asset
   const programRef = { vertexPath, fragmentPath, program };
 
-  if (!shaderCache[vertexPath]) {
-    shaderCache[vertexPath] = {};
+  if (!_shaderCache.get(vertexPath)) {
+    _shaderCache.set(vertexPath, new Map());
   }
 
-  // NOTE: Typescript has issues with sub-indexes
-  shaderCache[vertexPath]![fragmentPath] = { refs: 1, resource: programRef };
+  _shaderCache.get(vertexPath)!.set(fragmentPath, { refs: 1, resource: programRef });
 
   return programRef;
 }
 
 export function shaderDestroy(gl: WebGL2RenderingContext, shaderRef: ShaderRef): void {
   const { vertexPath, fragmentPath } = shaderRef;
-  const refCounter = shaderCache[vertexPath]?.[fragmentPath];
+  const refCounter = _shaderCache.get(vertexPath)?.get(fragmentPath);
 
   if (!refCounter) {
     console.warn(`Shader could not be destroyed. Not defined: ${vertexPath}, ${fragmentPath}`);
@@ -85,8 +84,7 @@ export function shaderDestroy(gl: WebGL2RenderingContext, shaderRef: ShaderRef):
 
   if (refCounter.refs === 1) {
     gl.deleteProgram(refCounter.resource.program);
-    // NOTE: Typescript has issues with sub-indexes
-    shaderCache[vertexPath]![fragmentPath] = undefined;
+    _shaderCache.get(vertexPath)!.delete(fragmentPath);
   } else {
     refCounter.refs--;
   }

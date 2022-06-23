@@ -1,5 +1,4 @@
 import { Mesh, meshInit } from '../mesh';
-import { Vec3, Vec2 } from '../../utils/math';
 import { ObjParseException } from '../../expcetions';
 
 const POINT_MATCH = /^(-?\d+)\/?(-?\d*)\/?(-?\d*)$/;
@@ -7,10 +6,10 @@ const POINT_MATCH = /^(-?\d+)\/?(-?\d*)\/?(-?\d*)$/;
 export function objParse(data: string): Mesh {
   const lines = data.split(/\r\n|\n/g);
 
-  const vertices: Array<Vec3> = [];
-  const uvs: Array<Vec2> = [];
-  const normals: Array<Vec3> = [];
-  const points: Array<Vec3> = [];
+  const vertices = [];
+  const uvs = [];
+  const normals = [];
+  const points = [];
 
   // Parse obj
   for (let i = 0; i < lines.length; i++) {
@@ -59,6 +58,7 @@ export function objParse(data: string): Mesh {
 
   for (let i = 0, index = 0; i < points.length; i++) {
     const point = points[i];
+
     // Returns -1 if index does not exist
     const vertexIndex = point[0] < 0 ? vertices.length + point[0] : point[0] - 1;
     const uvIndex = point[1] < 0 ? uvs.length + point[1] : point[1] - 1;
@@ -105,13 +105,11 @@ export function objParse(data: string): Mesh {
         indexCache.set(vertexIndex, new Map());
       }
 
-      // NOTE: Typescript has issues with sub-indexes
       if (!indexCache.get(vertexIndex)!.get(uvIndex)) {
         indexCache.get(vertexIndex)!.set(uvIndex, new Map());
       }
 
       indices[i] = index;
-      // NOTE: Typescript has issues with sub-indexes
       indexCache.get(vertexIndex)!.get(uvIndex)!.set(normalIndex, index);
       index++;
     } else {
