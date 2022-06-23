@@ -87,7 +87,15 @@ export function sceneRender(gl: WebGL2RenderingContext, scene: Scene): void {
 
     gl.useProgram(shader);
 
+    // Bind projection matrix
+    const projectionLocation = gl.getUniformLocation(shader, 'projection');
+    gl.uniformMatrix4fv(projectionLocation, false, new Float32Array(scene.camera.projection));
+
     for (const [prop, actors] of props) {
+      // Bind mesh
+      const meshRef = prop.meshRef;
+      gl.bindVertexArray(meshRef.vao);
+
       // Bind textures
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, prop.textureRefs.diffuseRef?.tbo ?? null);
@@ -107,21 +115,14 @@ export function sceneRender(gl: WebGL2RenderingContext, scene: Scene): void {
       for (let i = 0; i < actors.length; i++) {
         const actor = actors[i];
 
-        // Bind variables
+        // Bind position matrices
         const modelView = mat4Multiply(scene.camera.view, actor.model);
         const modelViewLocation = gl.getUniformLocation(shader, 'modelView');
         gl.uniformMatrix4fv(modelViewLocation, false, new Float32Array(modelView));
 
-        const projectionLocation = gl.getUniformLocation(shader, 'projection');
-        gl.uniformMatrix4fv(projectionLocation, false, new Float32Array(scene.camera.projection));
-
         const normalMatrix = mat4Transpose(mat4Invert(modelView));
         const normalMatrixLocation = gl.getUniformLocation(shader, 'normalMatrix');
         gl.uniformMatrix4fv(normalMatrixLocation, false, new Float32Array(normalMatrix));
-
-        // Bind mesh
-        const meshRef = prop.meshRef;
-        gl.bindVertexArray(meshRef.vao);
 
         // Render
         gl.drawElements(gl.TRIANGLES, meshRef.mesh.indices.length, gl.UNSIGNED_SHORT, 0);

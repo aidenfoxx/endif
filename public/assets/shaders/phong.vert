@@ -4,7 +4,9 @@ layout(location = 0) in vec3 position;
 layout(location = 1) in vec2 uv;
 layout(location = 2) in vec3 normal;
 
-uniform mat4 modelView, projection, normalMatrix;
+uniform mat4 modelView;
+uniform mat4 projection;
+uniform mat4 normalMatrix;
 
 out vec3 vertexPosition;
 out vec2 uvPosition;
