@@ -6,4 +6,4 @@ export function contextInit(viewport: HTMLCanvasElement): WebGL2RenderingContext
   }
 
   return gl;
-};
+}

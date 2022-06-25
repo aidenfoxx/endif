@@ -11,7 +11,10 @@ export interface Scene {
   readonly frustumCulling: boolean;
 }
 
-function generateRenderQueue(actors: ReadonlySet<Actor>, camera?: Camera): ReadonlyMap<ShaderRef, ReadonlyMap<Prop, Actor[]>> {
+function generateRenderQueue(
+  actors: ReadonlySet<Actor>,
+  camera?: Camera
+): ReadonlyMap<ShaderRef, ReadonlyMap<Prop, Actor[]>> {
   const renderQueue: Map<ShaderRef, Map<Prop, Actor[]>> = new Map();
 
   for (const actor of actors) {
@@ -45,7 +48,7 @@ export function sceneInit(camera: Camera, frustumCulling: boolean = false): Scen
     camera,
     actors: new Set(),
     renderQueue: new Map(),
-    frustumCulling
+    frustumCulling,
   };
 }
 
@@ -53,7 +56,9 @@ export function sceneSetCamera(scene: Scene, camera: Camera): Scene {
   return {
     ...scene,
     camera,
-    renderQueue: scene.frustumCulling ? generateRenderQueue(scene.actors, camera) : scene.renderQueue
+    renderQueue: scene.frustumCulling
+      ? generateRenderQueue(scene.actors, camera)
+      : scene.renderQueue,
   };
 }
 
@@ -64,7 +69,7 @@ export function sceneAddActor(scene: Scene, actor: Actor): Scene {
   return {
     ...scene,
     actors: nextActors,
-    renderQueue: generateRenderQueue(nextActors, scene.frustumCulling ? scene.camera : undefined)
+    renderQueue: generateRenderQueue(nextActors, scene.frustumCulling ? scene.camera : undefined),
   };
 }
 
@@ -75,7 +80,7 @@ export function sceneRemoveActor(scene: Scene, actor: Actor): Scene {
   return {
     ...scene,
     actors: nextActors,
-    renderQueue: generateRenderQueue(nextActors, scene.frustumCulling ? scene.camera : undefined)
+    renderQueue: generateRenderQueue(nextActors, scene.frustumCulling ? scene.camera : undefined),
   };
 }
 

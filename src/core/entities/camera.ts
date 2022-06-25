@@ -16,10 +16,7 @@ export interface Camera {
 }
 
 function calculateViewMatrix(position: Vec3, rotation: Vec3): Mat4 {
-  return mat4Multiply(
-    mat4RotationEuler(rotation),
-    mat4Translation(position)
-  );
+  return mat4Multiply(mat4RotationEuler(rotation), mat4Translation(position));
 }
 
 export function cameraInit(position: Vec3, rotation: Vec3, projection: Mat4): Camera {
@@ -27,7 +24,7 @@ export function cameraInit(position: Vec3, rotation: Vec3, projection: Mat4): Ca
     position,
     rotation: rotation,
     projection: projection,
-    view: calculateViewMatrix(position, rotation)
+    view: calculateViewMatrix(position, rotation),
   };
 }
 
@@ -50,19 +47,16 @@ export function cameraTranslate(camera: Camera, translation: Vec3) {
   return {
     ...camera,
     position: nextPosition,
-    view: mat4Multiply(
-      rotationMatrix,
-      mat4Translation(nextPosition)
-    )
-  }
+    view: mat4Multiply(rotationMatrix, mat4Translation(nextPosition)),
+  };
 }
 
 export function cameraSetPosition(camera: Camera, position: Vec3): Camera {
   return {
     ...camera,
     position,
-    view: calculateViewMatrix(position, camera.rotation)
-  }
+    view: calculateViewMatrix(position, camera.rotation),
+  };
 }
 
 export function cameraRotate(camera: Camera, rotation: Vec3) {
@@ -71,14 +65,14 @@ export function cameraRotate(camera: Camera, rotation: Vec3) {
   return {
     ...camera,
     rotation: nextRotation,
-    view: calculateViewMatrix(camera.position, nextRotation)
-  }
+    view: calculateViewMatrix(camera.position, nextRotation),
+  };
 }
 
 export function cameraSetRotation(camera: Camera, rotation: Vec3): Camera {
   return {
     ...camera,
     rotation,
-    view: calculateViewMatrix(camera.position, rotation)
-  }
+    view: calculateViewMatrix(camera.position, rotation),
+  };
 }

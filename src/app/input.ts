@@ -2,19 +2,19 @@ import { Vec2 } from '../core/utils/math';
 
 export enum ButtonState {
   BUTTON_UP,
-  BUTTON_DOWN
+  BUTTON_DOWN,
 }
 
 export enum KeyState {
   KEY_UP,
-  KEY_DOWN
+  KEY_DOWN,
 }
 
 export enum KeyCode {
   KEY_A = 'KeyA',
   KEY_D = 'KeyD',
   KEY_S = 'KeyS',
-  KEY_W = 'KeyW'
+  KEY_W = 'KeyW',
 }
 
 interface InputState {
@@ -28,7 +28,7 @@ const inputState: InputState = {
   mouseX: 0,
   mouseY: 0,
   mouseButtonStates: [],
-  keyStates: new Map()
+  keyStates: new Map(),
 };
 
 window.addEventListener('mousedown', (event: MouseEvent) => {
@@ -42,7 +42,7 @@ window.addEventListener('mouseup', (event: MouseEvent) => {
 window.addEventListener('mousemove', (event: MouseEvent) => {
   inputState.mouseX = event.clientX;
   inputState.mouseY = event.clientY;
-})
+});
 
 window.addEventListener('keydown', (event: KeyboardEvent) => {
   inputState.keyStates.set(event.code, KeyState.KEY_DOWN);

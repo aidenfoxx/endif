@@ -25,7 +25,7 @@ export async function materialFetch(path: string): Promise<MaterialRef> {
   const extension = path.split('.').pop();
 
   if (extension?.toLowerCase() !== EXTENSION_MTL) {
-    throw new Error(`Unsupported material format: ${extension}`)
+    throw new Error(`Unsupported material format: ${extension}`);
   }
 
   const response = await fetch(path);

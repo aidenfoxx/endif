@@ -5,7 +5,7 @@ import {
   vec3Multiply,
   vec3MultiplyMat4,
   vec3Subtract,
-  vec4MultiplyMat4
+  vec4MultiplyMat4,
 } from './math';
 
 export type AABB = Readonly<[Vec3, Vec3]>;
@@ -29,11 +29,14 @@ export function aabbCalculate(vertices: ReadonlyArray<number>): AABB {
     maxZ = Math.max(maxZ, vertices[i + 2]);
   }
 
-  return [[minX, minY, minZ], [maxX, maxY, maxZ]];
+  return [
+    [minX, minY, minZ],
+    [maxX, maxY, maxZ],
+  ];
 }
 
 export function aabbTransform(aabb: AABB, transform: Mat4): AABB {
-  const center = vec3Multiply(vec3Add(aabb[0], aabb[1]), [.5, .5, .5]);
+  const center = vec3Multiply(vec3Add(aabb[0], aabb[1]), [0.5, 0.5, 0.5]);
   const extents = vec3Subtract(aabb[1], center);
 
   const nextCenter = vec4MultiplyMat4([...center, 1.0], transform);

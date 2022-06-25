@@ -3,8 +3,8 @@ import { meshInit } from '../../entities/mesh';
 import { ObjParseException } from '../../expcetions';
 
 jest.mock('../../entities/mesh', () => ({
-  meshInit: jest.fn()
-}))
+  meshInit: jest.fn(),
+}));
 
 describe('obj', () => {
   beforeEach(() => {
@@ -29,21 +29,9 @@ describe('obj', () => {
     `);
 
     expect(meshInit).toHaveBeenCalledWith(
-      [
-        0, 0.5, 0,
-        -0.5, -0.5, 0,
-        0.5, -0.5, 0
-      ],
-      [
-        0.5, 1,
-        1, 0.25,
-        0, 0.25
-      ],
-      [
-        0, 0.5, -0.5,
-        -0.5, -0.5, -0.5,
-        0.5, -0.5, -0.5
-      ],
+      [0, 0.5, 0, -0.5, -0.5, 0, 0.5, -0.5, 0],
+      [0.5, 1, 1, 0.25, 0, 0.25],
+      [0, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5],
       [0, 1, 2]
     );
   });
@@ -66,21 +54,9 @@ describe('obj', () => {
     `);
 
     expect(meshInit).toHaveBeenCalledWith(
-      [
-        0, 0.5, 0,
-        -0.5, -0.5, 0,
-        0.5, -0.5, 0
-      ],
-      [
-        0.5, 1,
-        1, 0.25,
-        0, 0.25
-      ],
-      [
-        0, 0.5, -0.5,
-        -0.5, -0.5, -0.5,
-        0.5, -0.5, -0.5
-      ],
+      [0, 0.5, 0, -0.5, -0.5, 0, 0.5, -0.5, 0],
+      [0.5, 1, 1, 0.25, 0, 0.25],
+      [0, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5],
       [0, 1, 2]
     );
   });
@@ -95,11 +71,7 @@ describe('obj', () => {
     `);
 
     expect(meshInit).toHaveBeenCalledWith(
-      [
-        0, 0.5, 0,
-        -0.5, -0.5, 0,
-        0.5, -0.5, 0
-      ],
+      [0, 0.5, 0, -0.5, -0.5, 0, 0.5, -0.5, 0],
       expect.any(Array),
       expect.any(Array),
       expect.any(Array)
@@ -121,11 +93,7 @@ describe('obj', () => {
 
     expect(meshInit).toHaveBeenCalledWith(
       expect.any(Array),
-      [
-        0.5, 1,
-        1, 0.25,
-        0, 0.25
-      ],
+      [0.5, 1, 1, 0.25, 0, 0.25],
       expect.any(Array),
       expect.any(Array)
     );
@@ -147,11 +115,7 @@ describe('obj', () => {
     expect(meshInit).toHaveBeenCalledWith(
       expect.any(Array),
       expect.any(Array),
-      [
-        0, 0.5, -0.5,
-        -0.5, -0.5, -0.5,
-        0.5, -0.5, -0.5
-      ],
+      [0, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5],
       expect.any(Array)
     );
   });
@@ -168,12 +132,7 @@ describe('obj', () => {
     `);
 
     expect(meshInit).toHaveBeenCalledWith(
-      [
-        0, 0.5, 0,
-        -0.5, -0.5, 0,
-        0.5, -0.5, 0,
-        1.0, 0.5, 0.0
-      ],
+      [0, 0.5, 0, -0.5, -0.5, 0, 0.5, -0.5, 0, 1.0, 0.5, 0.0],
       expect.any(Array),
       expect.any(Array),
       [0, 1, 2, 0, 2, 3]
@@ -182,7 +141,7 @@ describe('obj', () => {
 
   test('should throw when no faces defined', () => {
     const action = () => {
-      objParse('')
+      objParse('');
     };
 
     expect(action).toThrow(new ObjParseException('No faces defined'));
@@ -192,7 +151,7 @@ describe('obj', () => {
     const action = () => {
       objParse(`
         f 1 2 3
-      `)
+      `);
     };
 
     expect(action).toThrow(new ObjParseException('Vertex index out-of-bounds'));
@@ -206,7 +165,7 @@ describe('obj', () => {
         v 0.5 -0.5 0.0
 
         f 1/1 2/2 3/3
-      `)
+      `);
     };
 
     expect(action).toThrow(new ObjParseException('UV index out-of-bounds'));
@@ -220,7 +179,7 @@ describe('obj', () => {
         v 0.5 -0.5 0.0
 
         f 1//1 2//2 3//3
-      `)
+      `);
     };
 
     expect(action).toThrow(new ObjParseException('Normal index out-of-bounds'));

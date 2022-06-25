@@ -20,7 +20,7 @@ const server = http.createServer(function (req, res) {
 
     switch (extname) {
       case '.js':
-        res.setHeader("Content-Type", 'text/javascript');
+        res.setHeader('Content-Type', 'text/javascript');
         break;
     }
 

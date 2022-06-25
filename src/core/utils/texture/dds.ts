@@ -45,15 +45,15 @@ export function ddsParse(buffer: ArrayBuffer): Texture {
       const gBits = headers[24];
       const bBits = headers[25];
 
-      swapBGR = rBits === 0xFF0000 && bBits === 0xFF;
+      swapBGR = rBits === 0xff0000 && bBits === 0xff;
 
-      if ((swapBGR || rBits === 0xFF && bBits === 0xFF0000) && gBits === 0xFF00) {
+      if ((swapBGR || (rBits === 0xff && bBits === 0xff0000)) && gBits === 0xff00) {
         const aBits = headers[26];
 
         if (!aBits) {
           format = TextureFormat.RGB;
           bitsPerPixel = 24;
-        } else if (aBits === 0xFF000000) {
+        } else if (aBits === 0xff000000) {
           format = TextureFormat.RGBA;
           bitsPerPixel = 32;
         }
@@ -67,7 +67,10 @@ export function ddsParse(buffer: ArrayBuffer): Texture {
 
   const bytesPerPixel = bitsPerPixel! / 8;
   // DXT data cannot be smaller than 4x4 pixels
-  const minSize = format === TextureFormat.DXT1 || format === TextureFormat.DXT3 || format === TextureFormat.DXT5 ? 4 : 1;
+  const minSize =
+    format === TextureFormat.DXT1 || format === TextureFormat.DXT3 || format === TextureFormat.DXT5
+      ? 4
+      : 1;
   const mipmaps = [];
 
   let mipmapWidth = width;
@@ -76,7 +79,8 @@ export function ddsParse(buffer: ArrayBuffer): Texture {
   let i = 0;
 
   do {
-    const mipmapSize = Math.max(mipmapWidth, minSize) * Math.max(mipmapHeight, minSize) * bytesPerPixel;
+    const mipmapSize =
+      Math.max(mipmapWidth, minSize) * Math.max(mipmapHeight, minSize) * bytesPerPixel;
     const mipmapData = data.slice(mipmapOffset, mipmapOffset + mipmapSize);
 
     if (swapBGR) {
@@ -95,12 +99,5 @@ export function ddsParse(buffer: ArrayBuffer): Texture {
     mipmapOffset += mipmapSize;
   } while (++i < mipmapCount);
 
-  return textureInit(
-    mipmaps.shift()!,
-    width,
-    height,
-    format,
-    bitsPerPixel,
-    mipmaps
-  );
+  return textureInit(mipmaps.shift()!, width, height, format, bitsPerPixel, mipmaps);
 }

@@ -83,17 +83,38 @@ export async function textureFetch(gl: WebGL2RenderingContext, path: string): Pr
 
   gl.bindTexture(gl.TEXTURE_2D, buffer);
 
-  const isCompressed = texture.format === TextureFormat.DXT1 || texture.format === TextureFormat.DXT3 || texture.format === TextureFormat.DXT5;
+  const isCompressed =
+    texture.format === TextureFormat.DXT1 ||
+    texture.format === TextureFormat.DXT3 ||
+    texture.format === TextureFormat.DXT5;
   const glTextureFormat = mapTextureFormat(gl, texture.format);
 
   if (isCompressed) {
-    gl.compressedTexImage2D(gl.TEXTURE_2D, 0, glTextureFormat, texture.width, texture.height, 0, texture.data);
+    gl.compressedTexImage2D(
+      gl.TEXTURE_2D,
+      0,
+      glTextureFormat,
+      texture.width,
+      texture.height,
+      0,
+      texture.data
+    );
 
     if (!texture.mipmaps.length) {
       throw new Error(`Compressed texture mipmaps missing: ${path}`);
     }
   } else {
-    gl.texImage2D(gl.TEXTURE_2D, 0, glTextureFormat, texture.width, texture.height, 0, glTextureFormat, gl.UNSIGNED_BYTE, texture.data);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      glTextureFormat,
+      texture.width,
+      texture.height,
+      0,
+      glTextureFormat,
+      gl.UNSIGNED_BYTE,
+      texture.data
+    );
 
     if (!texture.mipmaps.length) {
       console.warn(`Texture mipmaps missing. Generating mipmaps: ${path}`);
@@ -107,9 +128,27 @@ export async function textureFetch(gl: WebGL2RenderingContext, path: string): Pr
 
   for (let i = 0; i < texture.mipmaps.length; i++) {
     if (isCompressed) {
-      gl.compressedTexImage2D(gl.TEXTURE_2D, i + 1, glTextureFormat, mipmapWidth, mipmapHeight, 0, texture.mipmaps[i]);
+      gl.compressedTexImage2D(
+        gl.TEXTURE_2D,
+        i + 1,
+        glTextureFormat,
+        mipmapWidth,
+        mipmapHeight,
+        0,
+        texture.mipmaps[i]
+      );
     } else {
-      gl.texImage2D(gl.TEXTURE_2D, i + 1, glTextureFormat, mipmapWidth, mipmapHeight, 0, glTextureFormat, gl.UNSIGNED_BYTE, texture.mipmaps[i]);
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        i + 1,
+        glTextureFormat,
+        mipmapWidth,
+        mipmapHeight,
+        0,
+        glTextureFormat,
+        gl.UNSIGNED_BYTE,
+        texture.mipmaps[i]
+      );
     }
 
     mipmapWidth /= 2;

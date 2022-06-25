@@ -8,7 +8,7 @@ export function timestepInit(delta: number): Timestep {
   return {
     delta: delta,
     accumulator: 0,
-    previous: performance.now()
+    previous: performance.now(),
   };
 }
 
@@ -16,7 +16,7 @@ export function timestepStep(timestep: Timestep): Timestep {
   if (timestep.accumulator >= 1) {
     return {
       ...timestep,
-      accumulator: timestep.accumulator - 1
+      accumulator: timestep.accumulator - 1,
     };
   }
 
@@ -29,7 +29,7 @@ export function timestepStep(timestep: Timestep): Timestep {
     return {
       delta: timestep.delta,
       previous: current,
-      accumulator: timestep.accumulator + delta / timestep.delta
+      accumulator: timestep.accumulator + delta / timestep.delta,
     };
   }
 

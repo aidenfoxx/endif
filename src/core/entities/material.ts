@@ -26,6 +26,6 @@ export function materialInit(
   return {
     diffuse,
     ...values,
-    ...textures
-  }
+    ...textures,
+  };
 }

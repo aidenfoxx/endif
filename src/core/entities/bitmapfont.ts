@@ -1,7 +1,7 @@
 import { Vec2 } from '../utils/math';
 
 export interface BitmapGlyph {
-  readonly char: string,
+  readonly char: string;
   readonly position: Vec2;
   readonly size: Vec2;
   readonly offset: Vec2;
@@ -17,7 +17,7 @@ export interface BitmapFont {
 export function bitmapFontInit(texture: string): BitmapFont {
   return {
     texture,
-    glyphs: new Map()
+    glyphs: new Map(),
   };
 }
 
@@ -27,7 +27,6 @@ export function bitmapFontAddGlyph(font: BitmapFont, glyph: BitmapGlyph): Bitmap
 
   return {
     ...font,
-    glyphs: nextGlyphs
+    glyphs: nextGlyphs,
   };
 }
-

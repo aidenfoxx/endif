@@ -1,3 +1,1 @@
-export class DdsParseException extends Error {
-
-}
+export class DdsParseException extends Error {}

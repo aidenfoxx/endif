@@ -1,3 +1,1 @@
-export class ObjParseException extends Error {
-
-}
+export class ObjParseException extends Error {}

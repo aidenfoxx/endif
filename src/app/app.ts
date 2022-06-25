@@ -1,4 +1,11 @@
-import { KeyState, KeyCode, inputGetKeyState, inputGetMouseButtonState, ButtonState, inputGetMousePosition } from './input';
+import {
+  KeyState,
+  KeyCode,
+  inputGetKeyState,
+  inputGetMouseButtonState,
+  ButtonState,
+  inputGetMousePosition,
+} from './input';
 import { textureFetch } from './assets/texture';
 import { shaderFetch } from './assets/shader';
 import { materialFetch } from './assets/material';
@@ -21,18 +28,14 @@ interface AppState {
     readonly timestep: Timestep;
     readonly previousMouseX: number;
     readonly previousMouseY: number;
-  }
+  };
 }
 
 function render(app: AppState): void {
   const {
     gl,
     scene,
-    input: {
-      timestep,
-      previousMouseX,
-      previousMouseY
-    }
+    input: { timestep, previousMouseX, previousMouseY },
   } = app;
 
   let nextScene = app.scene;
@@ -65,26 +68,26 @@ function render(app: AppState): void {
       nextInput = {
         ...nextInput,
         previousMouseX: mouseX,
-        previousMouseY: mouseY
+        previousMouseY: mouseY,
       };
     } else if (inputGetMouseButtonState(0) === ButtonState.BUTTON_UP) {
       nextInput = {
         ...nextInput,
         previousMouseX: -1,
-        previousMouseY: -1
+        previousMouseY: -1,
       };
     }
 
     if (inputGetKeyState(KeyCode.KEY_W) === KeyState.KEY_DOWN) {
-      nextCamera = cameraTranslate(nextCamera, [0, 0, -.1]);
+      nextCamera = cameraTranslate(nextCamera, [0, 0, -0.1]);
     } else if (inputGetKeyState(KeyCode.KEY_S) === KeyState.KEY_DOWN) {
-      nextCamera = cameraTranslate(nextCamera, [0, 0, .1]);
+      nextCamera = cameraTranslate(nextCamera, [0, 0, 0.1]);
     }
 
     if (inputGetKeyState(KeyCode.KEY_A) === KeyState.KEY_DOWN) {
-      nextCamera = cameraTranslate(nextCamera, [.1, 0, 0]);
+      nextCamera = cameraTranslate(nextCamera, [0.1, 0, 0]);
     } else if (inputGetKeyState(KeyCode.KEY_D) === KeyState.KEY_DOWN) {
-      nextCamera = cameraTranslate(nextCamera, [-.1, 0, 0]);
+      nextCamera = cameraTranslate(nextCamera, [-0.1, 0, 0]);
     }
 
     if (nextCamera) {
@@ -92,26 +95,40 @@ function render(app: AppState): void {
     }
   }
 
-  requestAnimationFrame(() => render({
-    gl,
-    scene: nextScene,
-    input: {
-      ...nextInput,
-      timestep: timestepStep(timestep)
-    }
-  }));
+  requestAnimationFrame(() =>
+    render({
+      gl,
+      scene: nextScene,
+      input: {
+        ...nextInput,
+        timestep: timestepStep(timestep),
+      },
+    })
+  );
 }
 
 async function buildScene(gl: WebGL2RenderingContext): Promise<Scene> {
-  const perspective = mat4Perspective(degreesToRadians(90), CANVAS_WIDTH / CANVAS_HEIGHT, .1, 1000);
-  const camera = cameraInit([.5, 0, -3], [0, 0, 0], perspective);
+  const perspective = mat4Perspective(
+    degreesToRadians(90),
+    CANVAS_WIDTH / CANVAS_HEIGHT,
+    0.1,
+    1000
+  );
+  const camera = cameraInit([0.5, 0, -3], [0, 0, 0], perspective);
 
   const meshRef = await meshFetch(gl, './assets/models/cube.obj');
   const materialRef = await materialFetch('./assets/models/cube.mtl');
   const textureRef = await textureFetch(gl, './assets/models/cube.dds');
-  const shaderRef = await shaderFetch(gl, './assets/shaders/phong.vert', './assets/shaders/phong.frag');
+  const shaderRef = await shaderFetch(
+    gl,
+    './assets/shaders/phong.vert',
+    './assets/shaders/phong.frag'
+  );
 
-  const crate = propAddShader(propInit(meshRef, materialRef, { diffuseRef: textureRef }), shaderRef);
+  const crate = propAddShader(
+    propInit(meshRef, materialRef, { diffuseRef: textureRef }),
+    shaderRef
+  );
   const crateActor = actorInit(crate, [0, 0, 0], [0, 0, 0], [1, 1, 1]);
   const scene = sceneAddActor(sceneInit(camera), crateActor);
 
@@ -135,13 +152,15 @@ export async function appInit(): Promise<void> {
 
   const scene = await buildScene(gl);
 
-  requestAnimationFrame(() => render({
-    gl,
-    scene,
-    input: {
-      timestep: timestepInit(1000 / 60),
-      previousMouseX: -1,
-      previousMouseY: -1
-    }
-  }));
+  requestAnimationFrame(() =>
+    render({
+      gl,
+      scene,
+      input: {
+        timestep: timestepInit(1000 / 60),
+        previousMouseX: -1,
+        previousMouseY: -1,
+      },
+    })
+  );
 }

@@ -68,15 +68,19 @@ export function mtlParse(data: string): Material {
     throw new MtlParseException('No diffuse value defined');
   }
 
-  return materialInit(diffuse, {
-    specular,
-    roughness,
-    metallic
-  }, {
-    diffuseMap,
-    specularMap,
-    roughnessMap,
-    metallicMap,
-    normalMap
-  });
+  return materialInit(
+    diffuse,
+    {
+      specular,
+      roughness,
+      metallic,
+    },
+    {
+      diffuseMap,
+      specularMap,
+      roughnessMap,
+      metallicMap,
+      normalMap,
+    }
+  );
 }

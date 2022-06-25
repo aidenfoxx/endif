@@ -3,8 +3,8 @@ import { MtlParseException } from '../../expcetions';
 import { materialInit } from '../../entities/material';
 
 jest.mock('../../entities/material', () => ({
-  materialInit: jest.fn()
-}))
+  materialInit: jest.fn(),
+}));
 
 describe('mtl', () => {
   beforeEach(() => {
@@ -25,22 +25,26 @@ describe('mtl', () => {
       norm -s 1 1 1 normal.tga
     `);
 
-    expect(materialInit).toHaveBeenCalledWith([1, 2, 3], {
-      specular: [4, 5, 6],
-      roughness: [7, 8, 9],
-      metallic: [10, 11, 12]
-    }, {
-      diffuseMap: 'diffuse.tga',
-      specularMap: 'specular.tga',
-      roughnessMap: 'roughness.tga',
-      metallicMap: 'metallic.tga',
-      normalMap: 'normal.tga'
-    })
+    expect(materialInit).toHaveBeenCalledWith(
+      [1, 2, 3],
+      {
+        specular: [4, 5, 6],
+        roughness: [7, 8, 9],
+        metallic: [10, 11, 12],
+      },
+      {
+        diffuseMap: 'diffuse.tga',
+        specularMap: 'specular.tga',
+        roughnessMap: 'roughness.tga',
+        metallicMap: 'metallic.tga',
+        normalMap: 'normal.tga',
+      }
+    );
   });
 
   test('should throw when no diffuse defined', () => {
     const action = () => {
-      mtlParse('')
+      mtlParse('');
     };
 
     expect(action).toThrow(new MtlParseException('No diffuse value defined'));

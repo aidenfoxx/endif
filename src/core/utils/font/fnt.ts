@@ -1,4 +1,9 @@
-import { BitmapFont, bitmapFontAddGlyph, bitmapFontInit, BitmapGlyph } from '../../entities/bitmapfont';
+import {
+  BitmapFont,
+  bitmapFontAddGlyph,
+  bitmapFontInit,
+  BitmapGlyph,
+} from '../../entities/bitmapfont';
 import { FntParseException } from '../../expcetions';
 
 export function fntParse(data: string): BitmapFont {
@@ -117,7 +122,7 @@ export function fntParse(data: string): BitmapFont {
         size: [width, height],
         offset: [offsetX, offsetY],
         advance: advanceX,
-        kernings: glyphs.get(char)!
+        kernings: glyphs.get(char)!,
       });
     } else if (nextChar !== undefined && offsetX !== undefined) {
       glyphs.get(char)!.set(nextChar, offsetX);

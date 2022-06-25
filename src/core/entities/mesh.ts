@@ -15,6 +15,6 @@ export function meshInit(
     vertices: [...vertices],
     uvs: [...uvs],
     normals: [...normals],
-    indices: [...indices]
+    indices: [...indices],
   };
 }

@@ -3,7 +3,7 @@ export enum TextureFormat {
   RGBA,
   DXT1,
   DXT3,
-  DXT5
+  DXT5,
 }
 
 export interface Texture {
@@ -29,6 +29,6 @@ export function textureInit(
     height,
     format,
     bitsPerPixel,
-    mipmaps: mipmaps.map(mipmap => new Uint8Array(mipmap))
+    mipmaps: mipmaps.map((mipmap) => new Uint8Array(mipmap)),
   };
 }

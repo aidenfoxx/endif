@@ -20,22 +20,23 @@ export interface PropTextures {
   readonly normalRef?: TextureRef;
 }
 
-export function propInit(meshRef: MeshRef, materialRef: MaterialRef, textureRefs: PropTextures = {}): Prop {
+export function propInit(
+  meshRef: MeshRef,
+  materialRef: MaterialRef,
+  textureRefs: PropTextures = {}
+): Prop {
   return {
     meshRef,
     materialRef,
     textureRefs,
     shaderRefs: [],
-    aabb: aabbCalculate(meshRef.mesh.vertices)
+    aabb: aabbCalculate(meshRef.mesh.vertices),
   };
 }
 
 export function propAddShader(prop: Prop, shaderRef: ShaderRef): Prop {
   return {
     ...prop,
-    shaderRefs: [
-      ...prop.shaderRefs,
-      shaderRef
-    ]
+    shaderRefs: [...prop.shaderRefs, shaderRef],
   };
 }

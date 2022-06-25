@@ -9,155 +9,106 @@ export type Vec3 = Readonly<[number, number, number]>;
 
 export type Vec4 = Readonly<[number, number, number, number]>;
 
-export type Mat4 = Readonly<[
-  number, number, number, number,
-  number, number, number, number,
-  number, number, number, number,
-  number, number, number, number
-]>;
+export type Mat4 = Readonly<
+  [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number
+  ]
+>;
 
 // Vector functions
 export function vec2Add(vec1: Vec2, vec2: Vec2): Vec2 {
-  return [
-    vec1[0] + vec2[0],
-    vec1[1] + vec2[1]
-  ];
+  return [vec1[0] + vec2[0], vec1[1] + vec2[1]];
 }
 
 export function vec3Add(vec1: Vec3, vec2: Vec3): Vec3 {
-  return [
-    vec1[0] + vec2[0],
-    vec1[1] + vec2[1],
-    vec1[2] + vec2[2]
-  ];
+  return [vec1[0] + vec2[0], vec1[1] + vec2[1], vec1[2] + vec2[2]];
 }
 
 export function vec4Add(vec1: Vec4, vec2: Vec4): Vec4 {
-  return [
-    vec1[0] + vec2[0],
-    vec1[1] + vec2[1],
-    vec1[2] + vec2[2],
-    vec1[3] + vec2[3]
-  ];
+  return [vec1[0] + vec2[0], vec1[1] + vec2[1], vec1[2] + vec2[2], vec1[3] + vec2[3]];
 }
 
 export function vec2Subtract(vec1: Vec2, vec2: Vec2): Vec2 {
-  return [
-    vec1[0] - vec2[0],
-    vec1[1] - vec2[1]
-  ];
+  return [vec1[0] - vec2[0], vec1[1] - vec2[1]];
 }
 
 export function vec3Subtract(vec1: Vec3, vec2: Vec3): Vec3 {
-  return [
-    vec1[0] - vec2[0],
-    vec1[1] - vec2[1],
-    vec1[2] - vec2[2]
-  ];
+  return [vec1[0] - vec2[0], vec1[1] - vec2[1], vec1[2] - vec2[2]];
 }
 
 export function vec4Subtract(vec1: Vec4, vec2: Vec4): Vec4 {
-  return [
-    vec1[0] - vec2[0],
-    vec1[1] - vec2[1],
-    vec1[2] - vec2[2],
-    vec1[3] - vec2[3]
-  ];
+  return [vec1[0] - vec2[0], vec1[1] - vec2[1], vec1[2] - vec2[2], vec1[3] - vec2[3]];
 }
 
 export function vec2Multiply(vec1: Vec2, vec2: Vec2): Vec2 {
-  return [
-    vec1[0] * vec2[0],
-    vec1[1] * vec2[1]
-  ];
+  return [vec1[0] * vec2[0], vec1[1] * vec2[1]];
 }
 
 export function vec3Multiply(vec1: Vec3, vec2: Vec3): Vec3 {
-  return [
-    vec1[0] * vec2[0],
-    vec1[1] * vec2[1],
-    vec1[2] * vec2[2]
-  ];
+  return [vec1[0] * vec2[0], vec1[1] * vec2[1], vec1[2] * vec2[2]];
 }
 
 export function vec4Multiply(vec1: Vec4, vec2: Vec4): Vec4 {
-  return [
-    vec1[0] * vec2[0],
-    vec1[1] * vec2[1],
-    vec1[2] * vec2[2],
-    vec1[3] * vec2[3]
-  ];
+  return [vec1[0] * vec2[0], vec1[1] * vec2[1], vec1[2] * vec2[2], vec1[3] * vec2[3]];
 }
 
 export function vec2Divide(vec1: Vec2, vec2: Vec2): Vec2 {
-  return [
-    vec1[0] / vec2[0],
-    vec1[1] / vec2[1]
-  ];
+  return [vec1[0] / vec2[0], vec1[1] / vec2[1]];
 }
 
 export function vec3Divide(vec1: Vec3, vec2: Vec3): Vec3 {
-  return [
-    vec1[0] / vec2[0],
-    vec1[1] / vec2[1],
-    vec1[2] / vec2[2]
-  ];
+  return [vec1[0] / vec2[0], vec1[1] / vec2[1], vec1[2] / vec2[2]];
 }
 
 export function vec4Divide(vec1: Vec4, vec2: Vec4): Vec4 {
-  return [
-    vec1[0] / vec2[0],
-    vec1[1] / vec2[1],
-    vec1[2] / vec2[2],
-    vec1[3] / vec2[3]
-  ];
+  return [vec1[0] / vec2[0], vec1[1] / vec2[1], vec1[2] / vec2[2], vec1[3] / vec2[3]];
 }
 
 export function vec2Inverse(vec: Vec2): Vec2 {
-  return [
-    -vec[0],
-    -vec[1]
-  ];
+  return [-vec[0], -vec[1]];
 }
 
 export function vec3Inverse(vec: Vec3): Vec3 {
-  return [
-    -vec[0],
-    -vec[1],
-    -vec[2]
-  ];
+  return [-vec[0], -vec[1], -vec[2]];
 }
 
 export function vec4Inverse(vec: Vec4): Vec4 {
-  return [
-    -vec[0],
-    -vec[1],
-    -vec[2],
-    -vec[3]
-  ];
+  return [-vec[0], -vec[1], -vec[2], -vec[3]];
 }
 
 export function vec2MultiplyMat4(vec: Vec2, mat: Mat4): Vec2 {
-  return [
-    (vec[0] * mat[0]) + (vec[1] * mat[4]),
-    (vec[0] * mat[1]) + (vec[1] * mat[5])
-  ];
+  return [vec[0] * mat[0] + vec[1] * mat[4], vec[0] * mat[1] + vec[1] * mat[5]];
 }
 
 export function vec3MultiplyMat4(vec: Vec3, mat: Mat4): Vec3 {
   return [
-    (vec[0] * mat[0]) + (vec[1] * mat[4]) + (vec[2] * mat[8]),
-    (vec[0] * mat[1]) + (vec[1] * mat[5]) + (vec[2] * mat[9]),
-    (vec[0] * mat[2]) + (vec[1] * mat[6]) + (vec[2] * mat[10])
+    vec[0] * mat[0] + vec[1] * mat[4] + vec[2] * mat[8],
+    vec[0] * mat[1] + vec[1] * mat[5] + vec[2] * mat[9],
+    vec[0] * mat[2] + vec[1] * mat[6] + vec[2] * mat[10],
   ];
 }
 
 export function vec4MultiplyMat4(vec: Vec4, mat: Mat4): Vec4 {
   return [
-    (vec[0] * mat[0]) + (vec[1] * mat[4]) + (vec[2] * mat[8]) + (vec[3] * mat[12]),
-    (vec[0] * mat[1]) + (vec[1] * mat[5]) + (vec[2] * mat[9]) + (vec[3] * mat[13]),
-    (vec[0] * mat[2]) + (vec[1] * mat[6]) + (vec[2] * mat[10]) + (vec[3] * mat[14]),
-    (vec[0] * mat[3]) + (vec[1] * mat[7]) + (vec[2] * mat[11]) + (vec[3] * mat[15])
+    vec[0] * mat[0] + vec[1] * mat[4] + vec[2] * mat[8] + vec[3] * mat[12],
+    vec[0] * mat[1] + vec[1] * mat[5] + vec[2] * mat[9] + vec[3] * mat[13],
+    vec[0] * mat[2] + vec[1] * mat[6] + vec[2] * mat[10] + vec[3] * mat[14],
+    vec[0] * mat[3] + vec[1] * mat[7] + vec[2] * mat[11] + vec[3] * mat[15],
   ];
 }
 
@@ -204,13 +155,12 @@ export function vec3CrossProduct(vec1: Vec3, vec2: Vec3): Vec3 {
   return [
     vec1[1] * vec2[2] - vec1[2] * vec2[1],
     vec1[2] * vec2[0] - vec1[0] * vec2[2],
-    vec1[0] * vec2[1] - vec1[1] * vec2[0]
+    vec1[0] * vec2[1] - vec1[1] * vec2[0],
   ];
 }
 
 // Rotation functions
 export function quatRotationX(angle: number): Vec4 {
-
   return quatRotationAxis([1, 0, 0], angle);
 }
 
@@ -227,57 +177,42 @@ export function quatRotationAxis(axis: Vec3, angle: number): Vec4 {
   const sin = Math.sin(angle / 2);
   const cos = Math.cos(angle / 2);
 
-  return [
-    normalized[0] * sin,
-    normalized[1] * sin,
-    normalized[2] * sin,
-    cos
-  ];
+  return [normalized[0] * sin, normalized[1] * sin, normalized[2] * sin, cos];
 }
 
 // Reference: https://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToQuaternion/index.htm
 export function eulerToQuat(euler: Vec3): Vec4 {
-  const cosX = Math.cos(euler[0] * .5);
-  const cosY = Math.cos(euler[1] * .5);
-  const cosZ = Math.cos(euler[2] * .5);
+  const cosX = Math.cos(euler[0] * 0.5);
+  const cosY = Math.cos(euler[1] * 0.5);
+  const cosZ = Math.cos(euler[2] * 0.5);
 
-  const sinX = Math.sin(euler[0] * .5);
-  const sinY = Math.sin(euler[1] * .5);
-  const sinZ = Math.sin(euler[2] * .5);
+  const sinX = Math.sin(euler[0] * 0.5);
+  const sinY = Math.sin(euler[1] * 0.5);
+  const sinZ = Math.sin(euler[2] * 0.5);
 
   return [
     sinZ * sinY * cosX + cosZ * cosY * sinX,
     cosZ * sinY * cosX - sinZ * cosY * sinX,
     sinZ * cosY * cosX + cosZ * sinY * sinX,
-    cosZ * cosY * cosX - sinZ * sinY * sinX
+    cosZ * cosY * cosX - sinZ * sinY * sinX,
   ];
 }
 
 export function degreesToRadians(degrees: number): number {
-  return degrees * Math.PI / 180.0;
+  return (degrees * Math.PI) / 180.0;
 }
 
 export function radiansToDegrees(radians: number): number {
-  return radians * 180.0 / Math.PI;
+  return (radians * 180.0) / Math.PI;
 }
 
 // Matrix functions
 export function mat4Translation(translation: Vec3): Mat4 {
-  return [
-    1, 0, 0, 0,
-    0, 1, 0, 0,
-    0, 0, 1, 0,
-    translation[0], translation[1], translation[2], 1
-  ];
+  return [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, translation[0], translation[1], translation[2], 1];
 }
 
 export function mat4Scale(scale: Vec3): Mat4 {
-  return [
-    scale[0], 0, 0, 0,
-    0, scale[1], 0, 0,
-    0, 0, scale[2], 0,
-    0, 0, 0, 1
-  ]
+  return [scale[0], 0, 0, 0, 0, scale[1], 0, 0, 0, 0, scale[2], 0, 0, 0, 0, 1];
 }
 
 // Reference: https://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToMatrix/index.htm
@@ -302,12 +237,7 @@ export function mat4RotationEuler(euler: Vec3): Mat4 {
   const zy = sinZ * sinY * cosX + cosZ * sinX;
   const zz = cosY * cosX;
 
-  return [
-    xx, yx, zx, 0,
-    xy, yy, zy, 0,
-    xz, yz, zz, 0,
-    0, 0, 0, 1
-  ];
+  return [xx, yx, zx, 0, xy, yy, zy, 0, xz, yz, zz, 0, 0, 0, 0, 1];
 }
 
 // Reference: https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/index.htm
@@ -338,12 +268,7 @@ export function mat4RotationQuat(quat: Vec4): Mat4 {
   const zy = 2 * (mulYZ + mulXW);
   const zz = 1 - 2 * (mulXX + mulYY);
 
-  return [
-    xx, yx, zx, 0,
-    xy, yy, zy, 0,
-    xz, yz, zz, 0,
-    0, 0, 0, 1
-  ];
+  return [xx, yx, zx, 0, xy, yy, zy, 0, xz, yz, zz, 0, 0, 0, 0, 1];
 }
 
 export function mat4Multiply(mat1: Mat4, mat2: Mat4): Mat4 {
@@ -363,16 +288,28 @@ export function mat4Multiply(mat1: Mat4, mat2: Mat4): Mat4 {
     mat1[0] * mat2[12] + mat1[4] * mat2[13] + mat1[8] * mat2[14] + mat1[12] * mat2[15],
     mat1[1] * mat2[12] + mat1[5] * mat2[13] + mat1[9] * mat2[14] + mat1[13] * mat2[15],
     mat1[2] * mat2[12] + mat1[6] * mat2[13] + mat1[10] * mat2[14] + mat1[14] * mat2[15],
-    mat1[3] * mat2[12] + mat1[7] * mat2[13] + mat1[11] * mat2[14] + mat1[15] * mat2[15]
+    mat1[3] * mat2[12] + mat1[7] * mat2[13] + mat1[11] * mat2[14] + mat1[15] * mat2[15],
   ];
 }
 
 export function mat4Transpose(mat: Mat4): Mat4 {
   return [
-    mat[0], mat[4], mat[8], mat[12],
-    mat[1], mat[5], mat[9], mat[13],
-    mat[2], mat[6], mat[10], mat[14],
-    mat[3], mat[7], mat[11], mat[15]
+    mat[0],
+    mat[4],
+    mat[8],
+    mat[12],
+    mat[1],
+    mat[5],
+    mat[9],
+    mat[13],
+    mat[2],
+    mat[6],
+    mat[10],
+    mat[14],
+    mat[3],
+    mat[7],
+    mat[11],
+    mat[15],
   ];
 }
 
@@ -393,12 +330,7 @@ export function mat4Invert(mat: Mat4): Mat4 {
   const determinant = s0 * s11 - s1 * s10 + s2 * s9 + s3 * s8 - s4 * s7 + s5 * s6;
 
   if (!determinant) {
-    return [
-      0, 0, 0, 0,
-      0, 0, 0, 0,
-      0, 0, 0, 0,
-      0, 0, 0, 0
-    ];
+    return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
   }
 
   const factor = 1 / determinant;
@@ -423,15 +355,15 @@ export function mat4Invert(mat: Mat4): Mat4 {
   const wz = (mat[9] * s2 - mat[8] * s4 - mat[11] * s0) * factor;
   const ww = (mat[8] * s3 - mat[9] * s1 + mat[10] * s0) * factor;
 
-  return [
-    xx, yx, zx, wx,
-    xy, yy, zy, wy,
-    xz, yz, zz, wz,
-    xw, yw, zw, ww
-  ];
+  return [xx, yx, zx, wx, xy, yy, zy, wy, xz, yz, zz, wz, xw, yw, zw, ww];
 }
 
-export function mat4Perspective(fov: number, aspectRatio: number, nearClip: number, farClip: number): Mat4 {
+export function mat4Perspective(
+  fov: number,
+  aspectRatio: number,
+  nearClip: number,
+  farClip: number
+): Mat4 {
   const cotan = 1.0 / Math.tan(fov / 2.0);
 
   const xx = cotan / aspectRatio;
@@ -440,12 +372,7 @@ export function mat4Perspective(fov: number, aspectRatio: number, nearClip: numb
   const zw = (2 * farClip * nearClip) / (nearClip - farClip);
   const wz = -1;
 
-  return [
-    xx, 0, 0, 0,
-    0, yy, 0, 0,
-    0, 0, zz, wz,
-    0, 0, zw, 0
-  ];
+  return [xx, 0, 0, 0, 0, yy, 0, 0, 0, 0, zz, wz, 0, 0, zw, 0];
 }
 
 export function mat4LookAt(position: Vec3, target: Vec3, up: Vec3): Mat4 {
@@ -468,10 +395,5 @@ export function mat4LookAt(position: Vec3, target: Vec3, up: Vec3): Mat4 {
   const zz = -z[2];
   const zw = z[0] * position[0] + z[1] * position[1] + z[2] * position[2];
 
-  return [
-    xx, yx, zx, 0,
-    xy, yy, zy, 0,
-    xz, yz, zz, 0,
-    xw, yw, zw, 1
-  ];
+  return [xx, yx, zx, 0, xy, yy, zy, 0, xz, yz, zz, 0, xw, yw, zw, 1];
 }

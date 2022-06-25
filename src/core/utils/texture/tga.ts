@@ -45,11 +45,5 @@ export function tgaParse(buffer: ArrayBuffer): Texture {
     textureData[i + 2] = colorSwap;
   }
 
-  return textureInit(
-    textureData,
-    width,
-    height,
-    format,
-    bitsPerPixel
-  );
+  return textureInit(textureData, width, height, format, bitsPerPixel);
 }

@@ -5,9 +5,7 @@ export default {
   output: {
     file: 'public/main.js',
     format: 'esm',
-    sourcemap: true
+    sourcemap: true,
   },
-  plugins: [
-    typescript()
-  ],
+  plugins: [typescript()],
 };

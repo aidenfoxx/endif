@@ -9,7 +9,11 @@ export interface ShaderRef {
 
 const shaderCache: Map<string, Map<string, RefCounter<ShaderRef>>> = new Map();
 
-async function createShader(gl: WebGL2RenderingContext, path: string, type: number): Promise<WebGLShader> {
+async function createShader(
+  gl: WebGL2RenderingContext,
+  path: string,
+  type: number
+): Promise<WebGLShader> {
   const shader = gl.createShader(type);
 
   if (!shader) {
@@ -27,9 +31,13 @@ async function createShader(gl: WebGL2RenderingContext, path: string, type: numb
   }
 
   return shader;
-};
+}
 
-export async function shaderFetch(gl: WebGL2RenderingContext, vertexPath: string, fragmentPath: string): Promise<ShaderRef> {
+export async function shaderFetch(
+  gl: WebGL2RenderingContext,
+  vertexPath: string,
+  fragmentPath: string
+): Promise<ShaderRef> {
   vertexPath = resolvePath(vertexPath);
   fragmentPath = resolvePath(fragmentPath);
 
@@ -48,7 +56,7 @@ export async function shaderFetch(gl: WebGL2RenderingContext, vertexPath: string
 
   const [vertexShader, fragmentShader] = await Promise.all([
     createShader(gl, vertexPath, gl.VERTEX_SHADER),
-    createShader(gl, fragmentPath, gl.FRAGMENT_SHADER)
+    createShader(gl, fragmentPath, gl.FRAGMENT_SHADER),
   ]);
 
   gl.attachShader(program, vertexShader);

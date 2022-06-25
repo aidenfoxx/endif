@@ -1,3 +1,1 @@
-export class TgaParseException extends Error {
-
-}
+export class TgaParseException extends Error {}

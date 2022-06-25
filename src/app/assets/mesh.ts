@@ -13,7 +13,12 @@ const EXTENSION_OBJ = 'obj';
 
 const meshCache: Map<string, RefCounter<MeshRef>> = new Map();
 
-function createAttribBuffer(gl: WebGL2RenderingContext, data: ReadonlyArray<number>, attrib: number, stride: number): WebGLBuffer {
+function createAttribBuffer(
+  gl: WebGL2RenderingContext,
+  data: ReadonlyArray<number>,
+  attrib: number,
+  stride: number
+): WebGLBuffer {
   const buffer = gl.createBuffer();
 
   if (!buffer) {
@@ -41,7 +46,7 @@ export async function meshFetch(gl: WebGL2RenderingContext, path: string): Promi
   const extension = path.split('.').pop();
 
   if (extension?.toLowerCase() !== EXTENSION_OBJ) {
-    throw new Error(`Unsupported mesh format: ${extension}`)
+    throw new Error(`Unsupported mesh format: ${extension}`);
   }
 
   const response = await fetch(path);

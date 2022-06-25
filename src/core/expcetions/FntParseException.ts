@@ -1,3 +1,1 @@
-export class FntParseException extends Error {
-
-}
+export class FntParseException extends Error {}

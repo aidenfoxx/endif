@@ -1,3 +1,1 @@
-export class MtlParseException extends Error {
-
-}
+export class MtlParseException extends Error {}
