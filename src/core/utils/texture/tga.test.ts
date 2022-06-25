@@ -1,8 +1,8 @@
 import { TextureFormat, textureInit } from '../../entities/texture';
 import { tgaParse } from './tga';
 
-jest.mock('../texture', () => ({
-  ...jest.requireActual('../texture'),
+jest.mock('../../entities/texture', () => ({
+  ...jest.requireActual('../../entities/texture'),
   textureInit: jest.fn()
 }))
 
