@@ -18,7 +18,7 @@ export interface Actor {
   readonly aabb: AABB;
 }
 
-function _calculateModelMatrix(position: Vec3, rotation: Vec3, scale: Vec3): Mat4 {
+function calculateModelMatrix(position: Vec3, rotation: Vec3, scale: Vec3): Mat4 {
   return mat4Multiply(
     mat4Multiply(
       mat4Scale(scale),
@@ -29,7 +29,7 @@ function _calculateModelMatrix(position: Vec3, rotation: Vec3, scale: Vec3): Mat
 }
 
 export function actorInit(prop: Prop, position: Vec3, rotation: Vec3, scale: Vec3): Actor {
-  const model = _calculateModelMatrix(position, rotation, scale);
+  const model = calculateModelMatrix(position, rotation, scale);
 
   return {
     prop,
@@ -42,7 +42,7 @@ export function actorInit(prop: Prop, position: Vec3, rotation: Vec3, scale: Vec
 }
 
 export function actorSetPosition(actor: Actor, position: Vec3): Actor {
-  const model = _calculateModelMatrix(position, actor.rotation, actor.scale);
+  const model = calculateModelMatrix(position, actor.rotation, actor.scale);
 
   return {
     ...actor,
@@ -53,7 +53,7 @@ export function actorSetPosition(actor: Actor, position: Vec3): Actor {
 }
 
 export function actorSetRotation(actor: Actor, rotation: Vec3): Actor {
-  const model = _calculateModelMatrix(actor.position, rotation, actor.scale);
+  const model = calculateModelMatrix(actor.position, rotation, actor.scale);
 
   return {
     ...actor,
@@ -64,7 +64,7 @@ export function actorSetRotation(actor: Actor, rotation: Vec3): Actor {
 }
 
 export function actorSetScale(actor: Actor, scale: Vec3): Actor {
-  const model = _calculateModelMatrix(actor.position, actor.scale, scale);
+  const model = calculateModelMatrix(actor.position, actor.scale, scale);
 
   return {
     ...actor,

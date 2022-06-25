@@ -7,9 +7,9 @@ export interface ShaderRef {
   readonly program: WebGLProgram;
 }
 
-const _shaderCache = new Map<string, Map<string, RefCounter<ShaderRef>>>();
+const shaderCache: Map<string, Map<string, RefCounter<ShaderRef>>> = new Map();
 
-async function _createShader(gl: WebGL2RenderingContext, path: string, type: number): Promise<WebGLShader> {
+async function createShader(gl: WebGL2RenderingContext, path: string, type: number): Promise<WebGLShader> {
   const shader = gl.createShader(type);
 
   if (!shader) {
@@ -33,7 +33,7 @@ export async function shaderFetch(gl: WebGL2RenderingContext, vertexPath: string
   vertexPath = resolvePath(vertexPath);
   fragmentPath = resolvePath(fragmentPath);
 
-  const refCounter = _shaderCache.get(vertexPath)?.get(fragmentPath);
+  const refCounter = shaderCache.get(vertexPath)?.get(fragmentPath);
 
   if (refCounter) {
     refCounter.refs++;
@@ -47,8 +47,8 @@ export async function shaderFetch(gl: WebGL2RenderingContext, vertexPath: string
   }
 
   const [vertexShader, fragmentShader] = await Promise.all([
-    _createShader(gl, vertexPath, gl.VERTEX_SHADER),
-    _createShader(gl, fragmentPath, gl.FRAGMENT_SHADER)
+    createShader(gl, vertexPath, gl.VERTEX_SHADER),
+    createShader(gl, fragmentPath, gl.FRAGMENT_SHADER)
   ]);
 
   gl.attachShader(program, vertexShader);
@@ -64,18 +64,18 @@ export async function shaderFetch(gl: WebGL2RenderingContext, vertexPath: string
 
   const programRef = { vertexPath, fragmentPath, program };
 
-  if (!_shaderCache.get(vertexPath)) {
-    _shaderCache.set(vertexPath, new Map());
+  if (!shaderCache.get(vertexPath)) {
+    shaderCache.set(vertexPath, new Map());
   }
 
-  _shaderCache.get(vertexPath)!.set(fragmentPath, { refs: 1, resource: programRef });
+  shaderCache.get(vertexPath)!.set(fragmentPath, { refs: 1, resource: programRef });
 
   return programRef;
 }
 
 export function shaderDestroy(gl: WebGL2RenderingContext, shaderRef: ShaderRef): void {
   const { vertexPath, fragmentPath } = shaderRef;
-  const refCounter = _shaderCache.get(vertexPath)?.get(fragmentPath);
+  const refCounter = shaderCache.get(vertexPath)?.get(fragmentPath);
 
   if (!refCounter) {
     console.warn(`Shader could not be destroyed. Not defined: ${vertexPath}, ${fragmentPath}`);
@@ -84,7 +84,7 @@ export function shaderDestroy(gl: WebGL2RenderingContext, shaderRef: ShaderRef):
 
   if (refCounter.refs === 1) {
     gl.deleteProgram(refCounter.resource.program);
-    _shaderCache.get(vertexPath)!.delete(fragmentPath);
+    shaderCache.get(vertexPath)!.delete(fragmentPath);
   } else {
     refCounter.refs--;
   }

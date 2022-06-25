@@ -24,7 +24,7 @@ interface AppState {
   }
 }
 
-function _render(app: AppState): void {
+function render(app: AppState): void {
   const {
     gl,
     scene,
@@ -92,7 +92,7 @@ function _render(app: AppState): void {
     }
   }
 
-  requestAnimationFrame(() => _render({
+  requestAnimationFrame(() => render({
     gl,
     scene: nextScene,
     input: {
@@ -102,7 +102,7 @@ function _render(app: AppState): void {
   }));
 }
 
-async function _buildScene(gl: WebGL2RenderingContext): Promise<Scene> {
+async function buildScene(gl: WebGL2RenderingContext): Promise<Scene> {
   const perspective = mat4Perspective(degreesToRadians(90), CANVAS_WIDTH / CANVAS_HEIGHT, .1, 1000);
   const camera = cameraInit([.5, 0, -3], [0, 0, 0], perspective);
 
@@ -133,9 +133,9 @@ export async function appInit(): Promise<void> {
   gl.enable(gl.DEPTH_TEST);
   gl.enable(gl.CULL_FACE);
 
-  const scene = await _buildScene(gl);
+  const scene = await buildScene(gl);
 
-  requestAnimationFrame(() => _render({
+  requestAnimationFrame(() => render({
     gl,
     scene,
     input: {

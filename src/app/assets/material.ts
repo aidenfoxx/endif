@@ -10,12 +10,12 @@ export interface MaterialRef {
 
 const EXTENSION_MTL = 'mtl';
 
-const _materialCache = new Map<string, RefCounter<MaterialRef>>();
+const materialCache: Map<string, RefCounter<MaterialRef>> = new Map();
 
 export async function materialFetch(path: string): Promise<MaterialRef> {
   path = resolvePath(path);
 
-  const refCounter = _materialCache.get(path);
+  const refCounter = materialCache.get(path);
 
   if (refCounter) {
     refCounter.refs++;
@@ -33,14 +33,14 @@ export async function materialFetch(path: string): Promise<MaterialRef> {
   // Cache and return asset
   const materialRef = { path, material };
 
-  _materialCache.set(path, { refs: 1, resource: materialRef });
+  materialCache.set(path, { refs: 1, resource: materialRef });
 
   return materialRef;
 }
 
 export function materialDestroy(materialRef: MaterialRef): void {
   const { path } = materialRef;
-  const refCounter = _materialCache.get(path);
+  const refCounter = materialCache.get(path);
 
   if (!refCounter) {
     console.warn(`Material could not be destroyed. Not defined: ${path}`);
@@ -48,7 +48,7 @@ export function materialDestroy(materialRef: MaterialRef): void {
   }
 
   if (refCounter.refs === 1) {
-    _materialCache.delete(path);
+    materialCache.delete(path);
   } else {
     refCounter.refs--;
   }

@@ -11,9 +11,9 @@ export interface MeshRef {
 
 const EXTENSION_OBJ = 'obj';
 
-const _meshCache: Map<string, RefCounter<MeshRef>> = new Map();
+const meshCache: Map<string, RefCounter<MeshRef>> = new Map();
 
-function _createAttribBuffer(gl: WebGL2RenderingContext, data: ReadonlyArray<number>, attrib: number, stride: number): WebGLBuffer {
+function createAttribBuffer(gl: WebGL2RenderingContext, data: ReadonlyArray<number>, attrib: number, stride: number): WebGLBuffer {
   const buffer = gl.createBuffer();
 
   if (!buffer) {
@@ -31,7 +31,7 @@ function _createAttribBuffer(gl: WebGL2RenderingContext, data: ReadonlyArray<num
 export async function meshFetch(gl: WebGL2RenderingContext, path: string): Promise<MeshRef> {
   path = resolvePath(path);
 
-  const refCounter = _meshCache.get(path);
+  const refCounter = meshCache.get(path);
 
   if (refCounter) {
     refCounter.refs++;
@@ -54,9 +54,9 @@ export async function meshFetch(gl: WebGL2RenderingContext, path: string): Promi
 
   gl.bindVertexArray(vao);
 
-  const vertexBuffer = _createAttribBuffer(gl, mesh.vertices, 0, 3);
-  const uvBuffer = _createAttribBuffer(gl, mesh.uvs, 1, 2);
-  const normalBuffer = _createAttribBuffer(gl, mesh.normals, 2, 3);
+  const vertexBuffer = createAttribBuffer(gl, mesh.vertices, 0, 3);
+  const uvBuffer = createAttribBuffer(gl, mesh.uvs, 1, 2);
+  const normalBuffer = createAttribBuffer(gl, mesh.normals, 2, 3);
   const indexBuffer = gl.createBuffer();
 
   if (!indexBuffer) {
@@ -76,14 +76,14 @@ export async function meshFetch(gl: WebGL2RenderingContext, path: string): Promi
 
   const meshRef = { path, mesh, vao };
 
-  _meshCache.set(path, { refs: 1, resource: meshRef });
+  meshCache.set(path, { refs: 1, resource: meshRef });
 
   return meshRef;
 }
 
 export function meshDestroy(gl: WebGL2RenderingContext, meshRef: MeshRef): void {
   const { path } = meshRef;
-  const refCounter = _meshCache.get(path);
+  const refCounter = meshCache.get(path);
 
   if (!refCounter) {
     console.warn(`Mesh could not be destroyed. Not defined: ${path}`);
@@ -92,7 +92,7 @@ export function meshDestroy(gl: WebGL2RenderingContext, meshRef: MeshRef): void 
 
   if (refCounter.refs === 1) {
     gl.deleteVertexArray(refCounter.resource.vao);
-    _meshCache.delete(path);
+    meshCache.delete(path);
   } else {
     refCounter.refs--;
   }

@@ -4,17 +4,15 @@ import { ShaderRef } from '../assets/shader';
 import { Actor } from './actor';
 import { Prop } from './prop';
 
-export type RenderQueue = ReadonlyMap<ShaderRef, ReadonlyMap<Prop, Actor[]>>;
-
 export interface Scene {
   readonly camera: Camera;
   readonly actors: ReadonlySet<Actor>;
-  readonly renderQueue: RenderQueue;
+  readonly renderQueue: ReadonlyMap<ShaderRef, ReadonlyMap<Prop, Actor[]>>;
   readonly frustumCulling: boolean;
 }
 
-function _generateRenderQueue(actors: ReadonlySet<Actor>, camera?: Camera): RenderQueue {
-  const renderQueue = new Map<ShaderRef, Map<Prop, Actor[]>>();
+function generateRenderQueue(actors: ReadonlySet<Actor>, camera?: Camera): ReadonlyMap<ShaderRef, ReadonlyMap<Prop, Actor[]>> {
+  const renderQueue: Map<ShaderRef, Map<Prop, Actor[]>> = new Map();
 
   for (const actor of actors) {
     if (camera) {
@@ -55,7 +53,7 @@ export function sceneSetCamera(scene: Scene, camera: Camera): Scene {
   return {
     ...scene,
     camera,
-    renderQueue: scene.frustumCulling ? _generateRenderQueue(scene.actors, camera) : scene.renderQueue
+    renderQueue: scene.frustumCulling ? generateRenderQueue(scene.actors, camera) : scene.renderQueue
   };
 }
 
@@ -66,7 +64,7 @@ export function sceneAddActor(scene: Scene, actor: Actor): Scene {
   return {
     ...scene,
     actors: nextActors,
-    renderQueue: _generateRenderQueue(nextActors, scene.frustumCulling ? scene.camera : undefined)
+    renderQueue: generateRenderQueue(nextActors, scene.frustumCulling ? scene.camera : undefined)
   };
 }
 
@@ -77,7 +75,7 @@ export function sceneRemoveActor(scene: Scene, actor: Actor): Scene {
   return {
     ...scene,
     actors: nextActors,
-    renderQueue: _generateRenderQueue(nextActors, scene.frustumCulling ? scene.camera : undefined)
+    renderQueue: generateRenderQueue(nextActors, scene.frustumCulling ? scene.camera : undefined)
   };
 }
 
