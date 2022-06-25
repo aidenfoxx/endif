@@ -49,6 +49,7 @@ export function fntParse(data: string): BitmapFont {
 
           switch (key.toLowerCase()) {
             case 'id':
+            case 'first':
               char = String.fromCharCode(Number(value));
               break;
 
@@ -80,10 +81,6 @@ export function fntParse(data: string): BitmapFont {
               advanceX = Number(value);
               break;
 
-            case 'first':
-              char = String.fromCharCode(Number(value));
-              break;
-
             case 'second':
               nextChar = String.fromCharCode(Number(value));
               break;
@@ -106,7 +103,6 @@ export function fntParse(data: string): BitmapFont {
     }
 
     if (
-      char !== undefined &&
       posX !== undefined &&
       posY !== undefined &&
       width !== undefined &&
@@ -123,11 +119,7 @@ export function fntParse(data: string): BitmapFont {
         advance: advanceX,
         kernings: glyphs.get(char)!
       });
-    } else if (
-      char !== undefined &&
-      nextChar !== undefined &&
-      offsetX !== undefined
-    ) {
+    } else if (nextChar !== undefined && offsetX !== undefined) {
       glyphs.get(char)!.set(nextChar, offsetX);
     }
   }

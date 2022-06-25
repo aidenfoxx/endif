@@ -24,7 +24,7 @@ interface InputState {
   keyStates: Map<string, KeyState>;
 }
 
-const _inputState: InputState = {
+const inputState: InputState = {
   mouseX: 0,
   mouseY: 0,
   mouseButtonStates: [],
@@ -32,34 +32,34 @@ const _inputState: InputState = {
 };
 
 window.addEventListener('mousedown', (event: MouseEvent) => {
-  _inputState.mouseButtonStates[event.button] = ButtonState.BUTTON_DOWN;
+  inputState.mouseButtonStates[event.button] = ButtonState.BUTTON_DOWN;
 });
 
 window.addEventListener('mouseup', (event: MouseEvent) => {
-  _inputState.mouseButtonStates[event.button] = ButtonState.BUTTON_UP;
+  inputState.mouseButtonStates[event.button] = ButtonState.BUTTON_UP;
 });
 
 window.addEventListener('mousemove', (event: MouseEvent) => {
-  _inputState.mouseX = event.clientX;
-  _inputState.mouseY = event.clientY;
+  inputState.mouseX = event.clientX;
+  inputState.mouseY = event.clientY;
 })
 
 window.addEventListener('keydown', (event: KeyboardEvent) => {
-  _inputState.keyStates.set(event.code, KeyState.KEY_DOWN);
+  inputState.keyStates.set(event.code, KeyState.KEY_DOWN);
 });
 
 window.addEventListener('keyup', (event: KeyboardEvent) => {
-  _inputState.keyStates.set(event.code, KeyState.KEY_UP);
+  inputState.keyStates.set(event.code, KeyState.KEY_UP);
 });
 
 export function inputGetMousePosition(): Vec2 {
-  return [_inputState.mouseX, _inputState.mouseY];
+  return [inputState.mouseX, inputState.mouseY];
 }
 
 export function inputGetMouseButtonState(index: number): ButtonState {
-  return _inputState.mouseButtonStates[index] ?? ButtonState.BUTTON_UP;
+  return inputState.mouseButtonStates[index] ?? ButtonState.BUTTON_UP;
 }
 
 export function inputGetKeyState(keyCode: string): KeyState {
-  return _inputState.keyStates.get(keyCode) ?? KeyState.KEY_UP;
+  return inputState.keyStates.get(keyCode) ?? KeyState.KEY_UP;
 }
