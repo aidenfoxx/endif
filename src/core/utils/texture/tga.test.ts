@@ -54,4 +54,6 @@ describe('tga', () => {
       32
     );
   });
+
+  test.todo('should throw on invalid format');
 });

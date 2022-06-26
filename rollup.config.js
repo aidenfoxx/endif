@@ -1,4 +1,7 @@
 import typescript from '@rollup/plugin-typescript';
+import replace from '@rollup/plugin-replace';
+
+console.log(process.env.DEBUG);
 
 export default {
   input: 'src/main.ts',
@@ -7,5 +10,11 @@ export default {
     format: 'esm',
     sourcemap: true,
   },
-  plugins: [typescript()],
+  plugins: [
+    typescript(),
+    replace({
+      'process.env.DEBUG': process.env.DEBUG,
+      preventAssignment: true
+    })
+  ],
 };

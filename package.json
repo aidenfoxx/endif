@@ -6,21 +6,21 @@
   "license": "UNLICENSED",
   "scripts": {
     "start": "node server.js",
-    "dev": "concurrently -p none \"npm run build:watch\" \"npm run start\"",
+    "dev": "concurrently -p none \"cross-env DEBUG=true npm run build:watch\" \"npm run start\"",
     "build": "rollup -c",
     "build:watch": "rollup -c -w",
     "test": "jest",
     "test:watch": "jest --watch",
     "format": "prettier --write src/**/*.{js,ts}"
   },
-  "dependencies": {
-    "concurrently": "^7.2.1"
-  },
   "devDependencies": {
+    "@rollup/plugin-replace": "^4.0.0",
     "@rollup/plugin-typescript": "^8.3.2",
     "@types/jest": "^28.1.2",
+    "concurrently": "^7.2.1",
+    "cross-env": "^7.0.3",
     "jest": "^28.1.1",
-    "prettier": "2.7.1",
+    "prettier": "^2.7.1",
     "rollup": "^2.75.1",
     "ts-jest": "^28.0.5",
     "typescript": "^4.7.4"

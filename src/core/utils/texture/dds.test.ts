@@ -280,4 +280,8 @@ describe('dds', () => {
       expect.objectContaining([0x08, 0x42, 0x08, 0x42, 0x00, 0x00, 0x00, 0x00]),
     ]);
   });
+
+  test.todo('should throw on invalid magic');
+
+  test.todo('should throw on invalid format');
 });

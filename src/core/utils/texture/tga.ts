@@ -1,5 +1,5 @@
 import { Texture, TextureFormat, textureInit } from '../../entities/texture';
-import { TgaParseException } from '../../expcetions/TgaParseException';
+import { ParseException } from '../../expcetions';
 
 const TGA_HEADER_SIZE = 0x12;
 const TGA_RGB_FORMAT = 2;
@@ -11,7 +11,7 @@ export function tgaParse(buffer: ArrayBuffer): Texture {
   const dataType = data[2];
 
   if (dataType !== TGA_RGB_FORMAT) {
-    throw new TgaParseException('Unsupported data type');
+    throw new ParseException('Unsupported data type');
   }
 
   const width = (data[13] << 8) + data[12];
@@ -31,7 +31,7 @@ export function tgaParse(buffer: ArrayBuffer): Texture {
   }
 
   if (format === undefined) {
-    throw new TgaParseException('Unsupported format');
+    throw new ParseException('Unsupported format');
   }
 
   const bytesPerPixel = bitsPerPixel / 8;

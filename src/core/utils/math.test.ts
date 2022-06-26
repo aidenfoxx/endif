@@ -32,7 +32,7 @@ describe('math', () => {
       expect(result).toEqual([-1, -2]);
     });
 
-    // TODO: Add test for mat4 multiply
+    test.todo('should multiply mat4');
 
     test('should normalize', () => {
       const result = math.vec2Normalize([1, 2]);
@@ -72,7 +72,7 @@ describe('math', () => {
       expect(result).toEqual([-1, -2, -3]);
     });
 
-    // TODO: Add test for mat4 multiply
+    test.todo('should multiply mat4');
 
     test('should normalize', () => {
       const result = math.vec3Normalize([1, 2, 3]);
@@ -118,7 +118,7 @@ describe('math', () => {
       expect(result).toEqual([-1, -2, -3, -4]);
     });
 
-    // TODO: Add test for mat4 multiply
+    test.todo('should multiply mat4');
 
     test('should normalize', () => {
       const result = math.vec4Normalize([1, 2, 3, 4]);

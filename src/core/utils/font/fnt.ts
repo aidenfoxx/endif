@@ -4,7 +4,7 @@ import {
   bitmapFontInit,
   BitmapGlyph,
 } from '../../entities/bitmapfont';
-import { FntParseException } from '../../expcetions';
+import { ParseException } from '../../expcetions';
 
 export function fntParse(data: string): BitmapFont {
   const lines = data.split(/\r\n|\n/g);
@@ -36,7 +36,7 @@ export function fntParse(data: string): BitmapFont {
       case 'page':
         for (let i = 1; i < values.length; i++) {
           if (texture) {
-            throw new FntParseException('Multi-page fonts not supported');
+            throw new ParseException('Multi-page fonts not supported');
           }
 
           const [key, value] = values[i].split('=');
@@ -130,7 +130,7 @@ export function fntParse(data: string): BitmapFont {
   }
 
   if (!texture) {
-    throw new FntParseException('Font texture not defined');
+    throw new ParseException('Font texture not defined');
   }
 
   const font = bitmapFontInit(texture);

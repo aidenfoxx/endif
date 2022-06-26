@@ -1,18 +1,19 @@
 import { Texture, TextureFormat, textureInit } from '../../entities/texture';
-import { DdsParseException } from '../../expcetions';
+import { ParseException } from '../../expcetions';
 
 const DDS_HEADER_SIZE = 0x80;
 const DDS_MAGIC = 0x20534444;
 const DDS_FORMAT_DXT1 = 0x31545844;
 const DDS_FORMAT_DXT3 = 0x33545844;
 const DDS_FORMAT_DXT5 = 0x35545844;
+const DDS_CUBEMAP_ALLFACES = 0xfe00;
 
 export function ddsParse(buffer: ArrayBuffer): Texture {
   const data = new Uint8Array(buffer);
   const headers = new Uint32Array(buffer.slice(0, DDS_HEADER_SIZE));
 
   if (headers[0] !== DDS_MAGIC) {
-    throw new DdsParseException('Invalid magic value');
+    throw new ParseException('Invalid magic value');
   }
 
   const width = headers[4];
@@ -62,7 +63,7 @@ export function ddsParse(buffer: ArrayBuffer): Texture {
   }
 
   if (format === undefined) {
-    throw new DdsParseException('Unsupported format');
+    throw new ParseException('Unsupported format');
   }
 
   const bytesPerPixel = bitsPerPixel! / 8;
@@ -77,6 +78,8 @@ export function ddsParse(buffer: ArrayBuffer): Texture {
   let mipmapHeight = height;
   let mipmapOffset = DDS_HEADER_SIZE;
   let i = 0;
+
+  // TODO: Add cubemap handling
 
   do {
     const mipmapSize =

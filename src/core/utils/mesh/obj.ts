@@ -1,5 +1,5 @@
 import { Mesh, meshInit } from '../../entities/mesh';
-import { ObjParseException } from '../../expcetions';
+import { ParseException } from '../../expcetions';
 
 const POINT_MATCH = /^(-?\d+)\/?(-?\d*)\/?(-?\d*)$/;
 
@@ -45,7 +45,7 @@ export function objParse(data: string): Mesh {
   }
 
   if (!points.length) {
-    throw new ObjParseException('No faces defined');
+    throw new ParseException('No faces defined');
   }
 
   // Index mesh
@@ -68,7 +68,7 @@ export function objParse(data: string): Mesh {
     if (pointIndex === undefined) {
       // Index point
       if (vertices[vertexIndex] === undefined) {
-        throw new ObjParseException(`Vertex index out-of-bounds`);
+        throw new ParseException(`Vertex index out-of-bounds`);
       }
 
       const vertexOffset = index * 3;
@@ -79,7 +79,7 @@ export function objParse(data: string): Mesh {
 
       if (point[1]) {
         if (uvs[uvIndex] === undefined) {
-          throw new ObjParseException('UV index out-of-bounds');
+          throw new ParseException('UV index out-of-bounds');
         }
 
         const uvOffset = index * 2;
@@ -90,7 +90,7 @@ export function objParse(data: string): Mesh {
 
       if (point[2]) {
         if (normals[normalIndex] === undefined) {
-          throw new ObjParseException('Normal index out-of-bounds');
+          throw new ParseException('Normal index out-of-bounds');
         }
 
         const normalOffset = index * 3;

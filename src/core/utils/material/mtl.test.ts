@@ -1,5 +1,5 @@
 import { mtlParse } from './mtl';
-import { MtlParseException } from '../../expcetions';
+import { ParseException } from '../../expcetions';
 import { materialInit } from '../../entities/material';
 
 jest.mock('../../entities/material', () => ({
@@ -47,6 +47,6 @@ describe('mtl', () => {
       mtlParse('');
     };
 
-    expect(action).toThrow(new MtlParseException('No diffuse value defined'));
+    expect(action).toThrow(new ParseException('No diffuse value defined'));
   });
 });

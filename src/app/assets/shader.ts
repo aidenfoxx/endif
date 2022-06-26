@@ -9,25 +9,20 @@ export interface ShaderRef {
 
 const shaderCache: Map<string, Map<string, RefCounter<ShaderRef>>> = new Map();
 
-async function createShader(
-  gl: WebGL2RenderingContext,
-  path: string,
-  type: number
-): Promise<WebGLShader> {
+function createShader(gl: WebGL2RenderingContext, type: number, source: string): WebGLShader {
   const shader = gl.createShader(type);
 
   if (!shader) {
-    throw new Error(`Failed to create shader`);
+    throw new Error('Failed to create shader');
   }
 
-  const response = await fetch(path);
-
-  gl.shaderSource(shader, await response.text());
+  gl.shaderSource(shader, source);
   gl.compileShader(shader);
 
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    console.error(`Failed to compile shader: ${path}`, gl.getShaderInfoLog(shader));
-    throw new Error(`Failed to compile shader: ${path}`);
+    gl.deleteShader(shader);
+    console.error('Failed to compile shader', gl.getShaderInfoLog(shader));
+    throw new Error('Failed to compile shader');
   }
 
   return shader;
@@ -43,21 +38,35 @@ export async function shaderFetch(
 
   const refCounter = shaderCache.get(vertexPath)?.get(fragmentPath);
 
+  // Return from cache
   if (refCounter) {
     refCounter.refs++;
     return refCounter.resource;
   }
 
+  const [vertexSource, fragmentSource] = await Promise.all([
+    fetch(vertexPath).then((response) => response.text()),
+    fetch(fragmentPath).then((response) => response.text()),
+  ]);
+
+  let vertexShader;
+  let fragmentShader;
+
+  try {
+    vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexSource);
+    fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
+  } catch (e) {
+    gl.deleteShader(vertexShader ?? null);
+    throw e;
+  }
+
   const program = gl.createProgram();
 
   if (!program) {
-    throw new Error(`Failed to create shader program`);
+    gl.deleteShader(vertexShader);
+    gl.deleteShader(fragmentShader);
+    throw new Error('Failed to create shader program');
   }
-
-  const [vertexShader, fragmentShader] = await Promise.all([
-    createShader(gl, vertexPath, gl.VERTEX_SHADER),
-    createShader(gl, fragmentPath, gl.FRAGMENT_SHADER),
-  ]);
 
   gl.attachShader(program, vertexShader);
   gl.attachShader(program, fragmentShader);
@@ -67,9 +76,11 @@ export async function shaderFetch(
   gl.deleteShader(fragmentShader);
 
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    gl.deleteProgram(program);
     throw new Error('Failed to link shader');
   }
 
+  // Cache and return
   const programRef = { vertexPath, fragmentPath, program };
 
   if (!shaderCache.get(vertexPath)) {
@@ -86,7 +97,7 @@ export function shaderDestroy(gl: WebGL2RenderingContext, shaderRef: ShaderRef):
   const refCounter = shaderCache.get(vertexPath)?.get(fragmentPath);
 
   if (!refCounter) {
-    console.warn(`Shader could not be destroyed. Not defined: ${vertexPath}, ${fragmentPath}`);
+    console.warn('Shader could not be destroyed. Not defined');
     return;
   }
 

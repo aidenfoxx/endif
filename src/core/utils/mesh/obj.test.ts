@@ -1,6 +1,6 @@
 import { objParse } from './obj';
 import { meshInit } from '../../entities/mesh';
-import { ObjParseException } from '../../expcetions';
+import { ParseException } from '../../expcetions';
 
 jest.mock('../../entities/mesh', () => ({
   meshInit: jest.fn(),
@@ -144,7 +144,7 @@ describe('obj', () => {
       objParse('');
     };
 
-    expect(action).toThrow(new ObjParseException('No faces defined'));
+    expect(action).toThrow(new ParseException('No faces defined'));
   });
 
   test('should throw when vertex out-of-bounds', () => {
@@ -154,7 +154,7 @@ describe('obj', () => {
       `);
     };
 
-    expect(action).toThrow(new ObjParseException('Vertex index out-of-bounds'));
+    expect(action).toThrow(new ParseException('Vertex index out-of-bounds'));
   });
 
   test('should throw when uv out-of-bounds', () => {
@@ -168,7 +168,7 @@ describe('obj', () => {
       `);
     };
 
-    expect(action).toThrow(new ObjParseException('UV index out-of-bounds'));
+    expect(action).toThrow(new ParseException('UV index out-of-bounds'));
   });
 
   test('should throw when normal out-of-bounds', () => {
@@ -182,6 +182,6 @@ describe('obj', () => {
       `);
     };
 
-    expect(action).toThrow(new ObjParseException('Normal index out-of-bounds'));
+    expect(action).toThrow(new ParseException('Normal index out-of-bounds'));
   });
 });

@@ -1,6 +1,7 @@
 import { Mesh } from '../../core/entities/mesh';
 import { objParse } from '../../core/utils/mesh/obj';
 import { RefCounter } from '../types';
+import { Extensions } from '../utils/extensions';
 import { resolvePath } from '../utils/resolve-path';
 
 export interface MeshRef {
@@ -8,8 +9,6 @@ export interface MeshRef {
   readonly vao: WebGLVertexArrayObject;
   readonly mesh: Mesh;
 }
-
-const EXTENSION_OBJ = 'obj';
 
 const meshCache: Map<string, RefCounter<MeshRef>> = new Map();
 
@@ -38,14 +37,15 @@ export async function meshFetch(gl: WebGL2RenderingContext, path: string): Promi
 
   const refCounter = meshCache.get(path);
 
+  // Return from cache
   if (refCounter) {
     refCounter.refs++;
     return refCounter.resource;
   }
 
-  const extension = path.split('.').pop();
+  const extension = path.split('.').pop()?.toLowerCase();
 
-  if (extension?.toLowerCase() !== EXTENSION_OBJ) {
+  if (extension !== Extensions.OBJ) {
     throw new Error(`Unsupported mesh format: ${extension}`);
   }
 
@@ -59,13 +59,26 @@ export async function meshFetch(gl: WebGL2RenderingContext, path: string): Promi
 
   gl.bindVertexArray(vao);
 
-  const vertexBuffer = createAttribBuffer(gl, mesh.vertices, 0, 3);
-  const uvBuffer = createAttribBuffer(gl, mesh.uvs, 1, 2);
-  const normalBuffer = createAttribBuffer(gl, mesh.normals, 2, 3);
-  const indexBuffer = gl.createBuffer();
+  let vertexBuffer;
+  let uvBuffer;
+  let normalBuffer;
+  let indexBuffer;
 
-  if (!indexBuffer) {
-    throw new Error('Failed to create mesh buffer');
+  try {
+    vertexBuffer = createAttribBuffer(gl, mesh.vertices, 0, 3);
+    uvBuffer = createAttribBuffer(gl, mesh.uvs, 1, 2);
+    normalBuffer = createAttribBuffer(gl, mesh.normals, 2, 3);
+    indexBuffer = gl.createBuffer();
+
+    if (!indexBuffer) {
+      throw new Error('Failed to create index buffer');
+    }
+  } catch (e) {
+    gl.deleteVertexArray(vao);
+    gl.deleteBuffer(vertexBuffer ?? null);
+    gl.deleteBuffer(uvBuffer ?? null);
+    gl.deleteBuffer(normalBuffer ?? null);
+    throw e;
   }
 
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
@@ -79,6 +92,7 @@ export async function meshFetch(gl: WebGL2RenderingContext, path: string): Promi
   gl.deleteBuffer(normalBuffer);
   gl.deleteBuffer(indexBuffer);
 
+  // Cache and return
   const meshRef = { path, mesh, vao };
 
   meshCache.set(path, { refs: 1, resource: meshRef });
@@ -91,7 +105,7 @@ export function meshDestroy(gl: WebGL2RenderingContext, meshRef: MeshRef): void 
   const refCounter = meshCache.get(path);
 
   if (!refCounter) {
-    console.warn(`Mesh could not be destroyed. Not defined: ${path}`);
+    console.warn('Mesh could not be destroyed. Not defined');
     return;
   }
 

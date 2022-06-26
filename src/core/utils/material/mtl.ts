@@ -1,6 +1,6 @@
 import { Material, materialInit } from '../../entities/material';
 import { Vec3 } from '../../utils/math';
-import { MtlParseException } from '../../expcetions';
+import { ParseException } from '../../expcetions';
 
 // PBR reference: http://exocortex.com/blog/extending_wavefront_mtl_to_support_pbr
 export function mtlParse(data: string): Material {
@@ -65,7 +65,7 @@ export function mtlParse(data: string): Material {
   }
 
   if (!diffuse) {
-    throw new MtlParseException('No diffuse value defined');
+    throw new ParseException('No diffuse value defined');
   }
 
   return materialInit(
