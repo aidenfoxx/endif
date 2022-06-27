@@ -1,8 +1,5 @@
 import { AABB, aabbCalculate } from '../../core/utils/aabb';
-import { MaterialRef } from '../assets/material';
-import { MeshRef } from '../assets/mesh';
-import { ShaderRef } from '../assets/shader';
-import { TextureRef } from '../assets/texture';
+import { MaterialRef, MeshRef, ShaderRef, TextureRef } from '../assets/loader';
 
 export interface Prop {
   readonly meshRef: MeshRef;

@@ -1,6 +1,13 @@
 import { AppState, appInit, appStep } from './app/app';
 import { DebugState, debugInit, debugStep } from './debug/debug';
 
+async function requestAnimationFrameAsync(callback: () => Promise<void>): Promise<void> {
+  await new Promise((resolve) => {
+    window.requestAnimationFrame(resolve);
+  });
+  await callback();
+}
+
 const viewport = document.getElementById('viewport');
 
 if (!(viewport instanceof HTMLCanvasElement)) {
@@ -9,15 +16,8 @@ if (!(viewport instanceof HTMLCanvasElement)) {
 
 const gl = viewport.getContext('webgl2', { antialias: false });
 
-if (gl === null) {
+if (!gl) {
   throw new Error('Unable to initialize WebGL 2.0');
-}
-
-async function requestAnimationFrameAsync(callback: () => Promise<void>): Promise<void> {
-  await new Promise((resolve) => {
-    window.requestAnimationFrame(resolve);
-  });
-  await callback();
 }
 
 if (process.env.DEBUG) {

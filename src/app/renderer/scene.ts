@@ -1,6 +1,6 @@
 import { Camera } from '../../core/entities/camera';
 import { mat4Invert, mat4Multiply, mat4Transpose } from '../../core/utils/math';
-import { ShaderRef } from '../assets/shader';
+import { ShaderRef } from '../assets/loader';
 import { Actor } from './actor';
 import { Prop } from './prop';
 

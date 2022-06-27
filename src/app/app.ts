@@ -6,13 +6,13 @@ import {
   ButtonState,
   inputGetMousePosition,
 } from './input';
-import { materialFetch, meshFetch, shaderFetch, textureFetch } from './assets';
 import { cameraInit, cameraRotate, cameraTranslate } from '../core/entities/camera';
 import { Timestep, timestepInit, timestepStep } from '../core/entities/timestep';
 import { degreesToRadians, mat4Perspective } from '../core/utils/math';
 import { Scene, sceneAddActor, sceneInit, sceneRender, sceneSetCamera } from './renderer/scene';
 import { propAddShader, propInit } from './renderer/prop';
 import { actorInit } from './renderer/actor';
+import { materialLoad, meshLoad, shaderLoad, textureLoad } from './assets/loader';
 
 const CANVAS_WIDTH = 1600;
 const CANVAS_HEIGHT = 900;
@@ -36,10 +36,10 @@ async function buildScene(gl: WebGL2RenderingContext): Promise<Scene> {
   );
   const camera = cameraInit([0.5, 0, -3], [0, 0, 0], perspective);
 
-  const meshRef = await meshFetch(gl, './assets/models/cube.obj');
-  const materialRef = await materialFetch('./assets/models/cube.mtl');
-  const textureRef = await textureFetch(gl, './assets/models/cube.dds');
-  const shaderRef = await shaderFetch(
+  const meshRef = await meshLoad(gl, './assets/models/cube.obj');
+  const textureRef = await textureLoad(gl, './assets/models/cube.dds');
+  const materialRef = await materialLoad('./assets/models/cube.mtl');
+  const shaderRef = await shaderLoad(
     gl,
     './assets/shaders/phong.vert',
     './assets/shaders/phong.frag'
