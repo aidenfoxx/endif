@@ -1,7 +1,4 @@
-import {
-  BitmapFont, bitmapFontInit,
-  BitmapGlyph
-} from '../../entities/bitmapfont';
+import { BitmapFont, bitmapFontInit, BitmapGlyph } from '../../entities/bitmapfont';
 import { ParseException } from '../../expcetions';
 
 export function fntParse(data: string): BitmapFont {
@@ -10,6 +7,9 @@ export function fntParse(data: string): BitmapFont {
   const glyphs: Array<BitmapGlyph> = [];
   const kernings: Map<string, Map<string, number>> = new Map();
 
+  let lineHeight;
+  let textureWidth;
+  let textureHeight;
   let texture;
 
   // Parse fnt
@@ -27,32 +27,52 @@ export function fntParse(data: string): BitmapFont {
     let height;
     let offsetX;
     let offsetY;
-    let advanceX;
     let nextChar;
+    let advanceX;
 
     switch (definition.toLowerCase()) {
-      case 'page':
-        for (let i = 1; i < values.length; i++) {
-          if (texture) {
-            throw new ParseException('Multi-page fonts not supported');
-          }
+      case 'common':
+        for (let i = 0; i < values.length; i++) {
+          const [key, value] = values[i].split('=');
 
+          switch (key.toLowerCase()) {
+            case 'lineheight':
+              lineHeight = Number(value);
+              break;
+
+            case 'pages':
+              if (value !== '1') {
+                throw new ParseException('Multi-page fonts not supported');
+              }
+              break;
+
+            case 'scalew':
+              textureWidth = Number(value);
+              break;
+
+            case 'scaleh':
+              textureHeight = Number(value);
+              break;
+          }
+        }
+        break;
+
+      case 'page':
+        for (let i = 0; i < values.length; i++) {
           const [key, value] = values[i].split('=');
 
           if (key.toLowerCase() === 'file') {
-            texture = value.replace(/^"(.+)"$/, '$1');
+            texture = value?.replace(/^"(.+)"$/, '$1');
           }
         }
         break;
 
       case 'char':
-      case 'kerning':
         for (let i = 0; i < values.length; i++) {
           const [key, value] = values[i].split('=');
 
           switch (key.toLowerCase()) {
             case 'id':
-            case 'first':
               char = String.fromCharCode(Number(value));
               break;
 
@@ -82,6 +102,18 @@ export function fntParse(data: string): BitmapFont {
 
             case 'xadvance':
               advanceX = Number(value);
+              break;
+          }
+        }
+        break;
+
+      case 'kerning':
+        for (let i = 0; i < values.length; i++) {
+          const [key, value] = values[i].split('=');
+
+          switch (key.toLowerCase()) {
+            case 'first':
+              char = String.fromCharCode(Number(value));
               break;
 
             case 'second':
@@ -127,9 +159,14 @@ export function fntParse(data: string): BitmapFont {
     }
   }
 
-  if (!texture) {
-    throw new ParseException('Font texture not defined');
+  if (
+    texture === undefined ||
+    textureWidth === undefined ||
+    textureHeight === undefined ||
+    lineHeight === undefined
+  ) {
+    throw new ParseException('Font meta not defined');
   }
 
-  return bitmapFontInit(texture, glyphs);
+  return bitmapFontInit(texture, [textureWidth, textureHeight], lineHeight, glyphs);
 }
