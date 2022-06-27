@@ -1,5 +1,5 @@
-import { AppState, appInit, appStep } from './app/app';
-import { DebugState, debugInit, debugStep } from './debug/debug';
+import { appInit, AppState, appStep } from './app/app';
+import { debugInit, DebugState, debugStep } from './debug/debug';
 
 async function requestAnimationFrameAsync(callback: () => Promise<void>): Promise<void> {
   await new Promise((resolve) => {

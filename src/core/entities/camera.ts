@@ -1,9 +1,9 @@
 import {
-  Vec3,
   Mat4,
   mat4Multiply,
   mat4RotationEuler,
   mat4Translation,
+  Vec3,
   vec3Add,
   vec3Multiply,
 } from '../utils/math';

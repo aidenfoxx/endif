@@ -1,6 +1,6 @@
-import { mtlParse } from './mtl';
-import { ParseException } from '../../expcetions';
 import { materialInit } from '../../entities/material';
+import { ParseException } from '../../expcetions';
+import { mtlParse } from './mtl';
 
 jest.mock('../../entities/material', () => ({
   materialInit: jest.fn(),

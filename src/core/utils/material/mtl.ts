@@ -1,6 +1,6 @@
 import { Material, materialInit } from '../../entities/material';
-import { Vec3 } from '../../utils/math';
 import { ParseException } from '../../expcetions';
+import { Vec3 } from '../../utils/math';
 
 // PBR reference: http://exocortex.com/blog/extending_wavefront_mtl_to_support_pbr
 export function mtlParse(data: string): Material {

@@ -1,18 +1,18 @@
-import {
-  KeyState,
-  KeyCode,
-  inputGetKeyState,
-  inputGetMouseButtonState,
-  ButtonState,
-  inputGetMousePosition,
-} from './input';
 import { cameraInit, cameraRotate, cameraTranslate } from '../core/entities/camera';
 import { Timestep, timestepInit, timestepStep } from '../core/entities/timestep';
 import { degreesToRadians, mat4Perspective } from '../core/utils/math';
-import { Scene, sceneAddActor, sceneInit, sceneRender, sceneSetCamera } from './renderer/scene';
-import { propAddShader, propInit } from './renderer/prop';
-import { actorInit } from './renderer/actor';
 import { materialLoad, meshLoad, shaderLoad, textureLoad } from './assets/loader';
+import {
+  ButtonState,
+  inputGetKeyState,
+  inputGetMouseButtonState,
+  inputGetMousePosition,
+  KeyCode,
+  KeyState,
+} from './input';
+import { actorInit } from './renderer/actor';
+import { propAddShader, propInit } from './renderer/prop';
+import { Scene, sceneAddActor, sceneInit, sceneRender, sceneSetCamera } from './renderer/scene';
 
 const CANVAS_WIDTH = 1600;
 const CANVAS_HEIGHT = 900;

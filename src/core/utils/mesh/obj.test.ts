@@ -1,6 +1,6 @@
-import { objParse } from './obj';
 import { meshInit } from '../../entities/mesh';
 import { ParseException } from '../../expcetions';
+import { objParse } from './obj';
 
 jest.mock('../../entities/mesh', () => ({
   meshInit: jest.fn(),

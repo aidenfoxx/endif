@@ -1,4 +1,4 @@
-import { Prop } from './prop';
+import { AABB, aabbTransform } from '../../core/utils/aabb';
 import {
   Mat4,
   mat4Multiply,
@@ -7,7 +7,7 @@ import {
   mat4Translation,
   Vec3,
 } from '../../core/utils/math';
-import { AABB, aabbTransform } from '../../core/utils/aabb';
+import { Prop } from './prop';
 
 export interface Actor {
   readonly prop: Prop;
