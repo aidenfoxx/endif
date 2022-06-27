@@ -1,8 +1,6 @@
 import typescript from '@rollup/plugin-typescript';
 import replace from '@rollup/plugin-replace';
 
-console.log(process.env.DEBUG);
-
 export default {
   input: 'src/main.ts',
   output: {

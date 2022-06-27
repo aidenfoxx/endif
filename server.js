@@ -1,36 +1,48 @@
 const fs = require('fs');
 const path = require('path');
 const http = require('http');
+const zlib = require('node:zlib');
 
 const PORT = 8080;
 const HOST = '127.0.0.1';
 const PATH_BASE = path.resolve(`${process.cwd()}/public`);
 
 const server = http.createServer(function (req, res) {
+  let fileStream;
+
   if (req.url === '/') {
-    res.writeHead(200);
-    res.end(fs.readFileSync(`${PATH_BASE}/index.html`));
-    return;
-  }
+    fileStream = fs.createReadStream(`${PATH_BASE}/index.html`);
+  } else {
+    const fileName = path.resolve(`${PATH_BASE}${req.url}`);
 
-  const filename = path.resolve(`${PATH_BASE}${req.url}`);
+    if (fs.existsSync(fileName)) {
+      const extname = path.extname(fileName);
 
-  if (fs.existsSync(filename)) {
-    const extname = path.extname(filename);
+      switch (extname) {
+        case '.js':
+          res.setHeader('Content-Type', 'text/javascript');
+          break;
+      }
 
-    switch (extname) {
-      case '.js':
-        res.setHeader('Content-Type', 'text/javascript');
-        break;
+      fileStream = fs.createReadStream(fileName);
     }
+  }
 
-    res.writeHead(200);
-    res.end(fs.readFileSync(filename));
+  if (!fileStream) {
+    res.writeHead(404);
+    res.end();
     return;
   }
 
-  res.writeHead(404);
-  res.end('');
+  var acceptEncoding = req.headers['accept-encoding'];
+
+  if (acceptEncoding?.match(/\bgzip\b/)) {
+    res.writeHead(200, { 'Content-Encoding': 'gzip' });
+    fileStream.pipe(zlib.createGzip()).pipe(res);
+  } else {
+    res.writeHead(200);
+    fileStream.pipe(res);
+  }
 });
 
 server.listen(PORT, HOST, () => {
