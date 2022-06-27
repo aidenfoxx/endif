@@ -1,16 +1,14 @@
 import {
-  BitmapFont,
-  bitmapFontAddGlyph,
-  bitmapFontInit,
-  BitmapGlyph,
+  BitmapFont, bitmapFontInit,
+  BitmapGlyph
 } from '../../entities/bitmapfont';
 import { ParseException } from '../../expcetions';
 
 export function fntParse(data: string): BitmapFont {
   const lines = data.split(/\r\n|\n/g);
 
-  const chars: Array<BitmapGlyph> = [];
-  const glyphs: Map<string, Map<string, number>> = new Map();
+  const glyphs: Array<BitmapGlyph> = [];
+  const kernings: Map<string, Map<string, number>> = new Map();
 
   let texture;
 
@@ -42,14 +40,14 @@ export function fntParse(data: string): BitmapFont {
           const [key, value] = values[i].split('=');
 
           if (key.toLowerCase() === 'file') {
-            texture = value;
+            texture = value.replace(/^"(.+)"$/, '$1');
           }
         }
         break;
 
       case 'char':
       case 'kerning':
-        for (let i = 1; i < values.length; i++) {
+        for (let i = 0; i < values.length; i++) {
           const [key, value] = values[i].split('=');
 
           switch (key.toLowerCase()) {
@@ -102,9 +100,9 @@ export function fntParse(data: string): BitmapFont {
       continue;
     }
 
-    // Create glyph store for character
-    if (!glyphs.get(char)) {
-      glyphs.set(char, new Map());
+    // Create kerning store for glyph
+    if (!kernings.get(char)) {
+      kernings.set(char, new Map());
     }
 
     if (
@@ -116,16 +114,16 @@ export function fntParse(data: string): BitmapFont {
       offsetY !== undefined &&
       advanceX !== undefined
     ) {
-      chars.push({
+      glyphs.push({
         char,
         position: [posX, posY],
         size: [width, height],
         offset: [offsetX, offsetY],
         advance: advanceX,
-        kernings: glyphs.get(char)!,
+        kernings: kernings.get(char)!,
       });
     } else if (nextChar !== undefined && offsetX !== undefined) {
-      glyphs.get(char)!.set(nextChar, offsetX);
+      kernings.get(char)!.set(nextChar, offsetX);
     }
   }
 
@@ -133,11 +131,5 @@ export function fntParse(data: string): BitmapFont {
     throw new ParseException('Font texture not defined');
   }
 
-  const font = bitmapFontInit(texture);
-
-  for (let i = 0; i < chars.length; i++) {
-    bitmapFontAddGlyph(font, chars[i]);
-  }
-
-  return font;
+  return bitmapFontInit(texture, glyphs);
 }

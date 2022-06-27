@@ -14,19 +14,15 @@ export interface BitmapFont {
   readonly glyphs: ReadonlyMap<string, BitmapGlyph>;
 }
 
-export function bitmapFontInit(texture: string): BitmapFont {
+export function bitmapFontInit(texture: string, glyphs: BitmapGlyph[]): BitmapFont {
+  const mappedGlyphs: Map<string, BitmapGlyph> = new Map();
+
+  for (let i = 0; i < glyphs.length; i++) {
+    mappedGlyphs.set(glyphs[i].char, glyphs[i]);
+  }
+
   return {
     texture,
-    glyphs: new Map(),
-  };
-}
-
-export function bitmapFontAddGlyph(font: BitmapFont, glyph: BitmapGlyph): BitmapFont {
-  const nextGlyphs = new Map(font.glyphs);
-  nextGlyphs.set(glyph.char, glyph);
-
-  return {
-    ...font,
-    glyphs: nextGlyphs,
+    glyphs: mappedGlyphs
   };
 }

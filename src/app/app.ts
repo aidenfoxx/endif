@@ -1,5 +1,6 @@
 import { cameraInit, cameraRotate, cameraTranslate } from '../core/entities/camera';
 import { Timestep, timestepInit, timestepStep } from '../core/entities/timestep';
+import { fntParse } from '../core/utils/bitmapfont/fnt';
 import { degreesToRadians, mat4Perspective } from '../core/utils/math';
 import { materialLoad, meshLoad, shaderLoad, textureLoad } from './assets/loader';
 import {
@@ -8,7 +9,7 @@ import {
   inputGetMouseButtonState,
   inputGetMousePosition,
   KeyCode,
-  KeyState,
+  KeyState
 } from './input';
 import { actorInit } from './renderer/actor';
 import { propAddShader, propInit } from './renderer/prop';
@@ -63,6 +64,11 @@ export async function appInit(gl: WebGL2RenderingContext): Promise<AppState> {
   gl.enable(gl.CULL_FACE);
 
   const scene = await buildScene(gl);
+
+  const response = await fetch('./assets/fonts/open-sans.fnt');
+  const font = fntParse(await response.text());
+
+  console.log(font);
 
   return {
     gl,
