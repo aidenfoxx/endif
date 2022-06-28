@@ -7,7 +7,7 @@ import { degreesToRadians, mat4Orthographic, mat4Perspective } from '../core/uti
 import { materialLoad, meshLoad, shaderLoad, textureLoad } from './assets/loader';
 import { actorInit, actorSetRotation } from './renderer/actor';
 import { propAddShader, propInit } from './renderer/prop';
-import { Scene, sceneAddActor, sceneInit, sceneRemoveActor, sceneRender, sceneSetCamera } from './renderer/scene';
+import { Scene, sceneAddActor, sceneInit, sceneRender } from './renderer/scene';
 import { vaoCreate } from './utils/gl/vao';
 
 const VIEWPORT_WIDTH = 1600;
@@ -42,30 +42,29 @@ async function buildScene(gl: WebGL2RenderingContext): Promise<Scene> {
     './assets/shaders/phong.frag'
   );
 
-  const crate = propAddShader(
-    propInit(cubeRef, materialRef, { diffuseRef: textureRef }),
-    shaderRef
-  );
-  const teapot = propAddShader(
-    propInit(teapotRef, materialRef, { diffuseRef: textureRef }),
-    shaderRef
-  );
+  const crate = propInit(cubeRef, materialRef, { diffuseRef: textureRef });
+  propAddShader(crate, shaderRef);
+
+  const teapot = propInit(teapotRef, materialRef, { diffuseRef: textureRef });
+  propAddShader(teapot, shaderRef);
 
   let scene = sceneInit(camera);
 
-  for (let x = -8; x < 8; x++) {
-    for (let y = -8; y < 8; y++) {
+  for (let x = -25; x < 25; x++) {
+    for (let y = -25; y < 25; y++) {
       const teapotActor = actorInit(teapot, [x * 5, 0, y * 5], [0, 0, 0], [1, 1, 1]);
-      scene = sceneAddActor(scene, teapotActor);
+      sceneAddActor(scene, teapotActor);
     }
   }
 
-  for (let x = -8; x < 8; x++) {
-    for (let y = -8; y < 8; y++) {
+  for (let x = -25; x < 25; x++) {
+    for (let y = -25; y < 25; y++) {
       const crateActor = actorInit(crate, [x * 4.5, 0, y * 4.5], [0, 0, 0], [1, 1, 1]);
-      scene = sceneAddActor(scene, crateActor);
+      sceneAddActor(scene, crateActor);
     }
   }
+
+  console.log('Scene actors:', scene.actors.size);
 
   return scene;
 }
@@ -96,9 +95,13 @@ async function buildGUI(gl: WebGL2RenderingContext): Promise<Scene> {
     './assets/shaders/flat.frag'
   );
 
-  const text = propAddShader(propInit(meshRef, materialRef, { diffuseRef: textureRef }), shaderRef);
+  const text = propInit(meshRef, materialRef, { diffuseRef: textureRef });
+  propAddShader(text, shaderRef);
+
   const textActor = actorInit(text, [-width + 16, height - 8, 0], [0, 0, 0], [32, 32, 32]);
-  const scene = sceneAddActor(sceneInit(camera), textActor);
+  const scene = sceneInit(camera);
+
+  sceneAddActor(scene, textActor);
 
   return scene;
 }
@@ -132,11 +135,10 @@ let previousTime = performance.now();
 let counter = 0;
 let fps = 0;
 
-export async function appStep(appState: AppState): Promise<AppState> {
+export async function appStep(appState: AppState): Promise<void> {
   const {
     gl,
     scenes: [scene, gui],
-    input,
   } = appState;
 
   const nextTime = performance.now();
@@ -154,24 +156,14 @@ export async function appStep(appState: AppState): Promise<AppState> {
   sceneRender(gl, scene);
   sceneRender(gl, gui);
 
-  let nextScene = scene;
-
   for (const value of scene.actors) {
-    const nextActor = actorSetRotation(value, [
+    actorSetRotation(value, [
       value.rotation[0],
       value.rotation[1],
       value.rotation[2] + .1
     ]);
-
-    nextScene = sceneAddActor(sceneRemoveActor(nextScene, value), nextActor);
   }
 
-  const nextCamera = cameraRotate(cameraTranslate(scene.camera, [0.2, 0, 0]), [0, .005, 0]);
-  nextScene = sceneSetCamera(nextScene, nextCamera);
-
-  return {
-    gl,
-    scenes: [nextScene, gui],
-    input,
-  };
+  cameraTranslate(scene.camera, [0.2, 0, 0]);
+  cameraRotate(scene.camera, [0, .005, 0]);
 }

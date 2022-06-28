@@ -1,15 +1,15 @@
 export interface Mesh {
-  readonly vertices: ReadonlyArray<number>;
-  readonly normals: ReadonlyArray<number>;
-  readonly uvs: ReadonlyArray<number>;
-  readonly indices: ReadonlyArray<number>;
+  vertices: Array<number>;
+  normals: Array<number>;
+  uvs: Array<number>;
+  indices: Array<number>;
 }
 
 export function meshInit(
-  vertices: ReadonlyArray<number>,
-  uvs: ReadonlyArray<number> = [],
-  normals: ReadonlyArray<number> = [],
-  indices: ReadonlyArray<number> = []
+  vertices: Array<number>,
+  uvs: Array<number> = [],
+  normals: Array<number> = [],
+  indices: Array<number> = []
 ): Mesh {
   return {
     vertices: [...vertices],

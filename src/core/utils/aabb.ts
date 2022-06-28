@@ -5,12 +5,12 @@ import {
   vec3Multiply,
   vec3MultiplyMat4,
   vec3Subtract,
-  vec4MultiplyMat4,
+  vec4MultiplyMat4
 } from './math';
 
-export type AABB = Readonly<[Vec3, Vec3]>;
+export type AABB = [Vec3, Vec3];
 
-export function aabbCalculate(vertices: ReadonlyArray<number>): AABB {
+export function aabbCalculate(vertices: Array<number>): AABB {
   let minX = 0;
   let minY = 0;
   let minZ = 0;

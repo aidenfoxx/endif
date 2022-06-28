@@ -2,38 +2,34 @@ import { Vec2 } from '../utils/math';
 import { Mesh, meshInit } from './mesh';
 
 export interface BitmapGlyph {
-  readonly char: string;
-  readonly position: Vec2;
-  readonly size: Vec2;
-  readonly offset: Vec2;
-  readonly advance: number;
-  readonly kernings: ReadonlyMap<string, number>;
+  char: string;
+  position: Vec2;
+  size: Vec2;
+  offset: Vec2;
+  advance: number;
+  kernings: Map<string, number>;
 }
 
 export interface BitmapFont {
-  readonly texture: string;
-  readonly textureSize: Vec2;
-  readonly lineHeight: number;
-  readonly glyphs: ReadonlyMap<string, BitmapGlyph>;
+  texture: string;
+  textureSize: Readonly<Vec2>;
+  lineHeight: number;
+  glyphs: Map<string, BitmapGlyph>;
 }
 
 export function bitmapFontInit(
-  texture: string,
-  textureSize: Vec2,
   lineHeight: number,
-  glyphs: BitmapGlyph[]
+  texture: string,
+  textureSize: Readonly<Vec2>,
+  glyphs: Array<BitmapGlyph>
 ): BitmapFont {
-  const mappedGlyphs: Map<string, BitmapGlyph> = new Map();
-
-  for (let i = 0; i < glyphs.length; i++) {
-    mappedGlyphs.set(glyphs[i].char, glyphs[i]);
-  }
-
   return {
     texture,
-    textureSize,
+    textureSize: [...textureSize],
     lineHeight,
-    glyphs: mappedGlyphs,
+    glyphs: new Map(
+      glyphs.map(glyph => [glyph.char, { ...glyph }])
+    )
   };
 }
 

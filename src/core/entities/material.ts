@@ -1,30 +1,30 @@
 import { Vec3 } from '../utils/math';
 
 export interface MaterialValues {
-  readonly specular?: Vec3;
-  readonly roughness?: Vec3;
-  readonly metallic?: Vec3;
+  specular?: Vec3;
+  roughness?: Vec3;
+  metallic?: Vec3;
 }
 
 export interface MaterialTextures {
-  readonly diffuseMap?: string;
-  readonly specularMap?: string;
-  readonly roughnessMap?: string;
-  readonly metallicMap?: string;
-  readonly normalMap?: string;
+  diffuseMap?: string;
+  specularMap?: string;
+  roughnessMap?: string;
+  metallicMap?: string;
+  normalMap?: string;
 }
 
 export interface Material extends MaterialValues, MaterialTextures {
-  readonly diffuse: Vec3;
+  diffuse: Vec3;
 }
 
 export function materialInit(
-  diffuse: Vec3,
-  values: MaterialValues = {},
-  textures: MaterialTextures = {}
+  diffuse: Readonly<Vec3>,
+  values: Readonly<MaterialValues> = {},
+  textures: Readonly<MaterialTextures> = {}
 ): Material {
   return {
-    diffuse,
+    diffuse: [...diffuse],
     ...values,
     ...textures,
   };

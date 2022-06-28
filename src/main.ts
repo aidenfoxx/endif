@@ -1,5 +1,5 @@
-import { appInit, AppState, appStep } from './app/app';
-import { debugInit, DebugState, debugStep } from './debug/debug';
+import { appInit, appStep } from './app/app';
+import { debugInit, debugStep } from './debug/debug';
 
 async function requestAnimationFrameAsync(callback: () => Promise<void>): Promise<void> {
   await new Promise((resolve) => {
@@ -21,25 +21,28 @@ if (!gl) {
 }
 
 if (process.env.DEBUG) {
-  async function exec(debugState: DebugState): Promise<void> {
-    const nextDebugState = await debugStep(debugState);
-
-    await requestAnimationFrameAsync(async () => {
-      await exec(nextDebugState);
-    });
-  }
-
   const debugState = await debugInit(gl);
-  await exec(debugState);
-} else {
-  async function exec(appState: AppState): Promise<void> {
-    const nextAppState = await appStep(appState);
+
+  async function exec(): Promise<void> {
+    await debugStep(debugState);
 
     await requestAnimationFrameAsync(async () => {
-      await exec(nextAppState);
+      await exec();
     });
   }
 
+
+  await exec();
+} else {
   const appState = await appInit(gl);
-  await exec(appState);
+
+  async function exec(): Promise<void> {
+    await appStep(appState);
+
+    await requestAnimationFrameAsync(async () => {
+      await exec();
+    });
+  }
+
+  await exec();
 }

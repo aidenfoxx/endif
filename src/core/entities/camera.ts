@@ -2,17 +2,18 @@ import {
   Mat4,
   mat4Multiply,
   mat4RotationEuler,
+  mat4Scale,
   mat4Translation,
   Vec3,
   vec3Add,
-  vec3Multiply,
+  vec3Multiply
 } from '../utils/math';
 
 export interface Camera {
-  readonly position: Vec3;
-  readonly rotation: Vec3;
-  readonly projection: Mat4;
-  readonly view: Mat4;
+  position: Vec3;
+  rotation: Vec3;
+  projection: Mat4;
+  view: Mat4;
 }
 
 function calculateViewMatrix(position: Vec3, rotation: Vec3): Mat4 {
@@ -28,7 +29,7 @@ export function cameraInit(position: Vec3, rotation: Vec3, projection: Mat4): Ca
   };
 }
 
-export function cameraTranslate(camera: Camera, translation: Vec3) {
+export function cameraTranslate(camera: Camera, translation: Vec3): void {
   const rotationMatrix = mat4RotationEuler(camera.rotation);
 
   const axisX: Vec3 = [rotationMatrix[0], rotationMatrix[4], rotationMatrix[8]];
@@ -44,35 +45,27 @@ export function cameraTranslate(camera: Camera, translation: Vec3) {
   nextPosition = vec3Add(nextPosition, vec3Multiply(axisY, translateY));
   nextPosition = vec3Add(nextPosition, vec3Multiply(axisZ, translateZ));
 
-  return {
-    ...camera,
-    position: nextPosition,
-    view: mat4Multiply(rotationMatrix, mat4Translation(nextPosition)),
-  };
+  camera.position = nextPosition;
+  camera.view = mat4Multiply(rotationMatrix, mat4Translation(nextPosition));
 }
 
-export function cameraSetPosition(camera: Camera, position: Vec3): Camera {
-  return {
-    ...camera,
-    position,
-    view: calculateViewMatrix(position, camera.rotation),
-  };
+export function cameraSetPosition(camera: Camera, position: Vec3): void {
+  camera.position = position;
+  camera.view = calculateViewMatrix(position, camera.rotation);
 }
 
-export function cameraRotate(camera: Camera, rotation: Vec3) {
+export function cameraRotate(camera: Camera, rotation: Vec3): void {
   const nextRotation = vec3Add(camera.rotation, rotation);
 
-  return {
-    ...camera,
-    rotation: nextRotation,
-    view: calculateViewMatrix(camera.position, nextRotation),
-  };
+  camera.rotation = nextRotation;
+  camera.view = calculateViewMatrix(camera.position, nextRotation);
 }
 
-export function cameraSetRotation(camera: Camera, rotation: Vec3): Camera {
-  return {
-    ...camera,
-    rotation,
-    view: calculateViewMatrix(camera.position, rotation),
-  };
+export function cameraSetRotation(camera: Camera, rotation: Vec3): void {
+  camera.rotation = rotation;
+  camera.view = calculateViewMatrix(camera.position, rotation);
 }
+
+const test = cameraInit([0, 0, 0], [0, 0, 0], mat4Scale([1, 1, 1]));
+
+cameraSetPosition(test, [1, 2, 3]);

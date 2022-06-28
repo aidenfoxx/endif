@@ -1,37 +1,33 @@
 export interface Timestep {
-  readonly delta: number;
-  readonly accumulator: number;
-  readonly previous: number;
+  delta: number;
+  accumulator: number;
+  previousTime: number;
 }
 
 export function timestepInit(delta: number): Timestep {
   return {
     delta: delta,
     accumulator: 0,
-    previous: performance.now(),
+    previousTime: performance.now(),
   };
 }
 
-export function timestepStep(timestep: Timestep): Timestep {
+export function timestepStep(timestep: Timestep): boolean {
   if (timestep.accumulator >= 1) {
-    return {
-      ...timestep,
-      accumulator: timestep.accumulator - 1,
-    };
+    timestep.accumulator -= 1;
+    return true;
+
   }
 
-  const current = performance.now();
+  const currentTime = performance.now();
 
   // Handle timing variance in browser
-  if (current > timestep.previous) {
-    const delta = current - timestep.previous;
+  if (currentTime > timestep.previousTime) {
+    const delta = currentTime - timestep.previousTime;
 
-    return {
-      delta: timestep.delta,
-      previous: current,
-      accumulator: timestep.accumulator + delta / timestep.delta,
-    };
+    timestep.previousTime = currentTime;
+    timestep.accumulator += delta / timestep.delta;
   }
 
-  return timestep;
+  return false;
 }

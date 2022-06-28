@@ -3,32 +3,30 @@
  */
 
 // Types
-export type Vec2 = Readonly<[number, number]>;
+export type Vec2 = [number, number];
 
-export type Vec3 = Readonly<[number, number, number]>;
+export type Vec3 = [number, number, number];
 
-export type Vec4 = Readonly<[number, number, number, number]>;
+export type Vec4 = [number, number, number, number];
 
-export type Mat4 = Readonly<
-  [
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number
-  ]
->;
+export type Mat4 = [
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number
+];
 
 // Vector functions
 export function vec2Add(vec1: Vec2, vec2: Vec2): Vec2 {

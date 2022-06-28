@@ -5,16 +5,16 @@ import { Actor } from './actor';
 import { Prop } from './prop';
 
 export interface Scene {
-  readonly camera: Camera;
-  readonly actors: ReadonlySet<Actor>;
-  readonly renderQueue: ReadonlyMap<ShaderRef, ReadonlyMap<Prop, Actor[]>>;
-  readonly frustumCulling: boolean;
+  camera: Camera;
+  actors: Set<Actor>;
+  renderQueue: Map<ShaderRef, Map<Prop, Actor[]>>;
+  frustumCulling: boolean;
 }
 
 function generateRenderQueue(
-  actors: ReadonlySet<Actor>,
+  actors: Set<Actor>,
   camera?: Camera
-): ReadonlyMap<ShaderRef, ReadonlyMap<Prop, Actor[]>> {
+): Map<ShaderRef, Map<Prop, Actor[]>> {
   const renderQueue: Map<ShaderRef, Map<Prop, Actor[]>> = new Map();
 
   for (const actor of actors) {
@@ -52,36 +52,19 @@ export function sceneInit(camera: Camera, frustumCulling: boolean = false): Scen
   };
 }
 
-export function sceneSetCamera(scene: Scene, camera: Camera): Scene {
-  return {
-    ...scene,
-    camera,
-    renderQueue: scene.frustumCulling
-      ? generateRenderQueue(scene.actors, camera)
-      : scene.renderQueue,
-  };
+export function sceneSetCamera(scene: Scene, camera: Camera): void {
+  scene.camera = camera;
+  scene.renderQueue = scene.frustumCulling ? generateRenderQueue(scene.actors, camera) : scene.renderQueue;
 }
 
-export function sceneAddActor(scene: Scene, actor: Actor): Scene {
-  const nextActors = new Set(scene.actors);
-  nextActors.add(actor);
-
-  return {
-    ...scene,
-    actors: nextActors,
-    renderQueue: generateRenderQueue(nextActors, scene.frustumCulling ? scene.camera : undefined),
-  };
+export function sceneAddActor(scene: Scene, actor: Actor): void {
+  scene.actors.add(actor);
+  scene.renderQueue = generateRenderQueue(scene.actors, scene.camera);
 }
 
-export function sceneRemoveActor(scene: Scene, actor: Actor): Scene {
-  const nextActors = new Set(scene.actors);
-  nextActors.delete(actor);
-
-  return {
-    ...scene,
-    actors: nextActors,
-    renderQueue: generateRenderQueue(nextActors, scene.frustumCulling ? scene.camera : undefined),
-  };
+export function sceneRemoveActor(scene: Scene, actor: Actor): void {
+  scene.actors.delete(actor);
+  scene.renderQueue = generateRenderQueue(scene.actors, scene.camera);
 }
 
 export function sceneRender(gl: WebGL2RenderingContext, scene: Scene): void {

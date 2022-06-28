@@ -168,5 +168,5 @@ export function fntParse(data: string): BitmapFont {
     throw new ParseException('Font meta not defined');
   }
 
-  return bitmapFontInit(texture, [textureWidth, textureHeight], lineHeight, glyphs);
+  return bitmapFontInit(lineHeight, texture, [textureWidth, textureHeight], glyphs);
 }
