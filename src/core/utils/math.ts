@@ -199,11 +199,11 @@ export function eulerToQuat(euler: Vec3): Vec4 {
 }
 
 export function degreesToRadians(degrees: number): number {
-  return (degrees * Math.PI) / 180.0;
+  return (degrees * Math.PI) / 180;
 }
 
 export function radiansToDegrees(radians: number): number {
-  return (radians * 180.0) / Math.PI;
+  return (radians * 180) / Math.PI;
 }
 
 // Matrix functions
@@ -364,7 +364,7 @@ export function mat4Perspective(
   nearClip: number,
   farClip: number
 ): Mat4 {
-  const cotan = 1.0 / Math.tan(fov / 2.0);
+  const cotan = 1 / Math.tan(fov / 2);
 
   const xx = cotan / aspectRatio;
   const yy = cotan;
@@ -373,6 +373,25 @@ export function mat4Perspective(
   const wz = -1;
 
   return [xx, 0, 0, 0, 0, yy, 0, 0, 0, 0, zz, wz, 0, 0, zw, 0];
+}
+
+export function mat4Orthographic(
+  left: number,
+  right: number,
+  top: number,
+  bottom: number,
+  nearClip: number,
+  farClip: number
+): Mat4 {
+  const xx = 2 / (right - left);
+  const yy = 2 / (top - bottom);
+  const zz = -2 / (farClip - nearClip);
+
+  const xw = -(right + left) / (right - left);
+  const yw = -(top + bottom) / (top - bottom);
+  const zw = -(farClip + nearClip) / (farClip - nearClip);
+
+  return [xx, 0, 0, 0, 0, yy, 0, 0, 0, 0, zz, 0, xw, yw, zw, 1];
 }
 
 export function mat4LookAt(position: Vec3, target: Vec3, up: Vec3): Mat4 {

@@ -241,6 +241,8 @@ describe('math', () => {
       ]);
     });
 
+    test.todo('should calculate orthographic');
+
     test('should calculate look at', () => {
       const result = math.mat4LookAt([1, 2, 3], [4, 5, 6], [0, 1, 0]);
 

@@ -95,6 +95,8 @@ export function ddsParse(buffer: ArrayBuffer): Texture {
       }
     }
 
+    // TODO: We need to flip the texture for GL
+
     mipmaps.push(mipmapData);
 
     mipmapWidth /= 2;

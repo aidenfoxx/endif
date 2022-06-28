@@ -20,8 +20,8 @@ export interface Actor {
 
 function calculateModelMatrix(position: Vec3, rotation: Vec3, scale: Vec3): Mat4 {
   return mat4Multiply(
-    mat4Multiply(mat4Scale(scale), mat4RotationEuler(rotation)),
-    mat4Translation(position)
+    mat4Multiply(mat4RotationEuler(rotation), mat4Translation(position)),
+    mat4Scale(scale)
   );
 }
 

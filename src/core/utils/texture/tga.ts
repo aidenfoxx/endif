@@ -45,5 +45,15 @@ export function tgaParse(buffer: ArrayBuffer): Texture {
     textureData[i + 2] = colorSwap;
   }
 
-  return textureInit(textureData, width, height, format, bitsPerPixel);
+  // TODO: This makes me sad
+  const flippedData = [];
+
+  for (let i = width - 1; i >= 0; i--) {
+    const lineSize = width * bytesPerPixel;
+    const lineOffset = lineSize * i;
+
+    flippedData.push(...textureData.slice(lineOffset, lineOffset + lineSize));
+  }
+
+  return textureInit(new Uint8Array(flippedData), width, height, format, bitsPerPixel);
 }

@@ -115,6 +115,8 @@ export function sceneRender(gl: WebGL2RenderingContext, scene: Scene): void {
       gl.activeTexture(gl.TEXTURE4);
       gl.bindTexture(gl.TEXTURE_2D, prop.textureRefs.normalRef?.tbo ?? null);
 
+      // TODO: Bind material
+
       for (let i = 0; i < actors.length; i++) {
         const actor = actors[i];
 

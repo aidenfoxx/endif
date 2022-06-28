@@ -67,10 +67,10 @@ export function bitmapFontGenerateMesh(font: BitmapFont, input: string): Mesh {
     const [offsetX, offsetY] = glyph.offset;
     const [width, height] = glyph.size;
 
-    const top = (offsetY + lineOffest) / font.lineHeight;
     const left = (offsetX + charOffset) / font.lineHeight;
-    const bottom = top + (height / font.lineHeight);
-    const right = left + (width / font.lineHeight);
+    const right = left + width / font.lineHeight;
+    const top = (offsetY + lineOffest) / font.lineHeight;
+    const bottom = top + height / font.lineHeight;
 
     vertices.push(left, -top, 0);
     vertices.push(left, -bottom, 0);
@@ -80,15 +80,15 @@ export function bitmapFontGenerateMesh(font: BitmapFont, input: string): Mesh {
     // Map texture to relative position
     const [positonX, positionY] = glyph.position;
 
-    const textureTop = positionY / textureHeight;
     const textureLeft = positonX / textureWidth;
-    const textureBottom = textureTop + (height / textureHeight);
-    const textureRight = textureLeft + (width / textureWidth);
+    const textureRight = textureLeft + width / textureWidth;
+    const textureTop = positionY / textureHeight;
+    const textureBottom = textureTop + height / textureHeight;
 
-    uvs.push(textureLeft, textureTop);
-    uvs.push(textureLeft, textureBottom);
-    uvs.push(textureRight, textureBottom);
-    uvs.push(textureRight, textureTop);
+    uvs.push(textureLeft, -textureTop);
+    uvs.push(textureLeft, -textureBottom);
+    uvs.push(textureRight, -textureBottom);
+    uvs.push(textureRight, -textureTop);
 
     indices.push(
       indexOffset,
