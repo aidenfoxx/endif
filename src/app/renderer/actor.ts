@@ -5,7 +5,7 @@ import {
   mat4RotationEuler,
   mat4Scale,
   mat4Translation,
-  Vec3,
+  Vec3
 } from '../../core/utils/math';
 import { Prop } from './prop';
 
@@ -20,7 +20,7 @@ export interface Actor {
 
 function calculateModelMatrix(position: Vec3, rotation: Vec3, scale: Vec3): Mat4 {
   return mat4Multiply(
-    mat4Multiply(mat4RotationEuler(rotation), mat4Translation(position)),
+    mat4Multiply(mat4Translation(position), mat4RotationEuler(rotation)),
     mat4Scale(scale)
   );
 }

@@ -1,21 +1,13 @@
 import { bitmapFontGenerateMesh } from '../core/entities/bitmapfont';
 import { cameraInit, cameraRotate, cameraTranslate } from '../core/entities/camera';
 import { materialInit } from '../core/entities/material';
-import { Timestep, timestepInit, timestepStep } from '../core/entities/timestep';
+import { Timestep, timestepInit } from '../core/entities/timestep';
 import { fntParse } from '../core/utils/bitmapfont/fnt';
 import { degreesToRadians, mat4Orthographic, mat4Perspective } from '../core/utils/math';
 import { materialLoad, meshLoad, shaderLoad, textureLoad } from './assets/loader';
-import {
-  ButtonState,
-  inputGetKeyState,
-  inputGetMouseButtonState,
-  inputGetMousePosition,
-  KeyCode,
-  KeyState,
-} from './input';
-import { actorInit } from './renderer/actor';
+import { actorInit, actorSetRotation } from './renderer/actor';
 import { propAddShader, propInit } from './renderer/prop';
-import { Scene, sceneAddActor, sceneInit, sceneRender, sceneSetCamera } from './renderer/scene';
+import { Scene, sceneAddActor, sceneInit, sceneRemoveActor, sceneRender, sceneSetCamera } from './renderer/scene';
 import { vaoCreate } from './utils/gl/vao';
 
 const VIEWPORT_WIDTH = 1600;
@@ -38,9 +30,10 @@ async function buildScene(gl: WebGL2RenderingContext): Promise<Scene> {
     0.1,
     1000
   );
-  const camera = cameraInit([0, 0, -5], [0, 0, 0], perspective);
+  const camera = cameraInit([0, -10, -40], [0, 0, 0], perspective);
 
-  const meshRef = await meshLoad(gl, './assets/models/cube.obj');
+  const cubeRef = await meshLoad(gl, './assets/models/cube.obj');
+  const teapotRef = await meshLoad(gl, './assets/models/teapot.obj');
   const textureRef = await textureLoad(gl, './assets/models/cube.dds');
   const materialRef = await materialLoad('./assets/models/cube.mtl');
   const shaderRef = await shaderLoad(
@@ -50,11 +43,29 @@ async function buildScene(gl: WebGL2RenderingContext): Promise<Scene> {
   );
 
   const crate = propAddShader(
-    propInit(meshRef, materialRef, { diffuseRef: textureRef }),
+    propInit(cubeRef, materialRef, { diffuseRef: textureRef }),
     shaderRef
   );
-  const crateActor = actorInit(crate, [0, 0, 0], [0, 0, 0], [1, 1, 1]);
-  const scene = sceneAddActor(sceneInit(camera), crateActor);
+  const teapot = propAddShader(
+    propInit(teapotRef, materialRef, { diffuseRef: textureRef }),
+    shaderRef
+  );
+
+  let scene = sceneInit(camera);
+
+  for (let x = -8; x < 8; x++) {
+    for (let y = -8; y < 8; y++) {
+      const teapotActor = actorInit(teapot, [x * 5, 0, y * 5], [0, 0, 0], [1, 1, 1]);
+      scene = sceneAddActor(scene, teapotActor);
+    }
+  }
+
+  for (let x = -8; x < 8; x++) {
+    for (let y = -8; y < 8; y++) {
+      const crateActor = actorInit(crate, [x * 4.5, 0, y * 4.5], [0, 0, 0], [1, 1, 1]);
+      scene = sceneAddActor(scene, crateActor);
+    }
+  }
 
   return scene;
 }
@@ -115,77 +126,52 @@ export async function appInit(gl: WebGL2RenderingContext): Promise<AppState> {
   };
 }
 
+const fpsElement = document.getElementById('fps');
+
+let previousTime = performance.now();
+let counter = 0;
+let fps = 0;
+
 export async function appStep(appState: AppState): Promise<AppState> {
   const {
     gl,
     scenes: [scene, gui],
-    input: { timestep, previousMouseX, previousMouseY },
+    input,
   } = appState;
 
-  let nextScene = appState.scenes[0];
-  let nextInput = appState.input;
+  const nextTime = performance.now();
+
+  counter += nextTime - previousTime;
+  previousTime = nextTime;
+  fps++;
+
+  if (counter >= 1000) {
+    fpsElement!.innerHTML = `FPS: ${fps}`;
+    counter = 0;
+    fps = 0;
+  }
 
   sceneRender(gl, scene);
   sceneRender(gl, gui);
 
-  if (timestep.accumulator >= 1) {
-    let nextCamera = appState.scenes[0].camera;
+  let nextScene = scene;
 
-    if (inputGetMouseButtonState(0) === ButtonState.BUTTON_DOWN) {
-      const [mouseX, mouseY] = inputGetMousePosition();
+  for (const value of scene.actors) {
+    const nextActor = actorSetRotation(value, [
+      value.rotation[0],
+      value.rotation[1],
+      value.rotation[2] + .1
+    ]);
 
-      let startX;
-      let startY;
-
-      if (previousMouseX == -1 && previousMouseY == -1) {
-        startX = mouseX;
-        startY = mouseY;
-      } else {
-        startX = previousMouseX;
-        startY = previousMouseY;
-      }
-
-      const maxRotation = 1.570795;
-      const rotateX = ((startX - mouseX) / (VIEWPORT_WIDTH / 2)) * maxRotation;
-      const rotateY = ((startY - mouseY) / (VIEWPORT_HEIGHT / 2)) * maxRotation;
-
-      nextCamera = cameraRotate(nextCamera, [rotateY, rotateX, 0]);
-      nextInput = {
-        ...nextInput,
-        previousMouseX: mouseX,
-        previousMouseY: mouseY,
-      };
-    } else if (inputGetMouseButtonState(0) === ButtonState.BUTTON_UP) {
-      nextInput = {
-        ...nextInput,
-        previousMouseX: -1,
-        previousMouseY: -1,
-      };
-    }
-
-    if (inputGetKeyState(KeyCode.KEY_W) === KeyState.KEY_DOWN) {
-      nextCamera = cameraTranslate(nextCamera, [0, 0, -0.1]);
-    } else if (inputGetKeyState(KeyCode.KEY_S) === KeyState.KEY_DOWN) {
-      nextCamera = cameraTranslate(nextCamera, [0, 0, 0.1]);
-    }
-
-    if (inputGetKeyState(KeyCode.KEY_A) === KeyState.KEY_DOWN) {
-      nextCamera = cameraTranslate(nextCamera, [0.1, 0, 0]);
-    } else if (inputGetKeyState(KeyCode.KEY_D) === KeyState.KEY_DOWN) {
-      nextCamera = cameraTranslate(nextCamera, [-0.1, 0, 0]);
-    }
-
-    if (nextCamera) {
-      nextScene = sceneSetCamera(scene, nextCamera);
-    }
+    nextScene = sceneAddActor(sceneRemoveActor(nextScene, value), nextActor);
   }
+
+  const nextCamera = cameraRotate(cameraTranslate(scene.camera, [0.2, 0, 0]), [0, .005, 0]);
+  nextScene = sceneSetCamera(nextScene, nextCamera);
 
   return {
     gl,
     scenes: [nextScene, gui],
-    input: {
-      ...nextInput,
-      timestep: timestepStep(timestep),
-    },
+    input,
   };
 }
