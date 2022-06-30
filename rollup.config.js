@@ -1,3 +1,4 @@
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import typescript from '@rollup/plugin-typescript';
 
@@ -5,7 +6,7 @@ export default [
   {
     input: [
       'src/main.ts',
-      'src/assetWorker.ts',
+      'packages/endif/dist/assetWorker.js',
     ],
     output: {
       dir: 'public',
@@ -14,11 +15,12 @@ export default [
       chunkFileNames: 'main.[hash].js',
     },
     plugins: [
-      typescript(),
+      nodeResolve(),
       replace({
         'process.env.DEBUG': process.env.DEBUG,
         preventAssignment: true
-      })
+      }),
+      typescript(),
     ],
-  }
+  },
 ];
