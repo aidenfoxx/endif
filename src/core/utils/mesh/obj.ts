@@ -54,7 +54,7 @@ export function objParse(data: string): Mesh {
   const indexedNormals = [];
   const indices = [];
 
-  const indexCache: Map<number, Map<number, Map<number, number>>> = new Map();
+  const indexCache: Map<string, number> = new Map();
 
   for (let i = 0, index = 0; i < points.length; i++) {
     const point = points[i];
@@ -63,7 +63,7 @@ export function objParse(data: string): Mesh {
     const vertexIndex = point[0] < 0 ? vertices.length + point[0] : point[0] - 1;
     const uvIndex = point[1] < 0 ? uvs.length + point[1] : point[1] - 1;
     const normalIndex = point[2] < 0 ? normals.length + point[2] : point[2] - 1;
-    const pointIndex = indexCache.get(vertexIndex)?.get(uvIndex)?.get(normalIndex);
+    const pointIndex = indexCache.get(`${vertexIndex}:${uvIndex}:${normalIndex}`);
 
     if (pointIndex === undefined) {
       // Index point
@@ -101,16 +101,8 @@ export function objParse(data: string): Mesh {
       }
 
       // Cached indexed point
-      if (!indexCache.get(vertexIndex)) {
-        indexCache.set(vertexIndex, new Map());
-      }
-
-      if (!indexCache.get(vertexIndex)!.get(uvIndex)) {
-        indexCache.get(vertexIndex)!.set(uvIndex, new Map());
-      }
-
       indices[i] = index;
-      indexCache.get(vertexIndex)!.get(uvIndex)!.set(normalIndex, index);
+      indexCache.set(`${vertexIndex}:${uvIndex}:${normalIndex}`, index);
       index++;
     } else {
       // Re-use indexed point

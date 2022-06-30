@@ -1,2 +1,4 @@
 node_modules
-public/main.*
+public/*
+!public/assets
+!public/index.html
