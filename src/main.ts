@@ -1,12 +1,10 @@
-import { entities, loader, math, renderer } from 'endif';
-
-type Timestep = entities.Timestep;
-type Scene = renderer.Scene;
-
-const { materialLoad, meshLoad, shaderLoad, textureLoad } = loader;
-const { degreesToRadians, mat4Orthographic, mat4Perspective } = math;
-const { cameraInit, cameraRotate, cameraTranslate, timestepInit } = entities;
-const { sceneAddActor, sceneInit, sceneRender, propAddShader, propInit, actorInit, actorSetRotation } = renderer;
+import {
+  Timestep,
+  Scene,
+  degreesToRadians, mat4Orthographic, mat4Perspective,
+  cameraInit, cameraRotate, cameraTranslate, timestepInit,
+  sceneAddActor, sceneInit, sceneRender, propAddShader, propInit, actorInit, actorSetRotation, parseOBJ, parseDDS, parseMTL, shaderInit
+} from '@endif/core';
 
 const VIEWPORT_WIDTH = 1600;
 const VIEWPORT_HEIGHT = 900;
@@ -26,19 +24,24 @@ async function buildScene(gl: WebGL2RenderingContext): Promise<Scene> {
     degreesToRadians(90),
     VIEWPORT_WIDTH / VIEWPORT_HEIGHT,
     0.1,
-    1000
+    1000 
   );
   const camera = cameraInit([0, -10, -40], [0, 0, 0], perspective);
 
-  const cubeRef = await meshLoad(gl, './assets/models/cube.obj');
-  const teapotRef = await meshLoad(gl, './assets/models/teapot.obj');
-  const textureRef = await textureLoad(gl, './assets/models/cube.dds');
-  const materialRef = await materialLoad('./assets/models/cube.mtl');
-  const shaderRef = await shaderLoad(
-    gl,
-    './assets/shaders/phong.vert',
-    './assets/shaders/phong.frag'
-  );
+  const cube = await (await fetch('./assets/models/cube.obj')).text();
+  const teapotData = await (await fetch('./assets/models/teapot.obj')).text();
+  const texture = await (await fetch('./assets/models/cube.dds')).arrayBuffer();
+  const materialData = await (await fetch('./assets/models/cube.mtl')).text();
+
+  const cubeRef = parseOBJ(gl, cube);
+  const teapotRef = parseOBJ(gl, teapotData);
+  const textureRef = parseDDS(gl, texture);
+  const materialRef = parseMTL(materialData);
+
+  const vertexData = await (await fetch('./assets/shaders/phong.vert')).text();
+  const fragmentData = await (await fetch('./assets/shaders/phong.frag')).text();
+
+  const shaderRef = shaderInit(gl, vertexData, fragmentData);
 
   const crate = propInit(cubeRef, materialRef, { diffuseRef: textureRef });
   propAddShader(crate, shaderRef);

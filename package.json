@@ -6,7 +6,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "start": "node server.js",
-    "dev": "concurrently -p none \"cross-env DEBUG=true npm run build:watch\" \"npm run start\"",
+    "dev": "cross-env DEBUG=true concurrently -p none \"npm run build:watch\" \"npm run build:watch -ws\" \"npm run start\"",
     "build": "rollup -c",
     "build:watch": "rollup -c -w",
     "test": "jest",

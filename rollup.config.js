@@ -4,10 +4,7 @@ import typescript from '@rollup/plugin-typescript';
 
 export default [
   {
-    input: [
-      'src/main.ts',
-      'packages/endif/dist/assetWorker.js',
-    ],
+    input: 'src/main.ts',
     output: {
       dir: 'public',
       format: 'esm',

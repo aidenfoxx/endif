@@ -1,4 +1,6 @@
 node_modules
 public/*
+packages/*/dist/*
 !public/assets
 !public/index.html
+!packages/*/dist/.gitkeep

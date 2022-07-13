@@ -1,4 +1,4 @@
-import ENDIF from 'endif';
+import { Vec2 } from '@endif/core';
 
 export enum ButtonState {
   BUTTON_UP,
@@ -52,7 +52,7 @@ window.addEventListener('keyup', (event: KeyboardEvent) => {
   inputState.keyStates.set(event.code, KeyState.KEY_UP);
 });
 
-export function inputGetMousePosition(): ENDIF.math.Vec2 {
+export function inputGetMousePosition(): Vec2 {
   return [inputState.mouseX, inputState.mouseY];
 }
 
