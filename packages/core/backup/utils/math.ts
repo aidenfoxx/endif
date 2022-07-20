@@ -207,14 +207,6 @@ export function radiansToDegrees(radians: number): number {
 }
 
 // Matrix functions
-export function mat4Empty(): Mat4 {
-  return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-}
-
-export function mat4Identity(): Mat4 {
-  return [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
-}
-
 export function mat4Translation(translation: Vec3): Mat4 {
   return [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, translation[0], translation[1], translation[2], 1];
 }

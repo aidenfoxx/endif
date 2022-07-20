@@ -1,31 +1,19 @@
-import { Vec3 } from '../utils/math';
+import { Shader } from "../renderer/Shader";
+import { Vec3, Vec4 } from "../utils/math";
+import { Texture } from "./Texture";
 
-export interface MaterialValues {
-  specular?: Vec3;
-  roughness?: Vec3;
-  metallic?: Vec3;
-}
-
-export interface MaterialTextures {
-  diffuseMap?: string;
-  specularMap?: string;
-  roughnessMap?: string;
-  metallicMap?: string;
-  normalMap?: string;
-}
-
-export interface Material extends MaterialValues, MaterialTextures {
-  diffuse: Vec3;
-}
-
-export function materialInit(
-  diffuse: Readonly<Vec3>,
-  values: Readonly<MaterialValues> = {},
-  textures: Readonly<MaterialTextures> = {}
-): Material {
-  return {
-    diffuse: [...diffuse],
-    ...values,
-    ...textures,
-  };
+export class Material {
+  public diffuseTexture?: Texture;
+  public metallicRoughnessTexture?: Texture;
+  public normalTexture?: Texture;
+  public occlusionTexture?: Texture;
+  public emissiveTexture?: Texture;
+  public emissiveFactor?: Vec3;
+  
+  constructor(
+    public shader: Shader,
+    public diffuseFactor: Vec4 = [1, 1, 1, 1],
+    public metallicFactor: number = 1,
+    public roughnessFactor: number = 1
+  ) {}
 }

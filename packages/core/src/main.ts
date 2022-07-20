@@ -1,17 +1,20 @@
-export * from './entities/font';
-export * from './entities/material';
-export * from './entities/mesh';
-export * from './entities/texture';
-export * from './entities/timestep';
-export * from './entities/shader';
-export * from './exceptions';
-export * from './utils/math';
-export * from './parsers/parseDDS';
-export * from './parsers/parseFNT';
-export * from './parsers/parseMTL';
-export * from './parsers/parseOBJ';
-export * from './parsers/parseTGA';
-export * from './renderer/actor';
-export * from './renderer/camera';
-export * from './renderer/prop';
-export * from './renderer/scene';
+import { DataBuffer } from "./entities/buffers/DataBuffer";
+import { Material } from "./entities/Material";
+import { Mesh } from "./entities/Mesh";
+import { MeshPrimitive } from "./entities/MeshPrimitive";
+import { MeshNode } from "./entities/nodes/MeshNode";
+import { Scene } from "./entities/Scene";
+import { Renderer } from "./renderer/Renderer";
+
+const material = new Material();
+material.diffuseFactor = [1, 0, 0, 1];
+
+const positionBuffer = new DataBuffer(new Float32Array(), 123);
+const mesh = new Mesh();
+mesh.primitives.push(new MeshPrimitive(positionBuffer, undefined, undefined, undefined, material));
+
+const scene = new Scene();
+scene.nodes.push(new MeshNode(mesh));
+
+const renderer = new Renderer(document.getElementById('canvas')!);
+renderer.renderScene(scene);

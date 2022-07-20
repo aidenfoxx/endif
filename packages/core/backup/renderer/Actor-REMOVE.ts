@@ -9,10 +9,9 @@ import {
   Vec3,
   vec3Subtract
 } from '../utils/math';
-import { Prop } from './prop';
 
 export interface Actor {
-  prop: Prop;
+  mesh: Mesh;
   origin: Vec3;
   position: Vec3;
   rotation: Vec3;
@@ -33,11 +32,11 @@ function calculateModelMatrix(position: Vec3, rotation: Vec3, scale: Vec3): Mat4
   );
 }
 
-export function actorInit(prop: Prop, position: Vec3, rotation: Vec3, scale: Vec3): Actor {
+export function actorInit(prop: Mesh, position: Vec3, rotation: Vec3, scale: Vec3): Actor {
   const model = calculateModelMatrix(position, rotation, scale);
 
   return {
-    prop,
+    mesh,
     origin: [0, 0, 0],
     position,
     rotation,

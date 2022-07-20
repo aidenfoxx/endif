@@ -9,6 +9,7 @@ export interface Scene {
   actors: Set<Actor>;
   renderQueue: Map<Shader, Map<Prop, Actor[]>>;
   frustumCulling: boolean;
+  shaders: Array<Shader>;
 }
 
 function generateRenderQueue(
