@@ -1,20 +1,9 @@
-import { Camera } from './cameras/Camera';
-import { CameraNode } from './nodes/CameraNode';
-import { MeshNode } from './nodes/MeshNode';
-import { Node } from './nodes/Node';
+import { Camera } from './camera/Camera';
+import { Mesh } from './mesh/Mesh';
 
 export class Scene {
-  public readonly nodes: Array<Node> = new Array();
+  public readonly meshes: Array<Mesh> = new Array();
+  public readonly cameras: Array<Camera> = new Array();
 
-  constructor(public activeCamera?: Camera) {}
-
-  public getCameraNode(name: string): CameraNode | undefined {
-    // TODO: Implement
-    return undefined;
-  }
-
-  public getMeshNode(name: string): MeshNode | undefined {
-    // TODO: Implement
-    return undefined;
-  }
+  constructor() {}
 }

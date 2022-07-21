@@ -1,8 +1,4 @@
-export enum WrapMode {
-  CLAMP_TO_EDGE = WebGL2RenderingContext.CLAMP_TO_EDGE,
-  MIRRORED_REPEAT = WebGL2RenderingContext.MIRRORED_REPEAT,
-  REPEAT = WebGL2RenderingContext.REPEAT
-}
+import { WrapMode } from "../types";
 
 export class Texture {
   public texCoord: number = 0;
