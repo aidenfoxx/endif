@@ -1,9 +1,9 @@
 import { Camera } from './camera/Camera';
-import { Mesh } from './mesh/Mesh';
+import { Mesh } from './Mesh';
 
 export class Scene {
-  public readonly meshes: Array<Mesh> = new Array();
-  public readonly cameras: Array<Camera> = new Array();
+  public readonly meshes: Map<PropertyKey, Mesh> = new Map();
+  public readonly cameras: Map<PropertyKey, Camera> = new Map();
 
   constructor() {}
 }

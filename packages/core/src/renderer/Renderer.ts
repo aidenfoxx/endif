@@ -1,18 +1,29 @@
 import { Scene } from "../entities/Scene";
-import { mat4Multiply } from "../utils/math";
-import { createProgram } from "../utils/renderer/shader";
 import { Camera } from "../entities/camera/Camera";
-import { bindVertexArrayAttrib, bindVertexArrayElementBuffer, createArrayBuffer, createVertexArray } from "../utils/renderer/mesh";
-import { DataBuffer } from "../entities/buffer/DataBuffer";
-import { Mesh } from "../entities/mesh/Mesh";
-import { BufferType } from "../types";
+import { Mesh } from "../entities/Mesh";
+import { MeshPrimitive } from "../entities/MeshPrimitive";
+import { createProgram } from "../utils/renderer/shader";
+import { createMaterialUniform } from "../utils/renderer/material";
+import { aabbTransform } from "../utils/math";
+
+interface CacheRecord {
+  value: any;
+  stateID: number;
+  refs: number;
+}
+
+type RenderQueue = Map<WebGLProgram, Map<WebGLBuffer, Map<WebGLVertexArrayObject, Mesh>>>;
 
 export class Renderer {
   private gl: WebGL2RenderingContext;
-  private glCache: Map<object, WeakRef<object>> = new Map();
-  private sceneCache: WeakMap<Scene, Map<object, object>> = new WeakMap();
 
-  constructor(public readonly canvas: HTMLElement, options?: WebGLContextAttributes) {
+  // Store GL elements in general cache for shared use
+  private rendererCache: WeakMap<any, CacheRecord> = new WeakMap();
+  // Keep assets with scene for cleanup
+  private sceneCache: Map<Scene, WeakMap<any, CacheRecord>> = new Map();
+  private sceneVisibility: Map<Scene, WeakMap<Camera, WeakMap<MeshPrimitive, boolean>>> = new Map();
+
+  constructor(canvas: HTMLElement, options?: WebGLContextAttributes) {
     if (!(canvas instanceof HTMLCanvasElement)) {
       throw new Error('Invalid canvas element');
     }
@@ -27,150 +38,146 @@ export class Renderer {
   }
 
   public renderScene(scene: Scene, camera: Camera) {
-    // Fetch cache container
+    // Initialize scene cache
     let sceneCache = this.sceneCache.get(scene);
 
     if (!sceneCache) {
-      sceneCache = new Map();
+      sceneCache = new WeakMap();
       this.sceneCache.set(scene, sceneCache);
     }
 
-    // Render meshes
-    for (let i = 0; i < scene.meshes.length; i++)  {
-      this.renderMesh(scene.meshes[i], camera, sceneCache);
-    }
+    const renderQueue: RenderQueue = new Map();
 
-    this.gl.useProgram(null);
-  }
+    if (camera.frustumCulling) {
+      // Initialize visibility cache
+      let sceneVisibility = this.sceneVisibility.get(scene);
 
-  private renderMesh(mesh: Mesh, camera: Camera, sceneCache: Map<object, object>): void {
-
-    for (let i = 0; i < mesh.primitives.length; i++) {
-      const meshPrimitive = mesh.primitives[i];
-
-      // Bind shader
-      let program = sceneCache.get(meshPrimitive.material.shader) as WebGLProgram | undefined;
-
-      if (!program) {
-        program = createProgram(
-          this.gl,
-          meshPrimitive.material.shader.vertexSource,
-          meshPrimitive.material.shader.fragmentSource
-        );
-        sceneCache.set(meshPrimitive.material.shader, program);
+      if (!sceneVisibility) {
+        sceneVisibility = new WeakMap();
+        this.sceneVisibility.set(scene, sceneVisibility);
       }
 
-      this.gl.useProgram(program);
+      let cameraVisibility = sceneVisibility.get(camera);
 
-      const modelLocation = this.gl.getUniformLocation(program, 'model');
-      const viewLocation = this.gl.getUniformLocation(program, 'view');
-      const modelViewLocation = this.gl.getUniformLocation(program, 'modelView');
-      const projectionLocation = this.gl.getUniformLocation(program, 'projection');
-
-      this.gl.uniformMatrix4fv(modelLocation, false, new Float32Array(mesh.matrix));
-      this.gl.uniformMatrix4fv(viewLocation, false, new Float32Array(camera.matrix));
-      this.gl.uniformMatrix4fv(
-        modelViewLocation,
-        false,
-        new Float32Array(mat4Multiply(camera.matrix, mesh.matrix))
-      );
-      this.gl.uniformMatrix4fv(projectionLocation, false, new Float32Array(camera.projection));
-
-      // Bind vertex array
-      let vertexArray = sceneCache.get(meshPrimitive) as WebGLVertexArrayObject | undefined;
-  
-      if (!vertexArray) {
-        vertexArray = createVertexArray(this.gl)
-
-        this.bindVertexArrayAttrib(vertexArray, meshPrimitive.positions, 0, sceneCache);
-
-        if (meshPrimitive.normals) {
-          this.bindVertexArrayAttrib(vertexArray, meshPrimitive.normals, 1, sceneCache);
-        }
-
-        if (meshPrimitive.texCoords0) {
-          this.bindVertexArrayAttrib(vertexArray, meshPrimitive.texCoords0, 2, sceneCache);
-        }
-
-        if (meshPrimitive.texCoords1) {
-          this.bindVertexArrayAttrib(vertexArray, meshPrimitive.texCoords1, 3, sceneCache);
-        }
-
-        if (meshPrimitive.texCoords2) {
-          this.bindVertexArrayAttrib(vertexArray, meshPrimitive.texCoords2, 4, sceneCache);
-        }
-
-        if (meshPrimitive.texCoords3) {
-          this.bindVertexArrayAttrib(vertexArray, meshPrimitive.texCoords3, 5, sceneCache);
-        }
-
-        if (meshPrimitive.indices) {
-          this.bindVertexArrayElementBuffer(vertexArray, meshPrimitive.indices, sceneCache)
-        }
-
-        sceneCache.set(meshPrimitive, vertexArray);
+      if (!cameraVisibility) {
+        cameraVisibility = new WeakMap();
+        sceneVisibility.set(camera, cameraVisibility);
       }
 
-      this.gl.bindVertexArray(vertexArray);
+      // Generate render queue
+      const hasCameraChanged = this.hasRecordChaned(camera, sceneCache);
 
-      // Bind material
-      const material = meshPrimitive.material;
+      for (const [_, mesh] of scene.meshes) {
+        const hasMeshChanged = this.hasRecordChaned(mesh, sceneCache);
 
-      this.gl.activeTexture(this.gl.TEXTURE0);
-      this.gl.bindTexture(this.gl.TEXTURE_2D, material.diffuseTexture ?? null);
+        for (const [_, primitive] of mesh.primitives) {
+          const hasPrimitiveChanged = this.hasRecordChaned(primitive, sceneCache);
+          const hasChanged = hasCameraChanged || hasMeshChanged || hasPrimitiveChanged;
 
-      this.gl.activeTexture(this.gl.TEXTURE1);
-      this.gl.bindTexture(this.gl.TEXTURE_2D, material.metallicRoughnessTexture ?? null);
+          // Reuse previous visibility is nothing changed
+          const wasVisible = cameraVisibility.get(primitive);
 
-      this.gl.activeTexture(this.gl.TEXTURE2);
-      this.gl.bindTexture(this.gl.TEXTURE_2D, material.normalTexture ?? null);
+          if (wasVisible && !hasChanged) {
+            continue;
+          }
 
-      this.gl.activeTexture(this.gl.TEXTURE3);
-      this.gl.bindTexture(this.gl.TEXTURE_2D, material.occlusionTexture ?? null);
+          const aabb = aabbTransform(primitive.getAABB(), mesh.getMatrix());
+          const isVisible = camera.isVisible(aabb);
 
-      this.gl.activeTexture(this.gl.TEXTURE4);
-      this.gl.bindTexture(this.gl.TEXTURE_2D, material.emissiveTexture ?? null);
+          cameraVisibility.set(primitive, isVisible);
+
+          if (!isVisible) {
+            continue;
+          }
+
+          this.parsePrimitive(primitive, renderQueue, sceneCache);
+        }
+      }
+    } else {
+      // Generate render queue
+      for (const [_, mesh] of scene.meshes) {  
+        for (const [_, primitive] of mesh.primitives) {
+          this.parsePrimitive(primitive, renderQueue, sceneCache);
+        }
+      }
     }
+
+    // Handle render queue
   }
 
-  private bindVertexArrayAttrib(
-    vertexArray: WebGLVertexArrayObject,
-    dataBuffer: DataBuffer,
-    index: number,
-    sceneCache: Map<object, object>
+  private parsePrimitive(
+    primitive: MeshPrimitive, 
+    renderQueue: RenderQueue,
+    sceneCache: WeakMap<any, CacheRecord>
   ): void {
-    let buffer = sceneCache.get(dataBuffer.buffer) as WebGLBuffer | undefined;
+    const material = primitive.material;
+    const shader = material.shader;
 
-    if (!buffer) {
-      buffer = createArrayBuffer(this.gl, BufferType.ARRAY_BUFFER, dataBuffer.buffer);
-      sceneCache.set(dataBuffer.buffer, buffer);
+    // Add shader to render queue
+    let shaderRecord = this.rendererCache.get(shader);
+
+    if (!shaderRecord) {
+      shaderRecord = {
+        value: createProgram(this.gl,  shader.vertexSource, shader.fragmentSource),
+        stateID: -1,
+        refs: 0
+      };
+      this.rendererCache.set(shader, shaderRecord);
+    }
+    
+    if (!sceneCache.has(shader)) {
+      shaderRecord.refs++;
+      sceneCache.set(shader, shaderRecord);
     }
 
-    bindVertexArrayAttrib(
-      this.gl,
-      vertexArray,
-      buffer,
-      index,
-      dataBuffer.count,
-      dataBuffer.dataType,
-      dataBuffer.byteStride,
-      dataBuffer.byteOffest,
-      dataBuffer.normalized
-    );
+    let shaderQueue = renderQueue.get(shaderRecord.value);
+
+    if (!shaderQueue) {
+      shaderQueue = new Map();
+      renderQueue.set(shaderRecord.value, shaderQueue);
+    }
+
+    // Add material to render queue
+    let materialRecord = this.rendererCache.get(material);
+
+    if (!materialRecord) {
+      materialRecord = {
+        value: createMaterialUniform(this.gl), // TODO: Implement
+        stateID: material.stateID,
+        refs: 0
+      };
+      this.rendererCache.set(material, materialRecord);
+    } else if (material.stateID !== materialRecord.stateID) {
+      this.gl.deleteBuffer(materialRecord.value);
+      materialRecord.value = createMaterialUniform(this.gl);
+    }
+
+    if (!sceneCache.has(material)) {
+      materialRecord.refs++;
+      sceneCache.set(shader, materialRecord);
+    }
+
+    let materialQueue = shaderQueue.get(shaderRecord.value);
+
+    if (!materialQueue) {
+      materialQueue = new Map();
+      shaderQueue.set(materialRecord.value, materialQueue);
+    }
+
+    // TODO: We need some way to include Textures in the render queue
   }
 
-  private bindVertexArrayElementBuffer(
-    vertexArray: WebGLVertexArrayObject,
-    dataBuffer: ArrayBuffer,
-    sceneCache: Map<object, object>
-  ): void {
-    let buffer = sceneCache.get(dataBuffer) as WebGLBuffer | undefined;
+  private hasRecordChaned(key: Observable, sceneCache: WeakMap<any, CacheRecord>): boolean {    
+    const record = sceneCache.get(key);
 
-    if (!buffer) {
-      buffer = createArrayBuffer(this.gl, BufferType.ELEMENT_ARRAY_BUFFER, dataBuffer);
-      sceneCache.set(dataBuffer, buffer);
+    if (!record) {
+      sceneCache.set(key, { value: null, stateID: key.stateID, refs: -1 });
+      return true;
+    } else if (key.stateID !== record.stateID) {
+      record.stateID = key.stateID;
+      return true;
     }
 
-    bindVertexArrayElementBuffer(this.gl, vertexArray, dataBuffer);
+    return false;
   }
 }
