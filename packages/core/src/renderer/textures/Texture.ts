@@ -1,4 +1,4 @@
-import { MagFilter, MinFilter, WrapMode } from "../types";
+import { MagFilter, MinFilter, WrapMode } from "../../types";
 
 export class Texture {
   constructor(

@@ -1,4 +1,4 @@
-abstract class Observable {
+export abstract class Observable {
   private static uniqueID = 0;
 
   public stateID = Observable.uniqueID++;

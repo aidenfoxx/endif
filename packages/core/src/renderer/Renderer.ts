@@ -1,10 +1,11 @@
-import { Scene } from "../entities/Scene";
-import { Camera } from "../entities/camera/Camera";
-import { Mesh } from "../entities/Mesh";
-import { MeshPrimitive } from "../entities/MeshPrimitive";
-import { createProgram } from "../utils/renderer/shader";
-import { createMaterialUniform } from "../utils/renderer/material";
+import { Scene } from "./Scene";
+import { Camera } from "./cameras/Camera";
+import { Mesh } from "./meshes/Mesh";
+import { MeshPrimitive } from "./meshes/MeshPrimitive";
+import { createProgram } from "../utils/gl/shader";
+import { createMaterialUniform } from "../utils/gl/material";
 import { aabbTransform } from "../utils/math";
+import { Observable } from "../reactor/Observable";
 
 interface CacheRecord {
   value: any;

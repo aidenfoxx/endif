@@ -1,4 +1,5 @@
-import { AABB, Mat4, mat4Identity, mat4Multiply, mat4RotationQuat, mat4Scale, mat4Translation, Vec3, Vec4 } from '../utils/math';
+import { Observable } from '../../reactor/Observable';
+import { Mat4, mat4Identity, mat4Multiply, mat4RotationQuat, mat4Scale, mat4Translation, Vec3, Vec4 } from '../../utils/math';
 import { MeshPrimitive } from './MeshPrimitive';
 
 export class Mesh extends Observable {

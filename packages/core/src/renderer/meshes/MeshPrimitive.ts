@@ -1,7 +1,8 @@
-import { DrawMode } from "../types";
-import { AABB, aabbCalculate } from "../utils/math";
-import { BufferView } from "./buffer/BufferView";
-import { Material } from "./Material";
+import { Observable } from "../../reactor/Observable";
+import { DrawMode } from "../../types";
+import { AABB, aabbCalculate } from "../../utils/math";
+import { BufferView } from "../buffers/BufferView";
+import { Material } from "../materials/Material";
 
 export enum BufferKey {
   POSITION,

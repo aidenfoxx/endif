@@ -1,13 +1,15 @@
-import { Mat4, mat4Empty, mat4Perspective, Vec3, Vec4 } from "../../utils/math";
+import { AABB, Mat4, mat4Empty, mat4Orthographic, Vec3, Vec4 } from "../../utils/math";
 import { Camera } from "./Camera";
 
-export class PerspectiveCamera extends Camera {
+export class OrthographicCamera extends Camera {
   private projection: Mat4 = mat4Empty();
   private projectionStateID: number = -1;
 
   constructor(
-    public fov: number,
-    public aspectRatio: number,
+    public left: number,
+    public right: number,
+    public top: number,
+    public bottom: number,
     public nearClip: number,
     public farClip: number,
     public translation: Vec3 = [0, 0, 0],
@@ -15,17 +17,21 @@ export class PerspectiveCamera extends Camera {
   ) {
     super(translation, rotation);
 
-    this.watch(this, 'fov');
-    this.watch(this, 'aspectRatio');
+    this.watch(this, 'left');
+    this.watch(this, 'right');
+    this.watch(this, 'top');
+    this.watch(this, 'bottom');
     this.watch(this, 'nearClip');
     this.watch(this, 'farClip');
   }
 
   public getProjection(): Mat4 {
     if (this.stateID !== this.projectionStateID) {
-      this.projection = mat4Perspective(
-        this.fov,
-        this.aspectRatio,
+      this.projection = mat4Orthographic(
+        this.left,
+        this.right,
+        this.top,
+        this.bottom,
         this.nearClip,
         this.farClip
       );

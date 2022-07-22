@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@endif/core",
+  "name": "@endif/loaders",
   "version": "1.0.0",
   "author": "Aiden Foxx",
   "license": "UNLICENSED",

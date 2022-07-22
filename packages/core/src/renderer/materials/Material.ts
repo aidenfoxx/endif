@@ -1,6 +1,7 @@
-import { Vec3, Vec4 } from "../utils/math";
-import { Shader } from "./Shader";
-import { Texture } from "./Texture";
+import { Observable } from "../../reactor/Observable";
+import { Vec3, Vec4 } from "../../utils/math";
+import { Shader } from "../shaders/Shader";
+import { Texture } from "../textures/Texture";
 
 enum TextureKey {
   DIFFUSE,

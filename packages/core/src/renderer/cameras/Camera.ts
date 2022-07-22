@@ -1,4 +1,5 @@
-import { Mat4, mat4Identity, mat4Multiply, mat4RotationQuat, mat4Translation, Vec3, Vec4 } from '../../utils/math';
+import { Observable } from '../../reactor/Observable';
+import { AABB, Mat4, mat4Identity, mat4Multiply, mat4RotationQuat, mat4Translation, Vec3, Vec4 } from '../../utils/math';
 
 export abstract class Camera extends Observable {
   public frustumCulling: boolean = true;
