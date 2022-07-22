@@ -1,7 +1,6 @@
 {
   "preset": "ts-jest",
   "roots": [
-    "<rootDir>/src",
-    "<rootDir>/packages/*/src"
+    "<rootDir>/src"
   ]
 }

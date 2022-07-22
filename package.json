@@ -1,17 +1,17 @@
 {
   "private": true,
-  "name": "endif-debug",
+  "name": "endif",
   "version": "1.0.0",
   "author": "Aiden Foxx",
   "license": "UNLICENSED",
   "scripts": {
     "start": "node server.js",
-    "dev": "cross-env DEBUG=true concurrently -p none \"npm run build:watch\" \"npm run build:watch -ws\" \"npm run start\"",
+    "dev": "concurrently -p none \"cross-env DEBUG=true npm run build:watch\" \"npm run start\"",
     "build": "rollup -c",
     "build:watch": "rollup -c -w",
     "test": "jest",
     "test:watch": "jest --watch",
-    "format": "prettier --write src/**/*.{js,ts}"
+    "format": "prettier --write \"src/**/*.{js,ts}\" \"packages/*/src/**/*.{js,ts}\""
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.3.0",
