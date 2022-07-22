@@ -24,6 +24,7 @@ export class Renderer {
   private sceneVisibility: Map<Scene, WeakMap<Camera, WeakMap<MeshPrimitive, boolean>>> = new Map();
 
   constructor(canvas: HTMLElement, options?: WebGLContextAttributes) {
+    // TODO: This looks ugly
     if (!(canvas instanceof HTMLCanvasElement)) {
       throw new Error('Invalid canvas element');
     }
@@ -71,13 +72,13 @@ export class Renderer {
         const hasMeshChanged = this.hasRecordChaned(mesh, sceneCache);
 
         for (const [_, primitive] of mesh.primitives) {
-          const hasPrimitiveChanged = this.hasRecordChaned(primitive, sceneCache);
+          const hasPrimitiveChanged = this.hasRecordChaned(primitive, sceneCache); // TODO: This could cause issues with VAO
           const hasChanged = hasCameraChanged || hasMeshChanged || hasPrimitiveChanged;
 
           // Reuse previous visibility is nothing changed
           const wasVisible = cameraVisibility.get(primitive);
 
-          if (wasVisible && !hasChanged) {
+          if (!wasVisible && !hasChanged) {
             continue;
           }
 
@@ -86,11 +87,9 @@ export class Renderer {
 
           cameraVisibility.set(primitive, isVisible);
 
-          if (!isVisible) {
-            continue;
+          if (isVisible) {
+            this.parsePrimitive(primitive, renderQueue, sceneCache);
           }
-
-          this.parsePrimitive(primitive, renderQueue, sceneCache);
         }
       }
     } else {
