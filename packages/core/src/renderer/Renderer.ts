@@ -1,11 +1,11 @@
-import { Scene } from "./Scene";
-import { Camera } from "./cameras/Camera";
-import { Mesh } from "./meshes/Mesh";
-import { MeshPrimitive } from "./meshes/MeshPrimitive";
-import { createProgram } from "../utils/gl/shader";
-import { createMaterialUniform } from "../utils/gl/material";
-import { aabbTransform } from "../utils/math";
-import { Observable } from "../reactor/Observable";
+import { Scene } from './Scene';
+import { Camera } from './cameras/Camera';
+import { Mesh } from './meshes/Mesh';
+import { MeshPrimitive } from './meshes/MeshPrimitive';
+import { createProgram } from '../utils/gl/shader';
+import { createMaterialUniform } from '../utils/gl/material';
+import { aabbTransform } from '../utils/math';
+import { Observable } from '../reactor/Observable';
 
 interface CacheRecord {
   value: any;
@@ -29,9 +29,9 @@ export class Renderer {
     if (!(canvas instanceof HTMLCanvasElement)) {
       throw new Error('Invalid canvas element');
     }
-    
+
     const gl = canvas.getContext('webgl2', options);
-    
+
     if (!gl) {
       throw new Error('Unable to initialize WebGL context');
     }
@@ -95,7 +95,7 @@ export class Renderer {
       }
     } else {
       // Generate render queue
-      for (const [_, mesh] of scene.meshes) {  
+      for (const [_, mesh] of scene.meshes) {
         for (const [_, primitive] of mesh.primitives) {
           this.parsePrimitive(primitive, renderQueue, sceneCache);
         }
@@ -106,7 +106,7 @@ export class Renderer {
   }
 
   private parsePrimitive(
-    primitive: MeshPrimitive, 
+    primitive: MeshPrimitive,
     renderQueue: RenderQueue,
     sceneCache: WeakMap<any, CacheRecord>
   ): void {
@@ -118,13 +118,13 @@ export class Renderer {
 
     if (!shaderRecord) {
       shaderRecord = {
-        value: createProgram(this.gl,  shader.vertexSource, shader.fragmentSource),
+        value: createProgram(this.gl, shader.vertexSource, shader.fragmentSource),
         stateID: -1,
-        refs: 0
+        refs: 0,
       };
       this.rendererCache.set(shader, shaderRecord);
     }
-    
+
     if (!sceneCache.has(shader)) {
       shaderRecord.refs++;
       sceneCache.set(shader, shaderRecord);
@@ -144,7 +144,7 @@ export class Renderer {
       materialRecord = {
         value: createMaterialUniform(this.gl), // TODO: Implement
         stateID: material.stateID,
-        refs: 0
+        refs: 0,
       };
       this.rendererCache.set(material, materialRecord);
     } else if (material.stateID !== materialRecord.stateID) {
@@ -167,7 +167,7 @@ export class Renderer {
     // TODO: We need some way to include Textures in the render queue
   }
 
-  private hasRecordChaned(key: Observable, sceneCache: WeakMap<any, CacheRecord>): boolean {    
+  private hasRecordChaned(key: Observable, sceneCache: WeakMap<any, CacheRecord>): boolean {
     const record = sceneCache.get(key);
 
     if (!record) {

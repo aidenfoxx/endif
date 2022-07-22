@@ -2,7 +2,7 @@ export function createTexture(gl: WebGL2RenderingContext, image: ImageBitmap): W
   const texture = gl.createTexture();
 
   if (!texture) {
-      throw new Error('Failed to create texture buffer');
+    throw new Error('Failed to create texture buffer');
   }
 
   gl.bindTexture(gl.TEXTURE_2D, texture);

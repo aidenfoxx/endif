@@ -1,5 +1,14 @@
 import { Observable } from '../../reactor/Observable';
-import { Mat4, mat4Identity, mat4Multiply, mat4RotationQuat, mat4Scale, mat4Translation, Vec3, Vec4 } from '../../utils/math';
+import {
+  Mat4,
+  mat4Identity,
+  mat4Multiply,
+  mat4RotationQuat,
+  mat4Scale,
+  mat4Translation,
+  Vec3,
+  Vec4,
+} from '../../utils/math';
 import { MeshPrimitive } from './MeshPrimitive';
 
 export class Mesh extends Observable {
@@ -23,10 +32,7 @@ export class Mesh extends Observable {
   public getMatrix(): Mat4 {
     if (this.stateID !== this.matrixStateID) {
       this.matrix = mat4Multiply(
-        mat4Multiply(
-          mat4Translation(this.translation),
-          mat4RotationQuat(this.rotation)
-        ),
+        mat4Multiply(mat4Translation(this.translation), mat4RotationQuat(this.rotation)),
         mat4Scale(this.scale)
       );
       this.matrixStateID = this.stateID;

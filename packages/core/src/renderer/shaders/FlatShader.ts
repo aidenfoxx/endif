@@ -1,4 +1,4 @@
-import { Shader } from "./Shader";
+import { Shader } from './Shader';
 
 const vertexSource = `#version 300 es
 

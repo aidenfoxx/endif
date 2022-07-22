@@ -7,11 +7,13 @@ export abstract class Observable {
     let propertyRef: any = target[property];
 
     Object.defineProperty(target, property, {
-      get: function () { return propertyRef; },
-      set: function (value) {        
+      get: function () {
+        return propertyRef;
+      },
+      set: function (value) {
         propertyRef = value;
         this.stateID = Observable.uniqueID++;
-      }
+      },
     });
   }
 }

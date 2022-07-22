@@ -1,9 +1,24 @@
 import {
   Timestep,
   Scene,
-  degreesToRadians, mat4Orthographic, mat4Perspective,
-  cameraInit, cameraRotate, cameraTranslate, timestepInit,
-  sceneAddActor, sceneInit, sceneRender, propAddShader, propInit, actorInit, actorSetRotation, parseOBJ, parseDDS, parseMTL, shaderInit
+  degreesToRadians,
+  mat4Orthographic,
+  mat4Perspective,
+  cameraInit,
+  cameraRotate,
+  cameraTranslate,
+  timestepInit,
+  sceneAddActor,
+  sceneInit,
+  sceneRender,
+  propAddShader,
+  propInit,
+  actorInit,
+  actorSetRotation,
+  parseOBJ,
+  parseDDS,
+  parseMTL,
+  shaderInit,
 } from '@endif/core';
 
 const VIEWPORT_WIDTH = 1600;
@@ -24,7 +39,7 @@ async function buildScene(gl: WebGL2RenderingContext): Promise<Scene> {
     degreesToRadians(90),
     VIEWPORT_WIDTH / VIEWPORT_HEIGHT,
     0.1,
-    1000 
+    1000
   );
   const camera = cameraInit([0, -10, -40], [0, 0, 0], perspective);
 
@@ -158,15 +173,11 @@ export async function appStep(appState: AppState): Promise<void> {
   sceneRender(gl, gui);
 
   for (const value of scene.actors) {
-    actorSetRotation(value, [
-      value.rotation[0],
-      value.rotation[1],
-      value.rotation[2] + .1
-    ]);
+    actorSetRotation(value, [value.rotation[0], value.rotation[1], value.rotation[2] + 0.1]);
   }
 
   cameraTranslate(scene.camera, [0.2, 0, 0]);
-  cameraRotate(scene.camera, [0, .005, 0]);
+  cameraRotate(scene.camera, [0, 0.005, 0]);
 }
 
 // Init app

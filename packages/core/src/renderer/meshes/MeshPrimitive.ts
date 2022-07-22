@@ -1,8 +1,8 @@
-import { Observable } from "../../reactor/Observable";
-import { DrawMode } from "../../types";
-import { AABB, aabbCalculate } from "../../utils/math";
-import { BufferView } from "../buffers/BufferView";
-import { Material } from "../materials/Material";
+import { Observable } from '../../reactor/Observable';
+import { DrawMode } from '../../types';
+import { AABB, aabbCalculate } from '../../utils/math';
+import { BufferView } from '../buffers/BufferView';
+import { Material } from '../materials/Material';
 
 export enum BufferKey {
   POSITION,
@@ -11,7 +11,7 @@ export enum BufferKey {
   TEXTCOORD_1,
   TEXTCOORD_2,
   TEXTCOORD_3,
-  INDEX
+  INDEX,
 }
 
 export interface MeshBuffers {
@@ -27,11 +27,14 @@ export interface MeshBuffers {
 export class MeshPrimitive extends Observable {
   public mode: DrawMode = DrawMode.TRIANGLES;
 
-  private aabb: AABB = [[0, 0, 0], [0, 0, 0]];
+  private aabb: AABB = [
+    [0, 0, 0],
+    [0, 0, 0],
+  ];
   private aabbStateID: number = -1;
 
   constructor(public readonly buffers: MeshBuffers, public material: Material) {
-    super(); 
+    super();
 
     this.buffers = { ...buffers };
 
@@ -53,7 +56,7 @@ export class MeshPrimitive extends Observable {
         bufferView.buffer,
         bufferView.byteOffest,
         bufferView.count
-      )
+      );
 
       this.aabb = aabbCalculate(Array.from(positionData));
       this.aabbStateID = this.stateID;

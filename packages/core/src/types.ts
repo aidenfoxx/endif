@@ -1,6 +1,6 @@
 export enum BufferType {
   ARRAY_BUFFER = WebGL2RenderingContext.ARRAY_BUFFER,
-  ELEMENT_ARRAY_BUFFER = WebGL2RenderingContext.ELEMENT_ARRAY_BUFFER
+  ELEMENT_ARRAY_BUFFER = WebGL2RenderingContext.ELEMENT_ARRAY_BUFFER,
 }
 
 export enum DataType {
@@ -9,7 +9,7 @@ export enum DataType {
   SHORT = WebGL2RenderingContext.SHORT,
   UNSIGNED_SHORT = WebGL2RenderingContext.UNSIGNED_SHORT,
   UNSIGNED_INT = WebGL2RenderingContext.UNSIGNED_INT,
-  FLOAT = WebGL2RenderingContext.FLOAT
+  FLOAT = WebGL2RenderingContext.FLOAT,
 }
 
 export enum DrawMode {
@@ -19,7 +19,7 @@ export enum DrawMode {
   LINE_STRIP = WebGL2RenderingContext.LINE_STRIP,
   TRIANGLES = WebGL2RenderingContext.TRIANGLES,
   TRIANGLE_STRIP = WebGL2RenderingContext.TRIANGLE_STRIP,
-  TRIANGLE_FAN = WebGL2RenderingContext.TRIANGLE_FAN
+  TRIANGLE_FAN = WebGL2RenderingContext.TRIANGLE_FAN,
 }
 
 export enum MinFilter {
@@ -28,16 +28,16 @@ export enum MinFilter {
   NEAREST_MIPMAP_NEAREST = WebGL2RenderingContext.NEAREST_MIPMAP_NEAREST,
   LINEAR_MIPMAP_NEAREST = WebGL2RenderingContext.LINEAR_MIPMAP_NEAREST,
   NEAREST_MIPMAP_LINEAR = WebGL2RenderingContext.NEAREST_MIPMAP_LINEAR,
-  LINEAR_MIPMAP_LINEAR = WebGL2RenderingContext.LINEAR_MIPMAP_LINEAR
+  LINEAR_MIPMAP_LINEAR = WebGL2RenderingContext.LINEAR_MIPMAP_LINEAR,
 }
 
 export enum MagFilter {
   NEAREST = WebGL2RenderingContext.NEAREST,
-  LINEAR = WebGL2RenderingContext.LINEAR
+  LINEAR = WebGL2RenderingContext.LINEAR,
 }
 
 export enum WrapMode {
   CLAMP_TO_EDGE = WebGL2RenderingContext.CLAMP_TO_EDGE,
   MIRRORED_REPEAT = WebGL2RenderingContext.MIRRORED_REPEAT,
-  REPEAT = WebGL2RenderingContext.REPEAT
+  REPEAT = WebGL2RenderingContext.REPEAT,
 }

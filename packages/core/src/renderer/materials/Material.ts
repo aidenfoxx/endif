@@ -1,17 +1,17 @@
-import { Observable } from "../../reactor/Observable";
-import { Vec3, Vec4 } from "../../utils/math";
-import { Shader } from "../shaders/Shader";
-import { Texture } from "../textures/Texture";
+import { Observable } from '../../reactor/Observable';
+import { Vec3, Vec4 } from '../../utils/math';
+import { Shader } from '../shaders/Shader';
+import { Texture } from '../textures/Texture';
 
-enum TextureKey {
+export enum TextureKey {
   DIFFUSE,
   METALLIC_ROUGHNESS,
   NORMAL,
   OCCLUSION,
-  EMISSIVE
+  EMISSIVE,
 }
 
-interface MaterialTextures {
+export interface MaterialTextures {
   [TextureKey.DIFFUSE]?: Texture;
   [TextureKey.METALLIC_ROUGHNESS]?: Texture;
   [TextureKey.NORMAL]?: Texture;
@@ -26,7 +26,7 @@ export class Material extends Observable {
     public metallicFactor: number = 1,
     public roughnessFactor: number = 1,
     public emissiveFactor: Vec3 = [0, 0, 0],
-    public readonly textures: MaterialTextures,
+    public readonly textures: MaterialTextures
   ) {
     super();
 

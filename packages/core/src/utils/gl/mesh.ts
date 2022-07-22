@@ -1,7 +1,7 @@
-import { BufferType, DataType } from "../../types";
+import { BufferType, DataType } from '../../types';
 
 export function createArrayBuffer(
-  gl: WebGL2RenderingContext, 
+  gl: WebGL2RenderingContext,
   bufferType: BufferType,
   data: ArrayBuffer // TODO: Fix the naming to match Renderer
 ): WebGLBuffer {

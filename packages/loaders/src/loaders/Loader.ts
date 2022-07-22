@@ -1,4 +1,4 @@
-import { resolvePath } from "../utils/resolvePath";
+import { resolvePath } from '../utils/resolvePath';
 
 export abstract class Loader {
   private static fetchCache: Map<string, WeakRef<Promise<Response>>> = new Map();
@@ -20,4 +20,4 @@ export abstract class Loader {
 
     return response;
   }
-} 
+}
