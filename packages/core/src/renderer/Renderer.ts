@@ -1,26 +1,22 @@
 import { Scene } from './Scene';
-import { Camera } from './cameras/Camera';
+import { Camera } from './camera/Camera';
 import { Mesh } from './meshes/Mesh';
 import { MeshPrimitive } from './meshes/MeshPrimitive';
 import { createProgram } from '../utils/gl/shader';
 import { createMaterialUniform } from '../utils/gl/material';
 import { aabbTransform } from '../utils/math';
-import { RendererCache } from './RendererCache';
+import { AssetCache } from './cache/AssetCache';
+import { VisbilityCache } from './cache/VisibilityCache';
 
 type RenderQueue = Map<WebGLProgram, Map<WebGLBuffer, Map<WebGLVertexArrayObject, Mesh>>>;
 
 export class Renderer {
   private gl: WebGL2RenderingContext;
 
-  private sceneCaches: Map<Scene, RendererCache> = new Map();
-
-  /* TODO: Remove
-    //private sceneVisibility: Map<Scene, WeakMap<Camera, WeakMap<MeshPrimitive, boolean>>> = new Map();
-    //private sceneVisibility: Map<Scene, WeakMap<object, VisibilityRecord>> = new Map();
-  */
+  private sceneAssets: Map<Scene, AssetCache> = new Map();
+  private sceneVisibility: Map<Scene, VisbilityCache> = new Map();
 
   constructor(canvas: HTMLElement, options?: WebGLContextAttributes) {
-    // TODO: This looks ugly
     if (!(canvas instanceof HTMLCanvasElement)) {
       throw new Error('Invalid canvas element');
     }
@@ -36,55 +32,51 @@ export class Renderer {
 
   public renderScene(scene: Scene, camera: Camera) {
     // Initialize scene cache
-    let cache = this.sceneCaches.get(scene);
+    let assetCache = this.sceneAssets.get(scene);
 
-    if (!cache) {
-      cache = new RendererCache();
-      this.sceneCaches.set(scene, cache);
+    if (!assetCache) {
+      assetCache = new AssetCache();
+      this.sceneAssets.set(scene, assetCache);
     }
 
     // Generate render queue
     const renderQueue: RenderQueue = new Map();
     
     if (camera.frustumCulling) {
-      let sceneVisibility = this.sceneVisibility.get(scene);
+      let visiblityCache = this.sceneVisibility.get(scene);
 
-      if (!sceneVisibility) {
-        sceneVisibility = new WeakMap();
-        this.sceneVisibility.set(scene, sceneVisibility);
+      if (!visiblityCache) {
+        visiblityCache = new VisbilityCache();
+        this.sceneVisibility.set(scene, visiblityCache);
       }
 
-      const hasCameraChanged = this.hasRecordChaned(camera, sceneVisibility);
+      let hasChanged = visiblityCache.observeChange(camera);
 
       for (const [_, mesh] of scene.meshes) {
-        const hasMeshChanged = this.hasRecordChaned(mesh, sceneVisibility);
+        hasChanged ||= visiblityCache.observeChange(mesh);
 
         for (const [_, primitive] of mesh.primitives) {
-          const hasPrimitiveChanged = this.hasRecordChaned(primitive, sceneVisibility);
-          const hasChanged = hasCameraChanged || hasMeshChanged || hasPrimitiveChanged;
+          hasChanged ||= visiblityCache.observeChange(primitive);
 
           // Reuse previous visibility if nothing changed
-          const visibilityRecord = sceneVisibility.get(primitive);
+          const wasVisible = visiblityCache.getVisibility(primitive);
 
-          // TODO: Can we combine this in the response from "hasRecordChaned"? E.g. do we need to fetch it?
-          if (!visibilityRecord!.value && !hasChanged) {
+          if (hasChanged || wasVisible === undefined) {
+            const aabb = aabbTransform(primitive.getAABB(), mesh.getMatrix());
+            const isVisible = camera.isVisible(aabb);
+
+            visiblityCache.setVisbility(primitive, isVisible);
+          } else if (!wasVisible) {
             continue;
           }
 
-          const aabb = aabbTransform(primitive.getAABB(), mesh.getMatrix());
-          const isVisible = camera.isVisible(aabb);
-
-          visibilityRecord!.value = isVisible;
-
-          if (isVisible) {
-            this.parsePrimitive(primitive, renderQueue, cache);
-          }
+          this.parsePrimitive(primitive, renderQueue, assetCache);
         }
       }
     } else {
       for (const [_, mesh] of scene.meshes) {
         for (const [_, primitive] of mesh.primitives) {
-          this.parsePrimitive(primitive, renderQueue, cache);
+          this.parsePrimitive(primitive, renderQueue, assetCache);
         }
       }
     }
@@ -95,13 +87,13 @@ export class Renderer {
   private parsePrimitive(
     primitive: MeshPrimitive,
     renderQueue: RenderQueue,
-    cache: RendererCache
+    assetCache: AssetCache
   ): void {
     const material = primitive.material;
     const shader = material.shader;
 
     // Add shader to queue
-    const program = cache.getValue(shader, () => {
+    const program = assetCache.getValue(shader, () => {
       return createProgram(this.gl, shader.vertexSource, shader.fragmentSource);
     });
 
@@ -113,7 +105,7 @@ export class Renderer {
     }
 
     // Add material to queue
-    const materialBuffer = cache.observeValue(material, (previousMaterial?: WebGLProgram) => {
+    const materialBuffer = assetCache.observeValue(material, (previousMaterial?: WebGLProgram) => {
       if (previousMaterial) {
         this.gl.deleteBuffer(previousMaterial);
       }
@@ -127,20 +119,6 @@ export class Renderer {
       shaderQueue.set(materialBuffer, materialQueue);
     }
 
-    // TODO: We need some way to include Textures in the render queue
+    // Add textures to queue
   }
-
-  /*private hasRecordChaned(key: Observable, sceneCache: WeakMap<any, VisibilityRecord>): boolean {
-    const record = sceneCache.get(key);
-
-    if (!record) {
-      sceneCache.set(key, { value: false, stateID: key.stateID });
-      return true;
-    } else if (key.stateID !== record.stateID) {
-      record.stateID = key.stateID;
-      return true;
-    }
-
-    return false;
-  }*/
 }

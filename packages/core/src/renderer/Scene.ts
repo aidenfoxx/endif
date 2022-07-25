@@ -1,4 +1,4 @@
-import { Camera } from './cameras/Camera';
+import { Camera } from './camera/Camera';
 import { Mesh } from './meshes/Mesh';
 
 export class Scene {
