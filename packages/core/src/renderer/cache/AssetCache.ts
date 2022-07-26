@@ -15,7 +15,6 @@ class AssetIterator implements Iterator<any> {
 
       if (key) {
         const record = this.cache.get(key);
-
         return { value: [key, record!.value], done: false };
       } else {
         // Clean up garbage colelcted key
@@ -37,13 +36,8 @@ export class AssetCache {
   public getValue(key: object, callback: () => object): object {
     let record = AssetCache.sharedCache.get(key);
 
-    // Create record in shared cache
     if (!record) {
-      record = {
-        stateID: -1,
-        value: callback(),
-        refs: 0,
-      };
+      record = { stateID: -1, value: callback(), refs: 0 };
       AssetCache.sharedCache.set(key, record);
     }
 
@@ -51,6 +45,7 @@ export class AssetCache {
     if (!this.cache.has(key)) {
       this.keys.add(new WeakRef(key));
       this.cache.set(key, record);
+    
       record.refs++;
     }
 
@@ -60,13 +55,8 @@ export class AssetCache {
   public observeValue(key: Observable, callback: (previousValue?: object) => object): object {
     let record = AssetCache.sharedCache.get(key);
 
-    // Create or update record in shared cache
     if (!record) {
-      record = {
-        stateID: key.stateID,
-        value: callback(),
-        refs: 0,
-      };
+      record = { stateID: key.stateID, value: callback(), refs: 0 };
       AssetCache.sharedCache.set(key, record);
     } else if (record.stateID !== key.stateID) {
       record.stateID = key.stateID;
@@ -77,6 +67,7 @@ export class AssetCache {
     if (!this.cache.has(key)) {
       this.keys.add(new WeakRef(key));
       this.cache.set(key, record);
+
       record.refs++;
     }
 
@@ -90,7 +81,6 @@ export class AssetCache {
       return;
     }
 
-    // Destroy shared record if last reference
     if (record.refs === 1) {
       AssetCache.sharedCache.delete(key);
       callback(record.value);

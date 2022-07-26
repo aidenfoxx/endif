@@ -1,7 +1,7 @@
 import { Observable } from '../../reactor/Observable';
 import { Vec3, Vec4 } from '../../utils/math';
-import { Shader } from '../shaders/Shader';
-import { Texture } from '../textures/Texture';
+import { Shader } from '../shader/Shader';
+import { Texture } from '../texture/Texture';
 
 export enum TextureKey {
   DIFFUSE,

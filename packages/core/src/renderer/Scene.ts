@@ -1,5 +1,5 @@
 import { Camera } from './camera/Camera';
-import { Mesh } from './meshes/Mesh';
+import { Mesh } from './mesh/Mesh';
 
 export class Scene {
   public readonly meshes: Map<PropertyKey, Mesh> = new Map();
