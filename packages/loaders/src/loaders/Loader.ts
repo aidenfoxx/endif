@@ -13,9 +13,9 @@ export abstract class Loader {
       return response;
     }
 
-    response = fetch(uri, { ...options, cache: 'force-cache' });
+    response = fetch(uri, { cache: 'force-cache', ...options });
 
-    // Use a weak ref to allow GC and fetch from browser cache
+    // Use a WeakRef to allow GC, with future requests fetched from cache
     this.fetchCache.set(uri, new WeakRef(response));
 
     return response;

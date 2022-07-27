@@ -1,12 +1,13 @@
 import { Observable } from '../../reactor/Observable';
 import { DrawMode } from '../../types';
 import { AABB, aabbCalculate } from '../../utils/math';
-import { BufferView } from '../buffer/BufferView';
-import { Material } from '../material/Material';
+import { BufferView } from '../buffers/BufferView';
+import { Material } from '../materials/Material';
 
 export enum BufferKey {
   POSITION,
   NORMAL,
+  TANGENT,
   TEXTCOORD_0,
   TEXTCOORD_1,
   TEXTCOORD_2,
@@ -14,9 +15,11 @@ export enum BufferKey {
   INDEX,
 }
 
+// TODO: Potentially add tangent and color buffers
 export interface MeshBuffers {
   [BufferKey.POSITION]: BufferView;
   [BufferKey.NORMAL]?: BufferView;
+  [BufferKey.TANGENT]?: BufferView;
   [BufferKey.TEXTCOORD_0]?: BufferView;
   [BufferKey.TEXTCOORD_1]?: BufferView;
   [BufferKey.TEXTCOORD_2]?: BufferView;

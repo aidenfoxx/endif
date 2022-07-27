@@ -1,6 +1,6 @@
-import { FlatShader } from '../shader/FlatShader';
-import { Shader } from '../shader/Shader';
-import { BaseTexture } from '../texture/BaseTexture';
+import { FlatShader } from '../shaders/FlatShader';
+import { Shader } from '../shaders/Shader';
+import { BaseTexture } from '../textures/BaseTexture';
 import { Material, TextureKey } from './Material';
 
 export class BaseMaterial extends Material {

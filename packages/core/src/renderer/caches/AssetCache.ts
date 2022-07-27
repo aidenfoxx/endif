@@ -6,7 +6,7 @@ interface AssetRecord {
   refs: number;
 }
 
-class AssetIterator implements Iterator<any> {
+class AssetIterator implements Iterator<object> {
   constructor(private keys: Set<WeakRef<object>>, private cache: WeakMap<object, AssetRecord>) {}
 
   public next(): IteratorResult<[object, object]> {

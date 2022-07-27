@@ -30,7 +30,7 @@ export class Renderer {
       }
     }
 
-    throw new Error('Unable to initialize WebGL context');
+    throw new Error('Failed to initialize WebGL context');
   }
 
   public clear(): void {
@@ -172,6 +172,7 @@ export class Renderer {
       if (previousMaterial) {
         this.gl.deleteBuffer(previousMaterial);
       }
+
       return createMaterialUniform(this.gl);
     });
     
@@ -190,7 +191,7 @@ export class Renderer {
         continue;
       }
 
-      const buffer = assetCache.getValue(texture, () => { // TODO: Fix naming
+      const buffer = assetCache.getValue(texture, () => {
         const buffer = createTexture(this.gl, texture.image);
 
         this.gl.bindTexture(this.gl.TEXTURE_2D, buffer);
