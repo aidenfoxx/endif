@@ -4,8 +4,8 @@ export function createArrayBuffer(
   gl: WebGL2RenderingContext,
   data: ArrayBuffer,
   target: BufferType,
-  bufferLength: number,
-  bufferOffest: number = 0
+  byteLength: number,
+  byteOffest: number = 0
 ): WebGLBuffer {
   const buffer = gl.createBuffer();
 
@@ -14,7 +14,7 @@ export function createArrayBuffer(
   }
 
   gl.bindBuffer(target, buffer);
-  gl.bufferData(target, new Uint8Array(data), gl.STATIC_DRAW, bufferOffest, bufferLength);
+  gl.bufferData(target, new Uint8Array(data), gl.STATIC_DRAW, byteOffest, byteLength);
   gl.bindBuffer(target, null);
 
   return buffer;

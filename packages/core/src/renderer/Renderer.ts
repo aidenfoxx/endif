@@ -1,14 +1,14 @@
 import { Scene } from './Scene';
-import { Camera } from './camera/Camera';
-import { Mesh } from './mesh/Mesh';
-import { BufferKey, MeshPrimitive } from './mesh/MeshPrimitive';
+import { Camera } from './cameras/Camera';
+import { Mesh } from './meshes/Mesh';
+import { BufferKey, MeshPrimitive } from './meshes/MeshPrimitive';
 import { createProgram } from '../utils/gl/shader';
 import { createMaterialUniform } from '../utils/gl/material';
 import { aabbTransform } from '../utils/math';
-import { AssetCache } from './cache/AssetCache';
-import { VisbilityCache } from './cache/VisibilityCache';
-import { Material, TextureKey } from './material/Material';
-import { Shader } from './shader/Shader';
+import { AssetCache } from './caches/AssetCache';
+import { VisbilityCache } from './caches/VisibilityCache';
+import { Material, TextureKey } from './materials/Material';
+import { Shader } from './shaders/Shader';
 import { createTexture } from '../utils/gl/textures';
 import { createArrayBuffer, createVertexArray } from '../utils/gl/mesh';
 
@@ -110,11 +110,16 @@ export class Renderer {
 
           for (let i = 0; i < primitiveArray.length; i++) {
             const primitive = primitiveArray[i];
-            const bufferView = primitiveArray[i].buffers[BufferKey.INDEX]
-              ?? primitiveArray[i].buffers[BufferKey.POSITION];
+            const indexBuffer = primitive.buffers[BufferKey.INDEX];
 
             this.bindPrimitive(primitive, assetCache);
-            this.gl.drawElements(primitive.mode, bufferView.size, bufferView.type, 0);// TODO: This only works with indices?
+
+            if (indexBuffer) {
+              this.gl.drawElements(primitive.mode, indexBuffer.count, indexBuffer.type, 0);
+            } else {
+              const positionBuffer = primitive.buffers[BufferKey.POSITION];
+              this.gl.drawArrays(primitive.mode, 0, positionBuffer.count); // TODO: Verify this works (with offsets)
+            }
           }
         }
       }
@@ -221,7 +226,6 @@ export class Renderer {
           continue;
         }
 
-        const isIndexBuffer = Number(key) === BufferKey.INDEX;
         const buffer = assetCache.getValue(bufferView.buffer, () => {
           return createArrayBuffer(
             this.gl,
@@ -232,10 +236,9 @@ export class Renderer {
           );
         })
 
-        if (isIndexBuffer) {
-          this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, buffer);
-        } else {
-          this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+        this.gl.bindBuffer(bufferView.buffer.target, buffer);
+
+        if (key !== BufferKey.INDEX) {
           this.gl.vertexAttribPointer(
             Number(key),
             bufferView.count,
