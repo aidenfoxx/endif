@@ -179,7 +179,7 @@ export class Renderer {
     this.gl.bindBuffer(this.gl.UNIFORM_BUFFER, materialBuffer);
 
     // Bind textures
-    const textureKeys = Object.keys(TextureKey).map(Number).filter(key => isNaN(key));
+    const textureKeys = Object.keys(TextureKey).map(Number).filter(key => !isNaN(key));
 
     for (const key of textureKeys) {
       this.gl.activeTexture(this.gl.TEXTURE0 + key);
@@ -218,7 +218,7 @@ export class Renderer {
       this.gl.bindVertexArray(vertexArray);
 
       // Bind buffers
-      const bufferViewKeys = Object.keys(BufferKey).map(Number).filter(key => isNaN(key));
+      const bufferViewKeys = Object.keys(BufferKey).map(Number).filter(key => !isNaN(key));
 
       for (const key of bufferViewKeys) {
         const bufferView = primitive.buffers[key as BufferKey];
@@ -240,9 +240,10 @@ export class Renderer {
         this.gl.bindBuffer(bufferView.buffer.target, buffer);
 
         if (key !== BufferKey.INDEX) {
+          this.gl.enableVertexAttribArray(key);
           this.gl.vertexAttribPointer(
-            Number(key),
-            bufferView.count,
+            key,
+            bufferView.size,
             bufferView.type,
             bufferView.normalized,
             bufferView.byteStride,

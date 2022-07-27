@@ -28,7 +28,7 @@ export type Mat4 = Readonly<[
   number
 ]>;
 
-export type AABB = [Vec3, Vec3];
+export type AABB = [Vec3, Vec3]; // TODO: This should be readonly
 
 // Vector functions
 export function vec2Add(vec1: Vec2, vec2: Vec2): Vec2 {
