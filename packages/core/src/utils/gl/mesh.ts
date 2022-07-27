@@ -2,8 +2,10 @@ import { BufferType } from '../../types';
 
 export function createArrayBuffer(
   gl: WebGL2RenderingContext,
-  bufferType: BufferType,
-  buffer: ArrayBuffer
+  data: ArrayBuffer,
+  target: BufferType,
+  bufferLength: number,
+  bufferOffest: number = 0
 ): WebGLBuffer {
   const buffer = gl.createBuffer();
 
@@ -11,9 +13,9 @@ export function createArrayBuffer(
     throw new Error('Failed to create mesh buffer');
   }
 
-  gl.bindBuffer(bufferType, buffer);
-  gl.bufferData(bufferType, buffer, gl.STATIC_DRAW);
-  gl.bindBuffer(bufferType, null);
+  gl.bindBuffer(target, buffer);
+  gl.bufferData(target, new Uint8Array(data), gl.STATIC_DRAW, bufferOffest, bufferLength);
+  gl.bindBuffer(target, null);
 
   return buffer;
 }

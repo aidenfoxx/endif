@@ -7,12 +7,10 @@ import { createMaterialUniform } from '../utils/gl/material';
 import { aabbTransform } from '../utils/math';
 import { AssetCache } from './cache/AssetCache';
 import { VisbilityCache } from './cache/VisibilityCache';
-import { Material } from './material/Material';
+import { Material, TextureKey } from './material/Material';
 import { Shader } from './shader/Shader';
 import { createTexture } from '../utils/gl/textures';
 import { createArrayBuffer, createVertexArray } from '../utils/gl/mesh';
-import { BufferView } from './buffer/BufferView';
-import { Texture } from '../main';
 
 type RenderQueue = Map<Shader, Map<Material, Map<Mesh, Array<MeshPrimitive>>>>;
 
@@ -35,7 +33,11 @@ export class Renderer {
     throw new Error('Unable to initialize WebGL context');
   }
 
-  public renderScene(scene: Scene, camera: Camera) {
+  public clear(): void {
+    this.gl.clearColor(0, 0, 0, 0);
+  }
+
+  public renderScene(scene: Scene, camera: Camera): void {
     // Generate render queue
     const renderQueue: RenderQueue = new Map();
     
@@ -93,6 +95,7 @@ export class Renderer {
   
       this.gl.useProgram(program);
 
+      const modelLocation = this.gl.getUniformLocation(program, 'model');
       const viewLocation = this.gl.getUniformLocation(program, 'view');
       const projectionLocation = this.gl.getUniformLocation(program, 'projection');
 
@@ -103,10 +106,15 @@ export class Renderer {
         this.bindMaterial(material, assetCache);
 
         for (const [mesh, primitiveArray] of meshQueue) {
-          this.bindMesh(mesh);
+          this.gl.uniformMatrix4fv(modelLocation, false, new Float32Array(mesh.getMatrix()));
 
           for (let i = 0; i < primitiveArray.length; i++) {
-            this.drawPrimitive(primitiveArray[i], assetCache);
+            const primitive = primitiveArray[i];
+            const bufferView = primitiveArray[i].buffers[BufferKey.INDEX]
+              ?? primitiveArray[i].buffers[BufferKey.POSITION];
+
+            this.bindPrimitive(primitive, assetCache);
+            this.gl.drawElements(primitive.mode, bufferView.size, bufferView.type, 0);// TODO: This only works with indices?
           }
         }
       }
@@ -161,21 +169,24 @@ export class Renderer {
       }
       return createMaterialUniform(this.gl);
     });
-
-    const textures: Array<[string, Texture | undefined]> = Object.entries(material.textures);
     
     this.gl.bindBuffer(this.gl.UNIFORM_BUFFER, materialBuffer);
 
-    // TODO: We need to loop ALL keys so we can NULL set unused textures
-    for (const [key, texture] of textures) {
+    // Bind textures
+    const textureKeys = Object.keys(TextureKey).map(Number).filter(key => isNaN(key));
+
+    for (const key of textureKeys) {
+      this.gl.activeTexture(this.gl.TEXTURE0 + key);
+
+      const texture = material.textures[key as TextureKey];
+
       if (!texture) {
+        this.gl.bindTexture(this.gl.TEXTURE_2D, null);
         continue;
       }
 
-      this.gl.activeTexture(this.gl.TEXTURE0 + Number(key));
-
       const buffer = assetCache.getValue(texture, () => { // TODO: Fix naming
-        const buffer = createTexture(this.gl, texture.image);;
+        const buffer = createTexture(this.gl, texture.image);
 
         this.gl.bindTexture(this.gl.TEXTURE_2D, buffer);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, texture.minFilter);
@@ -190,33 +201,35 @@ export class Renderer {
     }
   }
 
-  private bindMesh(mesh: Mesh): void {
-
-  }
-
-  private drawPrimitive(primitive: MeshPrimitive, assetCache: AssetCache): void {
+  private bindPrimitive(primitive: MeshPrimitive, assetCache: AssetCache): void {
     const vertexArray = assetCache.observeValue(primitive, (previousVertexArray?: WebGLProgram) => {
       if (previousVertexArray) {
         this.gl.deleteVertexArray(previousVertexArray);
       }
 
       const vertexArray = createVertexArray(this.gl);
-      const bufferViews: Array<[string, BufferView | undefined]> = Object.entries(primitive.buffers);
-
+      
       this.gl.bindVertexArray(vertexArray);
 
-      for (const [key, bufferView] of bufferViews) {
+      // Bind buffers
+      const bufferViewKeys = Object.keys(BufferKey).map(Number).filter(key => isNaN(key));
+
+      for (const key of bufferViewKeys) {
+        const bufferView = primitive.buffers[key as BufferKey];
+
         if (!bufferView) {
           continue;
         }
 
         const isIndexBuffer = Number(key) === BufferKey.INDEX;
         const buffer = assetCache.getValue(bufferView.buffer, () => {
-          if (isIndexBuffer) {
-            return createArrayBuffer(this.gl, this.gl.ELEMENT_ARRAY_BUFFER, bufferView.buffer);
-          }
-
-          return createArrayBuffer(this.gl, this.gl.ARRAY_BUFFER, bufferView.buffer);
+          return createArrayBuffer(
+            this.gl,
+            bufferView.buffer.data,
+            bufferView.buffer.target,
+            bufferView.buffer.byteLength,
+            bufferView.buffer.byteOffest
+          );
         })
 
         if (isIndexBuffer) {
@@ -226,7 +239,7 @@ export class Renderer {
           this.gl.vertexAttribPointer(
             Number(key),
             bufferView.count,
-            this.gl.FLOAT,
+            bufferView.type,
             bufferView.normalized,
             bufferView.byteStride,
             bufferView.byteOffest

@@ -51,11 +51,11 @@ export class MeshPrimitive extends Observable {
   public getAABB(): AABB {
     if (this.stateID !== this.aabbStateID) {
       const bufferView = this.buffers[BufferKey.POSITION];
-      // TODO: This needs to support other data types
+      // TODO: This needs to support other data types and stride
       const positionData = new Float32Array(
-        bufferView.buffer,
-        bufferView.byteOffest,
-        bufferView.count
+        bufferView.buffer.data,
+        bufferView.buffer.byteOffest + bufferView.byteOffest,
+        bufferView.count // TODO: This is relative to the data type (Int, Short etc)
       );
 
       this.aabb = aabbCalculate(Array.from(positionData));

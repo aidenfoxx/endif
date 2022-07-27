@@ -1,12 +1,13 @@
 import { DataType } from '../../types';
+import { Buffer } from './Buffer';
 
 export class BufferView {
   constructor(
-    public readonly buffer: ArrayBuffer,
+    public readonly buffer: Buffer,
     public readonly count: number,
-    public readonly dataType: DataType,
-    public readonly byteStride: number = 0,
+    public readonly type: DataType,
+    public readonly byteStride: number = 1,
     public readonly byteOffest: number = 0,
-    public readonly normalized: boolean = false
+    public readonly normalized: boolean = false,
   ) {}
 }
