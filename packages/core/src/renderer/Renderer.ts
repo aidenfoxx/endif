@@ -41,7 +41,7 @@ export class Renderer {
   public renderScene(scene: Scene, camera: Camera): void {
     // Generate render queue
     const renderQueue: RenderQueue = new Map();
-    
+
     if (camera.frustumCulling) {
       let visiblityCache = this.sceneVisibility.get(scene);
 
@@ -67,7 +67,7 @@ export class Renderer {
             isVisible = camera.isVisible(aabb);
             visiblityCache.setVisbility(primitive, isVisible);
           }
-          
+
           if (!isVisible) {
             continue;
           }
@@ -95,7 +95,7 @@ export class Renderer {
       const program = assetCache.getValue(shader, () => {
         return createProgram(this.gl, shader.vertexSource, shader.fragmentSource);
       });
-  
+
       this.gl.useProgram(program);
 
       const modelLocation = this.gl.getUniformLocation(program, 'model');
@@ -181,11 +181,7 @@ export class Renderer {
     });
   }
 
-  private parsePrimitive(
-    mesh: Mesh,
-    primitive: MeshPrimitive,
-    renderQueue: RenderQueue
-  ): void {
+  private parsePrimitive(mesh: Mesh, primitive: MeshPrimitive, renderQueue: RenderQueue): void {
     let materialQueue = renderQueue.get(primitive.material.shader);
 
     if (!materialQueue) {
@@ -218,11 +214,13 @@ export class Renderer {
 
       return createMaterialUniform(this.gl);
     });
-    
+
     this.gl.bindBuffer(this.gl.UNIFORM_BUFFER, materialBuffer);
 
     // Bind textures
-    const textureKeys = Object.keys(TextureKey).map(Number).filter(key => !isNaN(key));
+    const textureKeys = Object.keys(TextureKey)
+      .map(Number)
+      .filter((key) => !isNaN(key));
 
     for (const key of textureKeys) {
       this.gl.activeTexture(this.gl.TEXTURE0 + key);
@@ -244,7 +242,7 @@ export class Renderer {
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, texture.wrapT);
 
         return buffer;
-      })
+      });
 
       this.gl.bindTexture(this.gl.TEXTURE_2D, buffer);
     }
@@ -257,11 +255,13 @@ export class Renderer {
       }
 
       const vertexArray = createVertexArray(this.gl);
-      
+
       this.gl.bindVertexArray(vertexArray);
 
       // Bind buffers
-      const bufferViewKeys = Object.keys(BufferKey).map(Number).filter(key => !isNaN(key));
+      const bufferViewKeys = Object.keys(BufferKey)
+        .map(Number)
+        .filter((key) => !isNaN(key));
 
       for (const key of bufferViewKeys) {
         const bufferView = primitive.buffers[key as BufferKey];
@@ -278,7 +278,7 @@ export class Renderer {
             bufferView.buffer.byteLength,
             bufferView.buffer.byteOffest
           );
-        })
+        });
 
         this.gl.bindBuffer(bufferView.buffer.target, buffer);
 

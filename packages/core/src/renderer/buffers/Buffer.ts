@@ -1,4 +1,4 @@
-import { BufferType } from "../../types";
+import { BufferType } from '../../types';
 
 export class Buffer {
   constructor(

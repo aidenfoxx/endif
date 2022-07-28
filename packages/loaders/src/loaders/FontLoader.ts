@@ -1,3 +1,1 @@
-export class FontLoader {
-
-}
+export class FontLoader {}

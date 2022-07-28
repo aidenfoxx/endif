@@ -9,6 +9,6 @@ export class BufferView {
     public readonly type: DataType,
     public readonly byteStride: number = 0,
     public readonly byteOffest: number = 0,
-    public readonly normalized: boolean = false,
+    public readonly normalized: boolean = false
   ) {}
 }

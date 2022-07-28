@@ -1,4 +1,4 @@
-import { Observable } from "../../reactor/Observable";
+import { Observable } from '../../reactor/Observable';
 
 interface AssetRecord {
   stateID: number;
@@ -45,7 +45,7 @@ export class AssetCache {
     if (!this.cache.has(key)) {
       this.keys.add(new WeakRef(key));
       this.cache.set(key, record);
-    
+
       record.refs++;
     }
 
@@ -92,7 +92,7 @@ export class AssetCache {
     this.cache.delete(key);
   }
 
-  public forEach(callback: (value: [object, object]) => void): void {    
+  public forEach(callback: (value: [object, object]) => void): void {
     for (const value of this) {
       callback(value);
     }

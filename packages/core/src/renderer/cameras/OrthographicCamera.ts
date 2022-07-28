@@ -40,9 +40,4 @@ export class OrthographicCamera extends Camera {
 
     return this.projection;
   }
-
-  public isVisible(aabb: AABB): boolean {
-    // TODO: Implement
-    return true;
-  }
 }

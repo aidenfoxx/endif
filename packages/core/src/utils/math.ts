@@ -9,24 +9,26 @@ export type Vec3 = Readonly<[number, number, number]>;
 
 export type Vec4 = Readonly<[number, number, number, number]>;
 
-export type Mat4 = Readonly<[
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number
-]>;
+export type Mat4 = Readonly<
+  [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number
+  ]
+>;
 
 export type AABB = [Vec3, Vec3]; // TODO: This should be readonly
 

@@ -1,4 +1,4 @@
-import { Observable } from "../../reactor/Observable";
+import { Observable } from '../../reactor/Observable';
 
 interface VisibilityRecord {
   stateID: number;
@@ -20,7 +20,7 @@ export class VisbilityCache {
     }
 
     return false;
-  };
+  }
 
   public getVisibility(key: Observable): boolean | undefined {
     return this.cache.get(key)?.value;
