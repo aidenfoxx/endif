@@ -16,4 +16,5 @@ export * from './renderer/textures/BaseTexture';
 export * from './renderer/textures/Texture';
 export * from './renderer/Renderer';
 export * from './renderer/Scene';
+export * from './types';
 export * from './utils/math';

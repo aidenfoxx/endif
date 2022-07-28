@@ -11,6 +11,7 @@ import { Material, TextureKey } from './materials/Material';
 import { Shader } from './shaders/Shader';
 import { createTexture } from '../utils/gl/textures';
 import { createArrayBuffer, createVertexArray } from '../utils/gl/mesh';
+import { Texture } from './textures/Texture';
 
 type RenderQueue = Map<Shader, Map<Material, Map<Mesh, Array<MeshPrimitive>>>>;
 
@@ -49,23 +50,25 @@ export class Renderer {
         this.sceneVisibility.set(scene, visiblityCache);
       }
 
-      let hasChanged = visiblityCache.observeChange(camera);
+      const hasCameraChanged = visiblityCache.observeChange(camera);
 
       for (const [_, mesh] of scene.meshes) {
-        hasChanged ||= visiblityCache.observeChange(mesh);
+        const hasMeshChanged = visiblityCache.observeChange(mesh);
 
         for (const [_, primitive] of mesh.primitives) {
-          hasChanged ||= visiblityCache.observeChange(primitive);
+          const hasPrimitiveChanged = visiblityCache.observeChange(primitive);
+          const hasChanged = hasCameraChanged || hasMeshChanged || hasPrimitiveChanged;
 
           // Reuse previous visibility if nothing changed
-          const wasVisible = visiblityCache.getVisibility(primitive);
+          let isVisible = visiblityCache.getVisibility(primitive);
 
-          if (hasChanged || wasVisible === undefined) {
+          if (hasChanged || isVisible === undefined) {
             const aabb = aabbTransform(primitive.getAABB(), mesh.getMatrix());
-            const isVisible = camera.isVisible(aabb);
-
+            isVisible = camera.isVisible(aabb);
             visiblityCache.setVisbility(primitive, isVisible);
-          } else if (!wasVisible) {
+          }
+          
+          if (!isVisible) {
             continue;
           }
 
@@ -118,7 +121,7 @@ export class Renderer {
               this.gl.drawElements(primitive.mode, indexBuffer.count, indexBuffer.type, 0);
             } else {
               const positionBuffer = primitive.buffers[BufferKey.POSITION];
-              this.gl.drawArrays(primitive.mode, 0, positionBuffer.count); // TODO: Verify this works (with offsets)
+              this.gl.drawArrays(primitive.mode, 0, positionBuffer.count);
             }
           }
         }
@@ -127,15 +130,55 @@ export class Renderer {
   }
 
   public releaseScene(scene: Scene): void {
-    let assetCache = this.sceneAssets.get(scene);
+    const assetCache = this.sceneAssets.get(scene);
 
     if (!assetCache) {
       return;
     }
 
-    for (const [key, value] of assetCache) {
-      // TODO: Cleanup assets
+    for (const [key] of assetCache) {
+      if (key instanceof Material || key instanceof Buffer) {
+        assetCache.deleteValue(key, (value: WebGLBuffer) => {
+          this.gl.deleteBuffer(value);
+        });
+      } else if (key instanceof Shader) {
+        assetCache.deleteValue(key, (value: WebGLProgram) => {
+          this.gl.deleteProgram(value);
+        });
+      } else if (key instanceof Texture) {
+        assetCache.deleteValue(key, (value: WebGLTexture) => {
+          this.gl.deleteTexture(value);
+        });
+      } else if (key instanceof MeshPrimitive) {
+        assetCache.deleteValue(key, (value: WebGLVertexArrayObject) => {
+          this.gl.deleteVertexArray(value);
+        });
+      }
     }
+  }
+
+  public releaseTexture(scene: Scene, texture: Texture): void {
+    const assetCache = this.sceneAssets.get(scene);
+
+    if (!assetCache) {
+      return;
+    }
+
+    assetCache.deleteValue(texture, (value: WebGLTexture) => {
+      this.gl.deleteTexture(value);
+    });
+  }
+
+  public releaseBuffer(scene: Scene, buffer: Buffer): void {
+    const assetCache = this.sceneAssets.get(scene);
+
+    if (!assetCache) {
+      return;
+    }
+
+    assetCache.deleteValue(buffer, (value: WebGLTexture) => {
+      this.gl.deleteBuffer(value);
+    });
   }
 
   private parsePrimitive(

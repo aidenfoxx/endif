@@ -34,7 +34,7 @@ export class Material extends Observable {
 
     this.watch(this, 'shader');
     this.watch(this, 'diffuseFactor');
-    this.watch(this, 'metallicFacror');
+    this.watch(this, 'metallicFactor');
     this.watch(this, 'roughnessFactor');
     this.watch(this, 'emissiveFactor');
     this.watch(this.textures, TextureKey.DIFFUSE);
