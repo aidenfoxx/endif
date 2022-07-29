@@ -28,7 +28,12 @@ export class Renderer {
       const gl = canvas.getContext('webgl2', options);
 
       if (gl) {
+        gl.enable(gl.DEPTH_TEST);
+        gl.enable(gl.CULL_FACE);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
         this.gl = gl;
+
         return;
       }
     }
@@ -54,10 +59,10 @@ export class Renderer {
 
       const hasCameraChanged = visiblityCache.observeChange(camera);
 
-      for (const mesh of scene.meshes.values()) {
+      for (const [_, mesh] of scene.meshes) {
         const hasMeshChanged = visiblityCache.observeChange(mesh);
 
-        for (const primitive of mesh.primitives.values()) {
+        for (const [_, primitive] of mesh.primitives) {
           const hasPrimitiveChanged = visiblityCache.observeChange(primitive);
           const hasChanged = hasCameraChanged || hasMeshChanged || hasPrimitiveChanged;
 
@@ -78,8 +83,8 @@ export class Renderer {
         }
       }
     } else {
-      for (const mesh of scene.meshes.values()) {
-        for (const primitive of mesh.primitives.values()) {
+      for (const [_, mesh] of scene.meshes) {
+        for (const [_, primitive] of mesh.primitives) {
           this.parsePrimitive(mesh, primitive, renderQueue);
         }
       }
