@@ -3,17 +3,19 @@ import { Camera } from './cameras/Camera';
 import { Mesh } from './meshes/Mesh';
 import { BufferKey, MeshPrimitive } from './meshes/MeshPrimitive';
 import { createProgram } from '../utils/gl/shader';
-import { createMaterialUniform } from '../utils/gl/material';
 import { aabbTransform } from '../utils/math';
 import { AssetCache } from './caches/AssetCache';
 import { VisbilityCache } from './caches/VisibilityCache';
 import { Material, TextureKey } from './materials/Material';
 import { Shader } from './shaders/Shader';
-import { createTexture } from '../utils/gl/textures';
-import { createArrayBuffer, createVertexArray } from '../utils/gl/mesh';
+import { createTexture } from '../utils/gl/texture';
+import { createArrayBuffer, createUniformBuffer, createVertexArray } from '../utils/gl/buffer';
 import { Texture } from './textures/Texture';
 
 type RenderQueue = Map<Shader, Map<Material, Map<Mesh, Array<MeshPrimitive>>>>;
+
+const CAMERA_BUFFER_INDEX = 0;
+const MATERIAL_BUFFER_INDEX = 1;
 
 export class Renderer {
   private gl: WebGL2RenderingContext;
@@ -91,25 +93,41 @@ export class Renderer {
       this.sceneAssets.set(scene, assetCache);
     }
 
+    // Bind camera UBO
+    const cameraBuffer = assetCache.observeValue(camera, (previousBuffer?: WebGLBuffer) => {
+      const buffer = previousBuffer ?? createUniformBuffer(this.gl, 192);
+
+      this.gl.bindBuffer(this.gl.UNIFORM_BUFFER, buffer);
+      this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 0, new Float32Array(camera.getMatrix()));
+      this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 64, new Float32Array(camera.getProjection()));
+
+      return buffer;
+    });
+
+    this.gl.bindBufferBase(this.gl.UNIFORM_BUFFER, CAMERA_BUFFER_INDEX, cameraBuffer);
+
     for (const [shader, materialQueue] of renderQueue) {
+      // Bind shader
       const program = assetCache.getValue(shader, () => {
-        return createProgram(this.gl, shader.vertexSource, shader.fragmentSource);
+        const program = createProgram(this.gl, shader.vertexSource, shader.fragmentSource);
+        const cameraBlockIndex = this.gl.getUniformBlockIndex(program, 'Camera');
+        const materialBlockIndex = this.gl.getUniformBlockIndex(program, 'Material');
+
+        this.gl.uniformBlockBinding(program, cameraBlockIndex, CAMERA_BUFFER_INDEX);
+        this.gl.uniformBlockBinding(program, materialBlockIndex, MATERIAL_BUFFER_INDEX);
+
+        return program;
       });
 
       this.gl.useProgram(program);
-
-      const modelLocation = this.gl.getUniformLocation(program, 'model');
-      const viewLocation = this.gl.getUniformLocation(program, 'view');
-      const projectionLocation = this.gl.getUniformLocation(program, 'projection');
-
-      this.gl.uniformMatrix4fv(viewLocation, false, new Float32Array(camera.getMatrix()));
-      this.gl.uniformMatrix4fv(projectionLocation, false, new Float32Array(camera.getProjection()));
 
       for (const [material, meshQueue] of materialQueue) {
         this.bindMaterial(material, assetCache);
 
         for (const [mesh, primitiveArray] of meshQueue) {
-          this.gl.uniformMatrix4fv(modelLocation, false, new Float32Array(mesh.getMatrix()));
+          // Update model matrix
+          this.gl.bindBuffer(this.gl.UNIFORM_BUFFER, cameraBuffer);
+          this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 128, new Float32Array(mesh.getMatrix()));
 
           for (let i = 0; i < primitiveArray.length; i++) {
             const primitive = primitiveArray[i];
@@ -137,7 +155,7 @@ export class Renderer {
     }
 
     for (const [key] of assetCache) {
-      if (key instanceof Material || key instanceof Buffer) {
+      if (key instanceof Camera || key instanceof Material || key instanceof Buffer) {
         assetCache.deleteValue(key, (value: WebGLBuffer) => {
           this.gl.deleteBuffer(value);
         });
@@ -207,15 +225,19 @@ export class Renderer {
   }
 
   private bindMaterial(material: Material, assetCache: AssetCache): void {
-    const materialBuffer = assetCache.observeValue(material, (previousMaterial?: WebGLProgram) => {
-      if (previousMaterial) {
-        this.gl.deleteBuffer(previousMaterial);
-      }
+    const materialBuffer = assetCache.observeValue(material, (previousBuffer?: WebGLProgram) => {
+      const buffer = previousBuffer ?? createUniformBuffer(this.gl, 48);
 
-      return createMaterialUniform(this.gl);
+      this.gl.bindBuffer(this.gl.UNIFORM_BUFFER, buffer);
+      this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 0, new Float32Array(material.diffuseFactor));
+      this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 16, new Float32Array(material.metallicFactor));
+      this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 20, new Float32Array(material.roughnessFactor));
+      this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 32, new Float32Array(material.emissiveFactor));
+
+      return buffer;
     });
 
-    this.gl.bindBuffer(this.gl.UNIFORM_BUFFER, materialBuffer);
+    this.gl.bindBufferBase(this.gl.UNIFORM_BUFFER, MATERIAL_BUFFER_INDEX, materialBuffer);
 
     // Bind textures
     const textureKeys = Object.keys(TextureKey)

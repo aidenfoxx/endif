@@ -1,4 +1,4 @@
-import { AABB, Mat4, mat4Empty, mat4Orthographic, Vec3, Vec4 } from '../../utils/math';
+import { Mat4, mat4Empty, mat4Orthographic, Vec3, Vec4 } from '../../utils/math';
 import { Camera } from './Camera';
 
 export class OrthographicCamera extends Camera {

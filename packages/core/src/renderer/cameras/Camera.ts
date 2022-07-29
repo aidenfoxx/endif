@@ -16,6 +16,9 @@ type ViewFrustum = [Vec4, Vec4, Vec4, Vec4, Vec4, Vec4];
 export abstract class Camera extends Observable {
   public frustumCulling: boolean = true;
 
+  private matrix: Mat4 = mat4Identity();
+  private matrixStateID: number = -1;
+
   private frustumPlanes: ViewFrustum = [
     [0, 0, 0, 0],
     [0, 0, 0, 0],
@@ -26,9 +29,6 @@ export abstract class Camera extends Observable {
   ];
   private frustumPlanesStateID: number = -1;
 
-  private matrix: Mat4 = mat4Identity();
-  private matrixStateID: number = -1;
-
   constructor(public translation: Vec3 = [0, 0, 0], public rotation: Vec4 = [0, 0, 0, 1]) {
     super();
 
@@ -37,9 +37,23 @@ export abstract class Camera extends Observable {
     this.watch(this, 'rotation');
   }
 
+  public getMatrix(): Mat4 {
+    if (this.stateID !== this.matrixStateID) {
+      this.matrix = mat4Multiply(
+        mat4Translation(this.translation),
+        mat4RotationQuat(this.rotation)
+      );
+    }
+
+    return this.matrix;
+  }
+
+  public abstract getProjection(): Mat4;
+
   public isVisible(aabb: AABB): boolean {
     if (this.stateID !== this.frustumPlanesStateID) {
       const mat = mat4Multiply(this.getProjection(), this.getMatrix());
+
       this.frustumPlanes = [
         vec4Normalize([mat[3] + mat[0], mat[7] + mat[4], mat[11] + mat[8], mat[15] + mat[12]]),
         vec4Normalize([mat[3] - mat[0], mat[7] - mat[4], mat[11] - mat[8], mat[15] - mat[12]]),
@@ -65,17 +79,4 @@ export abstract class Camera extends Observable {
 
     return true;
   }
-
-  public getMatrix(): Mat4 {
-    if (this.stateID !== this.matrixStateID) {
-      this.matrix = mat4Multiply(
-        mat4Translation(this.translation),
-        mat4RotationQuat(this.rotation)
-      );
-    }
-
-    return this.matrix;
-  }
-
-  public abstract getProjection(): Mat4;
 }

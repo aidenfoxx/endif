@@ -1,5 +1,19 @@
 import { BufferType } from '../../types';
 
+export function createUniformBuffer(gl: WebGL2RenderingContext, size: number): WebGLBuffer {
+  const buffer = gl.createBuffer();
+
+  if (!buffer) {
+    throw new Error('Failed to create uniform buffer')
+  }
+
+  gl.bindBuffer(gl.UNIFORM_BUFFER, buffer);
+  gl.bufferData(gl.UNIFORM_BUFFER, size, gl.DYNAMIC_DRAW);
+  gl.bindBuffer(gl.UNIFORM_BUFFER, null);
+
+  return buffer;
+}
+
 export function createArrayBuffer(
   gl: WebGL2RenderingContext,
   data: ArrayBuffer,

@@ -8,10 +8,10 @@ export enum BufferKey {
   POSITION,
   NORMAL,
   TANGENT,
-  TEXTCOORD_0,
-  TEXTCOORD_1,
-  TEXTCOORD_2,
-  TEXTCOORD_3,
+  TEXCOORD_0,
+  TEXCOORD_1,
+  TEXCOORD_2,
+  TEXCOORD_3,
   INDEX,
 }
 
@@ -20,10 +20,10 @@ export interface MeshBuffers {
   [BufferKey.POSITION]: BufferView;
   [BufferKey.NORMAL]?: BufferView;
   [BufferKey.TANGENT]?: BufferView;
-  [BufferKey.TEXTCOORD_0]?: BufferView;
-  [BufferKey.TEXTCOORD_1]?: BufferView;
-  [BufferKey.TEXTCOORD_2]?: BufferView;
-  [BufferKey.TEXTCOORD_3]?: BufferView;
+  [BufferKey.TEXCOORD_0]?: BufferView;
+  [BufferKey.TEXCOORD_1]?: BufferView;
+  [BufferKey.TEXCOORD_2]?: BufferView;
+  [BufferKey.TEXCOORD_3]?: BufferView;
   [BufferKey.INDEX]?: BufferView;
 }
 
@@ -43,10 +43,10 @@ export class MeshPrimitive extends Observable {
 
     this.watch(this.buffers, BufferKey.POSITION);
     this.watch(this.buffers, BufferKey.NORMAL);
-    this.watch(this.buffers, BufferKey.TEXTCOORD_0);
-    this.watch(this.buffers, BufferKey.TEXTCOORD_1);
-    this.watch(this.buffers, BufferKey.TEXTCOORD_2);
-    this.watch(this.buffers, BufferKey.TEXTCOORD_3);
+    this.watch(this.buffers, BufferKey.TEXCOORD_0);
+    this.watch(this.buffers, BufferKey.TEXCOORD_1);
+    this.watch(this.buffers, BufferKey.TEXCOORD_2);
+    this.watch(this.buffers, BufferKey.TEXCOORD_3);
     this.watch(this.buffers, BufferKey.INDEX);
     this.watch(this, 'material');
   }

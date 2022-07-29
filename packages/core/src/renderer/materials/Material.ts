@@ -19,6 +19,7 @@ export interface MaterialTextures {
   [TextureKey.EMISSIVE]?: Texture;
 }
 
+// TODO: Implement texCoord indexes
 export class Material extends Observable {
   constructor(
     public shader: Shader,
