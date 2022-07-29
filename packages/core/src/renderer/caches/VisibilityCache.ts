@@ -29,7 +29,9 @@ export class VisbilityCache {
   public setVisbility(key: Observable, isVisible: boolean): void {
     const record = this.cache.get(key);
 
-    if (record) {
+    if (!record) {
+      this.cache.set(key, { stateID: key.stateID, value: isVisible });
+    } else {
       record.value = isVisible;
     }
   }
