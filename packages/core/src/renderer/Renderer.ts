@@ -30,7 +30,6 @@ export class Renderer {
       if (gl) {
         gl.enable(gl.DEPTH_TEST);
         gl.enable(gl.CULL_FACE);
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
         this.gl = gl;
 
