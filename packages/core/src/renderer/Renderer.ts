@@ -54,10 +54,10 @@ export class Renderer {
 
       const hasCameraChanged = visiblityCache.observeChange(camera);
 
-      for (const [_, mesh] of scene.meshes) {
+      for (const mesh of scene.meshes.values()) {
         const hasMeshChanged = visiblityCache.observeChange(mesh);
 
-        for (const [_, primitive] of mesh.primitives) {
+        for (const primitive of mesh.primitives.values()) {
           const hasPrimitiveChanged = visiblityCache.observeChange(primitive);
           const hasChanged = hasCameraChanged || hasMeshChanged || hasPrimitiveChanged;
 
@@ -78,8 +78,8 @@ export class Renderer {
         }
       }
     } else {
-      for (const [_, mesh] of scene.meshes) {
-        for (const [_, primitive] of mesh.primitives) {
+      for (const mesh of scene.meshes.values()) {
+        for (const primitive of mesh.primitives.values()) {
           this.parsePrimitive(mesh, primitive, renderQueue);
         }
       }

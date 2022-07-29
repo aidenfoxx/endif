@@ -323,7 +323,7 @@ export function mat4Transpose(mat: Mat4): Mat4 {
   ];
 }
 
-export function mat4Invert(mat: Mat4): Mat4 {
+export function mat4Inverse(mat: Mat4): Mat4 {
   const s0 = mat[0] * mat[5] - mat[4] * mat[1];
   const s1 = mat[0] * mat[6] - mat[4] * mat[2];
   const s2 = mat[0] * mat[7] - mat[4] * mat[3];

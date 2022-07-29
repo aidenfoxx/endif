@@ -7,6 +7,7 @@ import {
   mat4RotationQuat,
   mat4Translation,
   Vec3,
+  vec3Inverse,
   Vec4,
   vec4Normalize,
 } from '../../utils/math';
@@ -40,10 +41,9 @@ export abstract class Camera extends Observable {
   public getMatrix(): Mat4 {
     if (this.stateID !== this.matrixStateID) {
       this.matrix = mat4Multiply(
-        mat4Translation(this.translation),
+        mat4Translation(vec3Inverse(this.translation)),
         mat4RotationQuat(this.rotation)
       );
-      console.trace(this.matrix);
       this.matrixStateID = this.stateID;
     }
 

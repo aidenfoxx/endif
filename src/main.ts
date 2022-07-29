@@ -10,6 +10,7 @@ import {
   Mesh,
   DataType,
   BufferType,
+  eulerToQuat,
 } from '@endif/core';
 
 const cubeData = new Uint8Array([
@@ -103,16 +104,39 @@ const cubePrimitive = new MeshPrimitive(
   new BaseMaterial()
 );
 
-const cube = new Mesh([0, 0, -2]);
-cube.primitives.set('cube', cubePrimitive);
-
 const renderer = new Renderer(document.getElementById('canvas')!);
-const camera = new PerspectiveCamera(1.5708, 1.777, 0.1, 1000, [0, 0, 0]);
+const camera = new PerspectiveCamera(1.5708, 1.777, 0.1, 1000, [0, 2, 0]);
 const scene = new Scene();
-scene.meshes.set('cube', cube);
+
+for (let x = -400; x < 400; x += 2) {
+  for (let y = -400; y < 400; y += 2) {
+    const cube = new Mesh([x, 0, y]);
+    cube.primitives.set('cube', cubePrimitive);
+  
+    scene.meshes.set(`cube-${x}-${y}`, cube);
+  }
+}
+ 
+const fpsElement = document.getElementById('fps');
+
+let previousTime = performance.now();
+let counter = 0;
+let fps = 0;
 
 function appStep() {
   window.requestAnimationFrame(appStep);
+
+  const time = performance.now();
+
+  counter += time - previousTime;
+  previousTime = time;
+  fps++;
+
+  if (counter >= 1000) {
+    fpsElement!.innerHTML = `FPS: ${fps}`;
+    counter = 0;
+    fps = 0;
+  }
 
   renderer.clear();
   renderer.renderScene(scene, camera);
