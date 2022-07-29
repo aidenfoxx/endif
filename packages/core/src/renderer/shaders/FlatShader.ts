@@ -6,9 +6,9 @@ layout(location = 0) in vec3 position;
 layout(location = 3) in vec2 texCoord0;
 
 layout(std140) uniform Camera {
-  mat4 projection;
-  mat4 view;
   mat4 model;
+  mat4 view;
+  mat4 projection;
 };
 
 out vec2 texCoord;

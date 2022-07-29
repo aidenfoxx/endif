@@ -98,8 +98,8 @@ export class Renderer {
       const buffer = previousBuffer ?? createUniformBuffer(this.gl, 192);
 
       this.gl.bindBuffer(this.gl.UNIFORM_BUFFER, buffer);
-      this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 0, new Float32Array(camera.getMatrix()));
-      this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 64, new Float32Array(camera.getProjection()));
+      this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 64, new Float32Array(camera.getMatrix()));
+      this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 128, new Float32Array(camera.getProjection()));
 
       return buffer;
     });
@@ -127,7 +127,7 @@ export class Renderer {
         for (const [mesh, primitiveArray] of meshQueue) {
           // Update model matrix
           this.gl.bindBuffer(this.gl.UNIFORM_BUFFER, cameraBuffer);
-          this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 128, new Float32Array(mesh.getMatrix()));
+          this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 0, new Float32Array(mesh.getMatrix()));
 
           for (let i = 0; i < primitiveArray.length; i++) {
             const primitive = primitiveArray[i];
