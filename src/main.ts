@@ -105,8 +105,8 @@ const cubePrimitive = new MeshPrimitive(
   new BaseMaterial()
 );
 
-//const renderer = new Renderer(document.getElementById('canvas')!);
-const renderer = new RendererInstanced(document.getElementById('canvas')!);
+const renderer = new Renderer(document.getElementById('canvas')!);
+//const renderer = new RendererInstanced(document.getElementById('canvas')!);
 //const renderer = new RendererLegacy(document.getElementById('canvas')!);
 const camera = new PerspectiveCamera(1.5708, 1.777, 0.1, 50, [0, 2, 0]);
 camera.translation = [0, 2, 0];

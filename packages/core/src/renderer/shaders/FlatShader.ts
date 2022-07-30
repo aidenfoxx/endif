@@ -16,7 +16,7 @@ out vec2 texCoord;
 
 void main() {
   texCoord = texCoord0;
-  gl_Position = projection * view * model2 * vec4(position, 1);
+  gl_Position = projection * view * model * vec4(position, 1);
 }`;
 const fragmentSource = `#version 300 es
 precision highp float;
