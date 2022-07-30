@@ -11,22 +11,26 @@ import { Shader } from './shaders/Shader';
 import { createTexture } from '../utils/gl/texture';
 import { createArrayBuffer, createUniformBuffer, createVertexArray } from '../utils/gl/buffer';
 import { Texture } from './textures/Texture';
+import { BufferType, DataType } from '../types';
 
 type RenderQueue = Map<Shader, Map<Material, Map<MeshPrimitive, Set<Mesh>>>>;
 
 const CAMERA_BUFFER_INDEX = 0;
 const MATERIAL_BUFFER_INDEX = 1;
+const INSTANCED_DRAWS_MAX = 100000;
 
 const renderedElement = document.getElementById('rendered')!;
 let rendered = 0;
 let notRendered = 0;
 let drawCalls = 0;
 
-export class Renderer {
+export class RendererInstanced {
   private gl: WebGL2RenderingContext;
 
   private sceneAssets: Map<Scene, AssetCache> = new Map();
   private sceneVisibility: Map<Scene, VisbilityCache> = new Map();
+
+  private modelMatrixBuffer;
 
   constructor(canvas: HTMLElement, options?: WebGLContextAttributes) {
     if (canvas instanceof HTMLCanvasElement) {
@@ -36,6 +40,16 @@ export class Renderer {
         gl.enable(gl.DEPTH_TEST);
         gl.enable(gl.CULL_FACE);
 
+        const modelMatrixBuffer = gl.createBuffer();
+
+        if (!modelMatrixBuffer) {
+          throw new Error('Failed to create matrix buffer');
+        }
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, modelMatrixBuffer)
+        gl.bufferData(gl.ARRAY_BUFFER, 64 * INSTANCED_DRAWS_MAX, gl.DYNAMIC_DRAW);
+
+        this.modelMatrixBuffer = modelMatrixBuffer;
         this.gl = gl;
 
         return;
@@ -99,7 +113,7 @@ export class Renderer {
       }
     }
 
-    renderedElement.innerHTML = `Drawn: ${rendered}, Not Drawn: ${notRendered}, Draw Calls: ${drawCalls}`;
+    renderedElement.innerHTML = `Drawn: ${rendered}, Not Drawn: ${notRendered}, Draw calls: ${drawCalls}`;
     rendered = 0;
     notRendered = 0;
     drawCalls = 0;
@@ -143,27 +157,32 @@ export class Renderer {
       for (const [material, primitiveQueue] of materialQueue) {
         this.bindMaterial(material, assetCache);
 
-        // Bind camera once we know the material won't unbind it
-        this.gl.bindBuffer(this.gl.UNIFORM_BUFFER, cameraBuffer);
+        // Rebind the camera to update model matrix
+        //this.gl.bindBuffer(this.gl.UNIFORM_BUFFER, cameraBuffer);
 
         for (const [primitive, meshQueue] of primitiveQueue) {
           this.bindPrimitive(primitive, assetCache);
+          this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.modelMatrixBuffer);
+
+          // Bind matrix to model matrix buffer
+          let index = 0;
           
-          const indexBuffer = primitive.buffers[BufferKey.INDEX];
-          const positionBuffer = primitive.buffers[BufferKey.POSITION];
-
           for (const mesh of meshQueue) {
-            // Update model matrix            
-            this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 0, new Float32Array(mesh.getMatrix()));
-
-            if (indexBuffer) {
-              this.gl.drawElements(primitive.mode, indexBuffer.count, indexBuffer.type, 0);
-            } else {
-              this.gl.drawArrays(primitive.mode, 0, positionBuffer.count);
-            }
-
-            drawCalls++;
+            this.gl.bufferSubData(this.gl.ARRAY_BUFFER, index * 64, new Float32Array(mesh.getMatrix()));
+            index++;
           }
+
+          // Instanced draw
+          const indexBuffer = primitive.buffers[BufferKey.INDEX];
+
+          if (indexBuffer) {
+            this.gl.drawElementsInstanced(primitive.mode, indexBuffer.count, indexBuffer.type, 0, meshQueue.size);
+          } else {
+            const positionBuffer = primitive.buffers[BufferKey.POSITION];
+            this.gl.drawArraysInstanced(primitive.mode, 0, positionBuffer.count, meshQueue.size);
+          }
+
+          drawCalls++;
         }
       }
     }
@@ -336,6 +355,15 @@ export class Renderer {
             bufferView.byteStride,
             bufferView.byteOffest
           );
+        }
+
+        // Instanced matrix buffer
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.modelMatrixBuffer);
+
+        for (let i = 0; i < 4; i++) {
+          this.gl.enableVertexAttribArray(10 + i);
+          this.gl.vertexAttribDivisor(10 + i, 1);
+          this.gl.vertexAttribPointer(10 + i, 4, DataType.FLOAT, false, 64, i * 16);
         }
       }
 

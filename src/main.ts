@@ -6,6 +6,7 @@ import {
   PerspectiveCamera,
   Renderer,
   RendererLegacy,
+  RendererInstanced,
   Scene,
   BufferView,
   Mesh,
@@ -105,14 +106,16 @@ const cubePrimitive = new MeshPrimitive(
 );
 
 //const renderer = new Renderer(document.getElementById('canvas')!);
-const renderer = new RendererLegacy(document.getElementById('canvas')!);
+const renderer = new RendererInstanced(document.getElementById('canvas')!);
+//const renderer = new RendererLegacy(document.getElementById('canvas')!);
 const camera = new PerspectiveCamera(1.5708, 1.777, 0.1, 50, [0, 2, 0]);
 camera.translation = [0, 2, 0];
 camera.fov = 1.5;
+//camera.frustumCulling = false;
 const scene = new Scene();
 
-for (let x = -320; x < 320; x += 2) {
-  for (let y = -320; y < 320; y += 2) {
+for (let x = -300; x < 300; x += 2) {
+  for (let y = -300; y < 300; y += 2) {
     const cube = new Mesh([x, 0, y]);
     cube.primitives.set('cube', cubePrimitive);
   
@@ -127,8 +130,6 @@ let counter = 0;
 let fps = 0;
 
 function appStep() {
-  window.requestAnimationFrame(appStep);
-
   const time = performance.now();
 
   counter += time - previousTime;
@@ -149,6 +150,8 @@ function appStep() {
 
   renderer.clear();
   renderer.renderScene(scene, camera);
+
+  window.requestAnimationFrame(appStep);
 }
 
 async function appInit(): Promise<void> {

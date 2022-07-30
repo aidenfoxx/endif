@@ -4,6 +4,7 @@ const vertexSource = `#version 300 es
 
 layout(location = 0) in vec3 position;
 layout(location = 3) in vec2 texCoord0;
+layout(location = 10) in mat4 model2; // TODO: Remove me
 
 layout(std140) uniform Camera {
   mat4 model;
@@ -15,7 +16,7 @@ out vec2 texCoord;
 
 void main() {
   texCoord = texCoord0;
-  gl_Position = projection * view * model * vec4(position, 1);
+  gl_Position = projection * view * model2 * vec4(position, 1);
 }`;
 const fragmentSource = `#version 300 es
 precision highp float;
