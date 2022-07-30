@@ -12,7 +12,7 @@ import { createTexture } from '../utils/gl/texture';
 import { createArrayBuffer, createUniformBuffer, createVertexArray } from '../utils/gl/buffer';
 import { Texture } from './textures/Texture';
 
-type RenderQueue = Map<Shader, Map<Material, Set<[Mesh, MeshPrimitive]>>>;
+type RenderQueue = Map<Shader, Map<Material, Map<Mesh, Array<MeshPrimitive>>>>;
 
 const CAMERA_BUFFER_INDEX = 0;
 const MATERIAL_BUFFER_INDEX = 1;
@@ -21,7 +21,7 @@ const renderedElement = document.getElementById('rendered')!;
 let rendered = 0;
 let notRendered = 0;
 
-export class Renderer {
+export class RendererLegacy {
   private gl: WebGL2RenderingContext;
 
   private sceneAssets: Map<Scene, AssetCache> = new Map();
@@ -62,10 +62,10 @@ export class Renderer {
 
       //const hasCameraChanged = visiblityCache.observeChange(camera);
 
-      for (const mesh of scene.meshes.values()) {
+      for (const [_, mesh] of scene.meshes) {
         //const hasMeshChanged = visiblityCache.observeChange(mesh);
 
-        for (const primitive of mesh.primitives.values()) {
+        for (const [_, primitive] of mesh.primitives) {
           //const hasPrimitiveChanged = visiblityCache.observeChange(primitive);
           //const hasChanged = hasCameraChanged || hasMeshChanged || hasPrimitiveChanged;
 
@@ -91,8 +91,8 @@ export class Renderer {
         }
       }
     } else {
-      for (const mesh of scene.meshes.values()) {
-        for (const primitive of mesh.primitives.values()) {
+      for (const [_, mesh] of scene.meshes) {
+        for (const [_, primitive] of mesh.primitives) {
           this.parsePrimitive(mesh, primitive, renderQueue);
         }
       }
@@ -138,23 +138,26 @@ export class Renderer {
 
       this.gl.useProgram(program);
 
-      for (const [material, primitiveArray] of materialQueue) {
+      for (const [material, meshQueue] of materialQueue) {
         this.bindMaterial(material, assetCache);
 
-        for (const [mesh, primitive] of primitiveArray) {
+        for (const [mesh, primitiveArray] of meshQueue) {
           // Update model matrix
           this.gl.bindBuffer(this.gl.UNIFORM_BUFFER, cameraBuffer);
           this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 0, new Float32Array(mesh.getMatrix()));
 
-          const indexBuffer = primitive.buffers[BufferKey.INDEX];
+          for (let i = 0; i < primitiveArray.length; i++) {
+            const primitive = primitiveArray[i];
+            const indexBuffer = primitive.buffers[BufferKey.INDEX];
 
-          this.bindPrimitive(primitive, assetCache);
+            this.bindPrimitive(primitive, assetCache);
 
-          if (indexBuffer) {
-            this.gl.drawElements(primitive.mode, indexBuffer.count, indexBuffer.type, 0);
-          } else {
-            const positionBuffer = primitive.buffers[BufferKey.POSITION];
-            this.gl.drawArrays(primitive.mode, 0, positionBuffer.count);
+            if (indexBuffer) {
+              this.gl.drawElements(primitive.mode, indexBuffer.count, indexBuffer.type, 0);
+            } else {
+              const positionBuffer = primitive.buffers[BufferKey.POSITION];
+              this.gl.drawArrays(primitive.mode, 0, positionBuffer.count);
+            }
           }
         }
       }
@@ -221,14 +224,21 @@ export class Renderer {
       renderQueue.set(primitive.material.shader, materialQueue);
     }
 
-    let primitiveArray = materialQueue.get(primitive.material);
+    let meshQueue = materialQueue.get(primitive.material);
 
-    if (!primitiveArray) {
-      primitiveArray = new Set();
-      materialQueue.set(primitive.material, primitiveArray);
+    if (!meshQueue) {
+      meshQueue = new Map();
+      materialQueue.set(primitive.material, meshQueue);
     }
 
-    primitiveArray.add([mesh, primitive]);
+    let primitiveArray = meshQueue.get(mesh);
+
+    if (!primitiveArray) {
+      primitiveArray = new Array();
+      meshQueue.set(mesh, primitiveArray);
+    }
+
+    primitiveArray.push(primitive);
   }
 
   private bindMaterial(material: Material, assetCache: AssetCache): void {

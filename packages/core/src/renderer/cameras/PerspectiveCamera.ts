@@ -21,6 +21,7 @@ export class PerspectiveCamera extends Camera {
   ) {
     super(translation, rotation);
 
+    this.watch(this, 'translation'); // TODO: Fix
     this.watch(this, 'fov');
     this.watch(this, 'aspectRatio');
     this.watch(this, 'nearClip');

@@ -5,12 +5,12 @@ import {
   MeshPrimitive,
   PerspectiveCamera,
   Renderer,
+  RendererLegacy,
   Scene,
   BufferView,
   Mesh,
   DataType,
   BufferType,
-  eulerToQuat,
 } from '@endif/core';
 
 const cubeData = new Uint8Array([
@@ -104,12 +104,15 @@ const cubePrimitive = new MeshPrimitive(
   new BaseMaterial()
 );
 
-const renderer = new Renderer(document.getElementById('canvas')!);
-const camera = new PerspectiveCamera(1.5708, 1.777, 0.1, 1000, [0, 2, 0]);
+//const renderer = new Renderer(document.getElementById('canvas')!);
+const renderer = new RendererLegacy(document.getElementById('canvas')!);
+const camera = new PerspectiveCamera(1.5708, 1.777, 0.1, 50, [0, 2, 0]);
+camera.translation = [0, 2, 0];
+camera.fov = 1.5;
 const scene = new Scene();
 
-for (let x = -400; x < 400; x += 2) {
-  for (let y = -400; y < 400; y += 2) {
+for (let x = -320; x < 320; x += 2) {
+  for (let y = -320; y < 320; y += 2) {
     const cube = new Mesh([x, 0, y]);
     cube.primitives.set('cube', cubePrimitive);
   
@@ -137,6 +140,12 @@ function appStep() {
     counter = 0;
     fps = 0;
   }
+
+  camera.translation = [
+    camera.translation[0],
+    camera.translation[1],
+    camera.translation[2] - .01
+  ];
 
   renderer.clear();
   renderer.renderScene(scene, camera);

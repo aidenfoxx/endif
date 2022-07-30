@@ -6,23 +6,34 @@ interface AssetRecord {
   refs: number;
 }
 
-class AssetIterator implements Iterator<object> {
-  constructor(private keys: Set<WeakRef<object>>, private cache: WeakMap<object, AssetRecord>) {}
+class KeyIterator implements IterableIterator<object> {
+  private iterator;
 
-  public next(): IteratorResult<[object, object]> {
-    for (const value of this.keys) {
-      const key = value.deref();
+  constructor(private keys: Set<WeakRef<object>>) {
+    this.iterator = keys.keys();
+  }
+
+  public next(): IteratorResult<object> {
+    let result = this.iterator.next();
+
+    while (!result.done) {
+      const key = result.value.deref();
 
       if (key) {
-        const record = this.cache.get(key);
-        return { value: [key, record!.value], done: false };
-      } else {
-        // Clean up garbage colelcted key
-        this.keys.delete(value);
+        return { value: key, done: false };
       }
+
+      // Clean up garbage colelcted key
+      this.keys.delete(result.value);
+
+      result = this.iterator.next();
     }
 
     return { value: undefined, done: true };
+  }
+
+  public [Symbol.iterator](): IterableIterator<object> {
+    return this;
   }
 }
 
@@ -30,7 +41,7 @@ export class AssetCache {
   private static sharedCache: WeakMap<object, AssetRecord> = new WeakMap();
 
   // Track keys so we can iterate the WeakMap
-  private keys: Set<WeakRef<object>> = new Set();
+  private keyRefs: Set<WeakRef<object>> = new Set(); 
   private cache: WeakMap<object, AssetRecord> = new WeakMap();
 
   public getValue(key: object, callback: () => object): object {
@@ -43,7 +54,7 @@ export class AssetCache {
 
     // Link record to instance
     if (!this.cache.has(key)) {
-      this.keys.add(new WeakRef(key));
+      this.keyRefs.add(new WeakRef(key));
       this.cache.set(key, record);
 
       record.refs++;
@@ -65,7 +76,7 @@ export class AssetCache {
 
     // Link record to instance
     if (!this.cache.has(key)) {
-      this.keys.add(new WeakRef(key));
+      this.keyRefs.add(new WeakRef(key));
       this.cache.set(key, record);
 
       record.refs++;
@@ -92,17 +103,7 @@ export class AssetCache {
     this.cache.delete(key);
   }
 
-  public forEach(callback: (value: [object, object]) => void): void {
-    for (const value of this) {
-      callback(value);
-    }
-  }
-
-  public entries(): AssetIterator {
-    return new AssetIterator(this.keys, this.cache);
-  }
-
-  public [Symbol.iterator]() {
-    return new AssetIterator(this.keys, this.cache);
+  public keys(): IterableIterator<object> {
+    return new KeyIterator(this.keyRefs);
   }
 }

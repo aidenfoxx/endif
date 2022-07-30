@@ -11,6 +11,7 @@ export abstract class Observable {
         return propertyRef;
       },
       set: function (value) {
+        // console.log('Value change:', target, property, propertyRef, value);
         propertyRef = value;
         this.stateID = Observable.uniqueID++;
       },

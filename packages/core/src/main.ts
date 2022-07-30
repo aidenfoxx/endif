@@ -15,6 +15,7 @@ export * from './renderer/shaders/Shader';
 export * from './renderer/textures/BaseTexture';
 export * from './renderer/textures/Texture';
 export * from './renderer/Renderer';
+export * from './renderer/RendererLegacy';
 export * from './renderer/Scene';
 export * from './types';
 export * from './utils/math';
