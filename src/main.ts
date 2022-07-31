@@ -12,6 +12,7 @@ import {
   Mesh,
   DataType,
   BufferType,
+  RendererGroupBy,
 } from '@endif/core';
 
 const cubeData = new Uint8Array([
@@ -106,6 +107,7 @@ const cubePrimitive = new MeshPrimitive(
 );
 
 const renderer = new Renderer(document.getElementById('canvas')!, { antialias: false });
+//const renderer = new RendererGroupBy(document.getElementById('canvas')!, { antialias: false });
 //const renderer = new RendererInstanced(document.getElementById('canvas')!);
 //const renderer = new RendererLegacy(document.getElementById('canvas')!);
 const camera = new PerspectiveCamera(1.5708, 1.777, 0.1, 1000, [0, 2, 0]);
