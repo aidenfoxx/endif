@@ -105,17 +105,17 @@ const cubePrimitive = new MeshPrimitive(
   new BaseMaterial()
 );
 
-const renderer = new Renderer(document.getElementById('canvas')!);
+const renderer = new Renderer(document.getElementById('canvas')!, { antialias: false });
 //const renderer = new RendererInstanced(document.getElementById('canvas')!);
 //const renderer = new RendererLegacy(document.getElementById('canvas')!);
-const camera = new PerspectiveCamera(1.5708, 1.777, 0.1, 50, [0, 2, 0]);
+const camera = new PerspectiveCamera(1.5708, 1.777, 0.1, 1000, [0, 2, 0]);
 camera.translation = [0, 2, 0];
 camera.fov = 1.5;
 //camera.frustumCulling = false;
 const scene = new Scene();
 
 for (let x = -300; x < 300; x += 2) {
-  for (let y = -300; y < 300; y += 2) {
+  for (let y = -300; y < 0; y += 2) {
     const cube = new Mesh([x, 0, y]);
     cube.primitives.set('cube', cubePrimitive);
   

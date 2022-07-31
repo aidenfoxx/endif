@@ -22,6 +22,19 @@ const server = http.createServer(function (req, res) {
         case '.js':
           res.setHeader('Content-Type', 'text/javascript');
           break;
+
+        case '.jpg':
+        case '.jpeg':
+          res.setHeader('Content-Type', 'image/jpeg');
+          break;
+
+        case '.png':
+          res.setHeader('Content-Type', 'image/png');
+          break;
+
+        case '.gltf':
+          res.setHeader('Content-Type', 'model/gltf+json');
+          break;
       }
 
       fileStream = fs.createReadStream(fileName);

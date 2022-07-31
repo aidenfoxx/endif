@@ -20,7 +20,7 @@ export interface MaterialTextures {
 }
 
 // TODO: Implement texCoord indexes
-export class Material extends Observable {
+export class Material extends Observable { // TODO: Observable not required anymore for Renderer (needed by RendererInstanced and RendererLegacy)
   constructor(
     public shader: Shader,
     public diffuseFactor: Vec4 = [1, 1, 1, 1],

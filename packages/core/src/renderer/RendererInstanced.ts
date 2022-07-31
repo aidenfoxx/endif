@@ -16,7 +16,11 @@ import { BufferType, DataType } from '../types';
 type RenderQueue = Map<Shader, Map<Material, Map<MeshPrimitive, Set<Mesh>>>>;
 
 const CAMERA_BUFFER_INDEX = 0;
+const CAMERA_BUFFER_SIZE = 192;
+
 const MATERIAL_BUFFER_INDEX = 1;
+const MATERIAL_BUFFER_SIZE = 48;
+
 const INSTANCED_DRAWS_MAX = 100000;
 
 const renderedElement = document.getElementById('rendered')!;
@@ -30,7 +34,9 @@ export class RendererInstanced {
   private sceneAssets: Map<Scene, AssetCache> = new Map();
   private sceneVisibility: Map<Scene, VisbilityCache> = new Map();
 
-  private modelMatrixBuffer;
+  private modelMatrixBuffer: WebGLBuffer;
+  private cameraBuffer: WebGLBuffer;
+  private materialBuffer: WebGLBuffer;
 
   constructor(canvas: HTMLElement, options?: WebGLContextAttributes) {
     if (canvas instanceof HTMLCanvasElement) {
@@ -50,6 +56,12 @@ export class RendererInstanced {
         gl.bufferData(gl.ARRAY_BUFFER, 64 * INSTANCED_DRAWS_MAX, gl.DYNAMIC_DRAW);
 
         this.modelMatrixBuffer = modelMatrixBuffer;
+        this.cameraBuffer = createUniformBuffer(gl, CAMERA_BUFFER_SIZE);
+        this.materialBuffer = createUniformBuffer(gl, MATERIAL_BUFFER_SIZE);
+
+        gl.bindBufferBase(gl.UNIFORM_BUFFER, CAMERA_BUFFER_INDEX, this.cameraBuffer);
+        gl.bindBufferBase(gl.UNIFORM_BUFFER, MATERIAL_BUFFER_INDEX, this.materialBuffer);
+        
         this.gl = gl;
 
         return;
@@ -127,17 +139,9 @@ export class RendererInstanced {
     }
 
     // Bind camera UBO
-    const cameraBuffer = assetCache.observeValue(camera, (previousBuffer?: WebGLBuffer) => {
-      const buffer = previousBuffer ?? createUniformBuffer(this.gl, 192);
-
-      this.gl.bindBuffer(this.gl.UNIFORM_BUFFER, buffer);
-      this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 64, new Float32Array(camera.getMatrix()));
-      this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 128, new Float32Array(camera.getProjection()));
-
-      return buffer;
-    });
-
-    this.gl.bindBufferBase(this.gl.UNIFORM_BUFFER, CAMERA_BUFFER_INDEX, cameraBuffer);
+    this.gl.bindBuffer(this.gl.UNIFORM_BUFFER, this.cameraBuffer);
+    this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 64, new Float32Array(camera.getMatrix()));
+    this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 128, new Float32Array(camera.getProjection()));
 
     for (const [shader, materialQueue] of renderQueue) {
       // Bind shader
@@ -156,9 +160,6 @@ export class RendererInstanced {
 
       for (const [material, primitiveQueue] of materialQueue) {
         this.bindMaterial(material, assetCache);
-
-        // Rebind the camera to update model matrix
-        //this.gl.bindBuffer(this.gl.UNIFORM_BUFFER, cameraBuffer);
 
         for (const [primitive, meshQueue] of primitiveQueue) {
           this.bindPrimitive(primitive, assetCache);
@@ -266,19 +267,11 @@ export class RendererInstanced {
   }
 
   private bindMaterial(material: Material, assetCache: AssetCache): void {
-    const materialBuffer = assetCache.observeValue(material, (previousBuffer?: WebGLProgram) => {
-      const buffer = previousBuffer ?? createUniformBuffer(this.gl, 48);
-
-      this.gl.bindBuffer(this.gl.UNIFORM_BUFFER, buffer);
-      this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 0, new Float32Array(material.diffuseFactor));
-      this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 16, new Float32Array(material.metallicFactor));
-      this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 20, new Float32Array(material.roughnessFactor));
-      this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 32, new Float32Array(material.emissiveFactor));
-
-      return buffer;
-    });
-
-    this.gl.bindBufferBase(this.gl.UNIFORM_BUFFER, MATERIAL_BUFFER_INDEX, materialBuffer);
+    this.gl.bindBuffer(this.gl.UNIFORM_BUFFER, this.materialBuffer);
+    this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 0, new Float32Array(material.diffuseFactor));
+    this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 16, new Float32Array(material.metallicFactor));
+    this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 20, new Float32Array(material.roughnessFactor));
+    this.gl.bufferSubData(this.gl.UNIFORM_BUFFER, 32, new Float32Array(material.emissiveFactor));
 
     // Bind textures
     const textureKeys = Object.keys(TextureKey)
