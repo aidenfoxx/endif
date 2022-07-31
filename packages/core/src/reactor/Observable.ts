@@ -1,6 +1,8 @@
 export abstract class Observable {
   private static uniqueID = 0;
 
+  public id = Observable.uniqueID++;
+
   public stateID = Observable.uniqueID++;
 
   public watch(target: any, property: PropertyKey): void {

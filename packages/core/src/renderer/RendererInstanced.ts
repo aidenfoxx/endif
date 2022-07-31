@@ -5,13 +5,12 @@ import { BufferKey, MeshPrimitive } from './meshes/MeshPrimitive';
 import { createProgram } from '../utils/gl/shader';
 import { aabbTransform } from '../utils/math';
 import { AssetCache } from './caches/AssetCache';
-import { VisbilityCache } from './caches/VisibilityCache';
 import { Material, TextureKey } from './materials/Material';
 import { Shader } from './shaders/Shader';
 import { createTexture } from '../utils/gl/texture';
 import { createArrayBuffer, createUniformBuffer, createVertexArray } from '../utils/gl/buffer';
 import { Texture } from './textures/Texture';
-import { BufferType, DataType } from '../types';
+import { DataType } from '../types';
 
 type RenderQueue = Map<Shader, Map<Material, Map<MeshPrimitive, Set<Mesh>>>>;
 
@@ -32,7 +31,6 @@ export class RendererInstanced {
   private gl: WebGL2RenderingContext;
 
   private sceneAssets: Map<Scene, AssetCache> = new Map();
-  private sceneVisibility: Map<Scene, VisbilityCache> = new Map();
 
   private modelMatrixBuffer: WebGLBuffer;
   private cameraBuffer: WebGLBuffer;
@@ -80,32 +78,10 @@ export class RendererInstanced {
     const renderQueue: RenderQueue = new Map();
 
     if (camera.frustumCulling) {
-      let visiblityCache = this.sceneVisibility.get(scene);
-
-      if (!visiblityCache) {
-        visiblityCache = new VisbilityCache();
-        this.sceneVisibility.set(scene, visiblityCache);
-      }
-
-      //const hasCameraChanged = visiblityCache.observeChange(camera);
-
       for (const mesh of scene.meshes.values()) {
-        //const hasMeshChanged = visiblityCache.observeChange(mesh);
-
         for (const primitive of mesh.primitives.values()) {
-          //const hasPrimitiveChanged = visiblityCache.observeChange(primitive);
-          //const hasChanged = hasCameraChanged || hasMeshChanged || hasPrimitiveChanged;
-
-          // Reuse previous visibility if nothing changed
-          //let isVisible = visiblityCache.getVisibility(primitive);
-
-          // TODO: This doesn't work. Needs to be cached WITH the mesh which contains the transform.
-
-          //if (hasChanged || isVisible === undefined) {
-            const aabb = aabbTransform(primitive.getAABB(), mesh.getMatrix());
-            const isVisible = camera.isVisible(aabb);
-            //visiblityCache.setVisbility(primitive, isVisible);
-          //}
+          const aabb = aabbTransform(primitive.getAABB(), mesh.getMatrix());
+          const isVisible = camera.isVisible(aabb);
 
           if (!isVisible) {
             notRendered++;

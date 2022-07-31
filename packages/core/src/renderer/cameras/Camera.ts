@@ -33,7 +33,6 @@ export abstract class Camera extends Observable {
   constructor(public translation: Vec3 = [0, 0, 0], public rotation: Vec4 = [0, 0, 0, 1]) {
     super();
 
-    this.watch(this, 'frustumCulling');
     this.watch(this, 'translation');
     this.watch(this, 'rotation');
   }

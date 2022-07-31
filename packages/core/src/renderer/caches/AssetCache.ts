@@ -2,7 +2,7 @@ import { Observable } from '../../reactor/Observable';
 
 interface AssetRecord {
   stateID: number;
-  value: object;
+  value: any;
   refs: number;
 }
 
@@ -44,7 +44,7 @@ export class AssetCache {
   private keyRefs: Set<WeakRef<object>> = new Set(); 
   private cache: WeakMap<object, AssetRecord> = new WeakMap();
 
-  public getValue(key: object, callback: () => object): object {
+  public getValue(key: object, callback: () => any): any {
     let record = AssetCache.sharedCache.get(key);
 
     if (!record) {
@@ -63,7 +63,7 @@ export class AssetCache {
     return record.value;
   }
 
-  public observeValue(key: Observable, callback: (previousValue?: object) => object): object {
+  public observeValue(key: Observable, callback: (previousValue?: any) => any): any {
     let record = AssetCache.sharedCache.get(key);
 
     if (!record) {
@@ -85,7 +85,7 @@ export class AssetCache {
     return record.value;
   }
 
-  public deleteValue(key: object, callback: (value: object) => void): void {
+  public deleteValue(key: object, callback: (value: any) => void): void {
     const record = this.cache.get(key);
 
     if (!record) {
@@ -101,6 +101,17 @@ export class AssetCache {
 
     // Orphaned keys will be cleaned up during iteration
     this.cache.delete(key);
+  }
+
+  public observeChange(key: Observable): boolean {
+    const record = this.cache.get(key);
+
+    if (record && key.stateID !== record.stateID) {
+      record.stateID = key.stateID;
+      return true;
+    }
+
+    return false;
   }
 
   public keys(): IterableIterator<object> {

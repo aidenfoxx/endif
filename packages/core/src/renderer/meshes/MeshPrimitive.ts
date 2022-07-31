@@ -42,13 +42,6 @@ export class MeshPrimitive extends Observable {
     this.buffers = { ...buffers };
 
     this.watch(this.buffers, BufferKey.POSITION);
-    this.watch(this.buffers, BufferKey.NORMAL);
-    this.watch(this.buffers, BufferKey.TEXCOORD_0);
-    this.watch(this.buffers, BufferKey.TEXCOORD_1);
-    this.watch(this.buffers, BufferKey.TEXCOORD_2);
-    this.watch(this.buffers, BufferKey.TEXCOORD_3);
-    this.watch(this.buffers, BufferKey.INDEX);
-    this.watch(this, 'material');
   }
 
   public getAABB(): AABB {
