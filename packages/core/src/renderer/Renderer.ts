@@ -19,6 +19,7 @@ const CAMERA_BUFFER_SIZE = 256;
 const MATERIAL_BUFFER_INDEX = 1;
 const MATERIAL_BUFFER_SIZE = 256;
 
+// TODO: Remove debug
 const renderedElement = document.getElementById('rendered')!;
 let rendered = 0;
 let notRendered = 0;
@@ -60,7 +61,7 @@ export class Renderer {
     const renderQueue: RenderQueue = new Map();
 
     if (camera.frustumCulling) {
-      for (const mesh of scene.meshes.values()) {
+      for (const mesh of scene.values()) {
         const transform = mesh.getMatrix();
 
         for (const primitive of mesh.primitives.values()) {
@@ -74,7 +75,7 @@ export class Renderer {
         }
       }
     } else {
-      for (const mesh of scene.meshes.values()) {
+      for (const mesh of scene.values()) {
         for (const primitive of mesh.primitives.values()) {
           this.parsePrimitive(mesh, primitive, renderQueue);
         }

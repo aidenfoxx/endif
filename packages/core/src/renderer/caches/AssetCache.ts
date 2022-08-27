@@ -99,7 +99,7 @@ export class AssetCache {
       record.refs--;
     }
 
-    // Orphaned keys will be cleaned up during iteration
+    // Orphaned keys are cleaned up during iteration
     this.cache.delete(key);
   }
 

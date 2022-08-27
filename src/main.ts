@@ -5,14 +5,11 @@ import {
   MeshPrimitive,
   PerspectiveCamera,
   Renderer,
-  RendererLegacy,
-  RendererInstanced,
   Scene,
   BufferView,
   Mesh,
   DataType,
-  BufferType,
-  RendererGroupBy,
+  BufferType
 } from '@endif/core';
 
 const cubeData = new Uint8Array([
@@ -121,7 +118,7 @@ for (let x = -300; x < 300; x += 2) {
     const cube = new Mesh([x, 0, y]);
     cube.primitives.set('cube', cubePrimitive);
   
-    scene.meshes.set(`cube-${x}-${y}`, cube);
+    scene.setMesh(`cube-${x}-${y}`, cube);
   }
 }
  
