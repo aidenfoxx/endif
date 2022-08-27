@@ -61,7 +61,7 @@ export class Renderer {
     const renderQueue: RenderQueue = new Map();
 
     if (camera.frustumCulling) {
-      for (const mesh of scene.values()) {
+      for (const mesh of scene.meshes.values()) {
         const transform = mesh.getMatrix();
 
         for (const primitive of mesh.primitives.values()) {
@@ -75,7 +75,7 @@ export class Renderer {
         }
       }
     } else {
-      for (const mesh of scene.values()) {
+      for (const mesh of scene.meshes.values()) {
         for (const primitive of mesh.primitives.values()) {
           this.parsePrimitive(mesh, primitive, renderQueue);
         }

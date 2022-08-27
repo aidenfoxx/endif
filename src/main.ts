@@ -118,7 +118,7 @@ for (let x = -300; x < 300; x += 2) {
     const cube = new Mesh([x, 0, y]);
     cube.primitives.set('cube', cubePrimitive);
   
-    scene.setMesh(`cube-${x}-${y}`, cube);
+    scene.meshes.set(`cube-${x}-${y}`, cube);
   }
 }
  
