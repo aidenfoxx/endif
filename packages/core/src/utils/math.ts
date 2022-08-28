@@ -455,10 +455,10 @@ export function aabbCalculate(vertices: Array<number>): AABB {
 
 export function aabbTransform(aabb: AABB, transform: Mat4): AABB {
   const center = vec3Multiply(vec3Add(aabb[0], aabb[1]), [0.5, 0.5, 0.5]);
-  const extents = vec3Subtract(aabb[1], center);
+  const extent = vec3Subtract(aabb[1], center);
 
   const nextCenter = vec4MultiplyMat4([...center, 1.0], transform);
-  const nextExtents = vec3MultiplyMat4(extents, transform);
+  const nextExtents = vec3MultiplyMat4(extent, transform);
 
   const min = vec3Subtract([nextCenter[0], nextCenter[1], nextCenter[2]], nextExtents);
   const max = vec3Add([nextCenter[0], nextCenter[1], nextCenter[2]], nextExtents);
