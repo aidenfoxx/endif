@@ -1,4 +1,3 @@
-export * from './reactor/Observable';
 export * from './renderer/buffers/Buffer';
 export * from './renderer/buffers/BufferView';
 export * from './renderer/cameras/Camera';
@@ -14,7 +13,6 @@ export * from './renderer/shaders/PhongShader';
 export * from './renderer/shaders/Shader';
 export * from './renderer/textures/BaseTexture';
 export * from './renderer/textures/Texture';
-export * from './renderer/Renderer';
 export * from './renderer/Scene';
 export * from './types';
 export * from './utils/math';

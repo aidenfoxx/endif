@@ -4,13 +4,13 @@ import {
   Buffer,
   MeshPrimitive,
   PerspectiveCamera,
-  Renderer,
   Scene,
   BufferView,
   Mesh,
   DataType,
   BufferType
 } from '@endif/core';
+import { Context } from '../packages/core/src/renderer/Context';
 
 const cubeData = new Uint8Array([
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x3F,
@@ -85,6 +85,8 @@ const cubeData = new Uint8Array([
   0x14, 0x00, 0x15, 0x00, 0x16, 0x00, 0x17, 0x00, 0x16, 0x00, 0x15, 0x00
 ]);
 
+Context.init(document.getElementById('canvas')!, { antialias: false });
+
 const cubeBuffer = new Buffer(cubeData.buffer, 768, 0);
 const cubeIndexBuffer = new Buffer(cubeData.buffer, 72, 768, BufferType.ELEMENT_ARRAY_BUFFER);
 
@@ -103,13 +105,10 @@ const cubePrimitive = new MeshPrimitive(
   new BaseMaterial()
 );
 
-const renderer = new Renderer(document.getElementById('canvas')!, { antialias: false });
 //const renderer = new RendererGroupBy(document.getElementById('canvas')!, { antialias: false });
 //const renderer = new RendererInstanced(document.getElementById('canvas')!);
 //const renderer = new RendererLegacy(document.getElementById('canvas')!);
 const camera = new PerspectiveCamera(1.5708, 1.777, 0.1, 1000, [0, 2, 0]);
-camera.translation = [0, 2, 0];
-camera.fov = 1.5;
 //camera.setFrustumCulling(false);
 const scene = new Scene();
 
@@ -147,8 +146,7 @@ function appStep() {
     camera.translation[2] - .01
   ]);
 
-  renderer.clear();
-  renderer.renderScene(scene, camera);
+  scene.render(camera);
 
   window.requestAnimationFrame(appStep);
 }

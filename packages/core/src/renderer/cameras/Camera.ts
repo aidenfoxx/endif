@@ -1,8 +1,6 @@
-import { Observable } from '../../reactor/Observable';
 import {
   AABB,
   Mat4,
-  mat4Identity,
   mat4Multiply,
   mat4RotationQuat,
   mat4Translation,
@@ -14,28 +12,17 @@ import {
 
 type ViewFrustum = [Vec4, Vec4, Vec4, Vec4, Vec4, Vec4];
 
-export abstract class Camera extends Observable {
+export abstract class Camera {
   public readonly frustumCulling: boolean = true;
 
-  private matrix: Mat4 = mat4Identity();
-  private matrixStateID: number = -1;
+  private matrix?: Mat4;
 
-  private viewFrustum: ViewFrustum = [
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-  ];
-  private viewFrustumStateID: number = -1;
+  private viewFrustum?: ViewFrustum;
 
   constructor(
     public readonly translation: Vec3 = [0, 0, 0],
     public readonly rotation: Vec4 = [0, 0, 0, 1]
-  ) {
-    super();
-  }
+  ) {}
 
   public setFrustumCulling(frustumCulling: boolean): void {
     (this.frustumCulling as boolean) = frustumCulling;
@@ -43,28 +30,29 @@ export abstract class Camera extends Observable {
 
   public setTranslation(translation: Vec3): void {
     (this.translation as Vec3) = translation;
-    this.updateState();
+    this.matrix = undefined;
+    this.viewFrustum = undefined;
   }
 
   public setRotation(rotation: Vec4): void {
     (this.rotation as Vec4) = rotation;
-    this.updateState();
+    this.matrix = undefined;
+    this.viewFrustum = undefined;
   }
 
   public getMatrix(): Mat4 {
-    if (this.stateID !== this.matrixStateID) {
+    if (!this.matrix) {
       this.matrix = mat4Multiply(
         mat4Translation(vec3Inverse(this.translation)),
         mat4RotationQuat(this.rotation)
       );
-      this.matrixStateID = this.stateID;
     }
 
     return this.matrix;
   }
 
   public isVisible(aabb: AABB): boolean {
-    if (this.stateID !== this.viewFrustumStateID) {
+    if (!this.viewFrustum) {
       const mat = mat4Multiply(this.getProjection(), this.getMatrix());
 
       this.viewFrustum = [
@@ -75,7 +63,6 @@ export abstract class Camera extends Observable {
         vec4Normalize([mat[3] + mat[2], mat[7] + mat[6], mat[11] + mat[10], mat[15] + mat[14]]),
         vec4Normalize([mat[3] - mat[2], mat[7] - mat[6], mat[11] - mat[10], mat[15] - mat[14]]),
       ];
-      this.viewFrustumStateID = this.stateID;
     }
 
     for (let i = 0; i < 6; i++) {

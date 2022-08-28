@@ -1,7 +1,8 @@
-import { Observable } from '../../reactor/Observable';
 import { DrawMode } from '../../types';
+import { createVertexArray } from '../../utils/gl/buffer';
 import { AABB, aabbCalculate } from '../../utils/math';
 import { BufferView } from '../buffers/BufferView';
+import { Context } from '../Context';
 import { Material } from '../materials/Material';
 
 export enum BufferKey {
@@ -34,6 +35,10 @@ export class MeshPrimitive {
   
   public readonly aabb: AABB;
 
+  private gl: WebGL2RenderingContext;
+
+  private vertexArray?: WebGLBuffer;
+
   constructor(buffers: MeshBuffers, public material: Material) {
     this.buffers = { ...buffers };
     
@@ -45,9 +50,48 @@ export class MeshPrimitive {
     );
 
     this.aabb = aabbCalculate(Array.from(positionData));
+    this.gl = Context.getContent();
   }
 
   public setMode(mode: DrawMode): void {
     (this.mode as DrawMode) = mode;
+  }
+
+  public bind(): void {
+    if (!this.vertexArray) {
+      const vertexArray = createVertexArray(this.gl);
+
+      this.gl.bindVertexArray(vertexArray);
+
+      // Bind buffers
+      const bufferKeys = Object.values(BufferKey).map(Number).filter(isFinite);
+
+      for (const key of bufferKeys) {
+        const bufferView = this.buffers[key as BufferKey];
+
+        if (!bufferView) {
+          this.gl.disableVertexAttribArray(key);
+          continue;
+        }
+
+        bufferView.buffer.bind();
+
+        if (key !== BufferKey.INDEX) {
+          this.gl.enableVertexAttribArray(key);
+          this.gl.vertexAttribPointer(
+            key,
+            bufferView.size,
+            bufferView.type,
+            bufferView.normalized,
+            bufferView.byteStride,
+            bufferView.byteOffest
+          );
+        }
+      }
+
+      this.vertexArray = vertexArray;
+    }
+
+    this.gl.bindVertexArray(this.vertexArray);
   }
 }
