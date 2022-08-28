@@ -27,37 +27,27 @@ export interface MeshBuffers {
   [BufferKey.INDEX]?: BufferView;
 }
 
-export class MeshPrimitive extends Observable {
-  public mode: DrawMode = DrawMode.TRIANGLES;
+export class MeshPrimitive {
+  public readonly mode: DrawMode = DrawMode.TRIANGLES;
 
-  private aabb: AABB = [
-    [0, 0, 0],
-    [0, 0, 0],
-  ];
-  private aabbStateID: number = -1;
+  public readonly buffers: Readonly<MeshBuffers>;
+  
+  public readonly aabb: AABB;
 
-  constructor(public readonly buffers: MeshBuffers, public material: Material) {
-    super();
-
+  constructor(buffers: MeshBuffers, public material: Material) {
     this.buffers = { ...buffers };
+    
+    const bufferView = this.buffers[BufferKey.POSITION];
+    const positionData = new Float32Array( // TODO: This needs to support other data types and stride
+      bufferView.buffer.data,
+      bufferView.buffer.byteOffest + bufferView.byteOffest,
+      bufferView.count // TODO: This is relative to the data type (Int, Short etc)
+    );
 
-    this.watch(this.buffers, BufferKey.POSITION);
+    this.aabb = aabbCalculate(Array.from(positionData));
   }
 
-  public getAABB(): AABB {
-    if (this.stateID !== this.aabbStateID) {
-      const bufferView = this.buffers[BufferKey.POSITION];
-      // TODO: This needs to support other data types and stride
-      const positionData = new Float32Array(
-        bufferView.buffer.data,
-        bufferView.buffer.byteOffest + bufferView.byteOffest,
-        bufferView.count // TODO: This is relative to the data type (Int, Short etc)
-      );
-
-      this.aabb = aabbCalculate(Array.from(positionData));
-      this.aabbStateID = this.stateID;
-    }
-
-    return this.aabb;
+  public setMode(mode: DrawMode): void {
+    (this.mode as DrawMode) = mode;
   }
 }

@@ -18,15 +18,23 @@ export class Mesh extends Observable {
   private matrixStateID: number = -1;
 
   constructor(
-    public translation: Vec3 = [0, 0, 0],
-    public rotation: Vec4 = [0, 0, 0, 1],
-    public scale: Vec3 = [1, 1, 1]
+    public readonly translation: Vec3 = [0, 0, 0],
+    public readonly rotation: Vec4 = [0, 0, 0, 1],
+    public readonly scale: Vec3 = [1, 1, 1]
   ) {
     super();
+  }
 
-    this.watch(this, 'translation');
-    this.watch(this, 'rotation');
-    this.watch(this, 'scale');
+  public setTranslation(translation: Vec3): void {
+    (this.translation as Vec3) = translation;
+  }
+
+  public setRotation(rotation: Vec4): void {
+    (this.rotation as Vec4) = rotation;
+  }
+
+  public setScale(translation: Vec3): void {
+    (this.translation as Vec3) = translation;
   }
 
   public getMatrix(): Mat4 {

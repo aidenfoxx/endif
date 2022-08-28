@@ -20,12 +20,6 @@ export class PerspectiveCamera extends Camera {
     public rotation: Vec4 = [0, 0, 0, 1]
   ) {
     super(translation, rotation);
-
-    this.watch(this, 'translation'); // TODO: Fix
-    this.watch(this, 'fov');
-    this.watch(this, 'aspectRatio');
-    this.watch(this, 'nearClip');
-    this.watch(this, 'farClip');
   }
 
   public getProjection(): Mat4 {

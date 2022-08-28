@@ -62,10 +62,10 @@ export class Renderer {
 
     if (camera.frustumCulling) {
       for (const mesh of scene.meshes.values()) {
-        const transform = mesh.getMatrix();
+        const matrix = mesh.getMatrix();
 
         for (const primitive of mesh.primitives.values()) {
-          const aabb = aabbTransform(primitive.getAABB(), transform);
+          const aabb = aabbTransform(primitive.aabb, matrix);
           const isVisible = camera.isVisible(aabb);
 
           if (isVisible) {
@@ -82,6 +82,7 @@ export class Renderer {
       }
     }
 
+    // TODO: Remove
     renderedElement.innerHTML = `Drawn: ${rendered}, Not Drawn: ${notRendered}, Draw Calls: ${drawCalls}`;
     rendered = 0;
     notRendered = 0;
@@ -266,7 +267,7 @@ export class Renderer {
   }
 
   private bindPrimitive(primitive: MeshPrimitive, assetCache: AssetCache): void {
-    const vertexArray = assetCache.observeValue(primitive, (previousVertexArray?: WebGLVertexArrayObject) => {
+    const vertexArray = assetCache.getValue(primitive, (previousVertexArray?: WebGLVertexArrayObject) => {
       const vertexArray = previousVertexArray ?? createVertexArray(this.gl);
 
       this.gl.bindVertexArray(vertexArray);

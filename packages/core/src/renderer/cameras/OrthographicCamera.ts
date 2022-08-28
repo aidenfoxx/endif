@@ -6,23 +6,16 @@ export class OrthographicCamera extends Camera {
   private projectionStateID: number = -1;
 
   constructor(
-    public left: number,
-    public right: number,
-    public top: number,
-    public bottom: number,
-    public nearClip: number,
-    public farClip: number,
-    public translation: Vec3 = [0, 0, 0],
-    public rotation: Vec4 = [0, 0, 0, 1]
+    public readonly left: number,
+    public readonly right: number,
+    public readonly top: number,
+    public readonly bottom: number,
+    public readonly nearClip: number,
+    public readonly farClip: number,
+    public readonly translation: Vec3 = [0, 0, 0],
+    public readonly rotation: Vec4 = [0, 0, 0, 1]
   ) {
     super(translation, rotation);
-
-    this.watch(this, 'left');
-    this.watch(this, 'right');
-    this.watch(this, 'top');
-    this.watch(this, 'bottom');
-    this.watch(this, 'nearClip');
-    this.watch(this, 'farClip');
   }
 
   public getProjection(): Mat4 {

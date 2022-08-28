@@ -19,28 +19,43 @@ export interface MaterialTextures {
   [TextureKey.EMISSIVE]?: Texture;
 }
 
-// TODO: Implement texCoord indexes
-export class Material extends Observable { // TODO: Observable not required anymore for Renderer (needed by RendererInstanced and RendererLegacy)
+export class Material extends Observable {
+  public readonly textures: Readonly<MaterialTextures>
+
   constructor(
-    public shader: Shader,
-    public diffuseFactor: Vec4 = [1, 1, 1, 1],
-    public metallicFactor: number = 1,
-    public roughnessFactor: number = 1,
-    public emissiveFactor: Vec3 = [0, 0, 0],
-    public readonly textures: MaterialTextures
+    public readonly shader: Shader,
+    public readonly diffuseFactor: Vec4 = [1, 1, 1, 1],
+    public readonly metallicFactor: number = 1,
+    public readonly roughnessFactor: number = 1,
+    public readonly emissiveFactor: Vec3 = [0, 0, 0],
+    textures: MaterialTextures
   ) {
     super();
-
     this.textures = { ...textures };
+  }
 
-    this.watch(this, 'shader');
-    this.watch(this, 'diffuseFactor');
-    this.watch(this, 'metallicFactor');
-    this.watch(this, 'roughnessFactor');
-    this.watch(this, 'emissiveFactor');
-    this.watch(this.textures, TextureKey.DIFFUSE);
-    this.watch(this.textures, TextureKey.METALLIC_ROUGHNESS);
-    this.watch(this.textures, TextureKey.OCCLUSION);
-    this.watch(this.textures, TextureKey.EMISSIVE);
+  public setDiffuseFactor(diffuseFactor: Vec4): void {
+    (this.diffuseFactor as Vec4) = diffuseFactor;
+    this.updateState();
+  }
+
+  public setMetallicFactor(metallicFactor: number): void {
+    (this.metallicFactor as number) = metallicFactor;
+    this.updateState();
+  }
+
+  public setRoughnessFactor(roughnessFactor: number): void {
+    (this.roughnessFactor as number) = roughnessFactor;
+    this.updateState();
+  }
+
+  public setEmissiveFactor(emissiveFactor: Vec3): void {
+    (this.emissiveFactor as Vec3) = emissiveFactor;
+    this.updateState();
+  }
+
+  public setTexture(key: TextureKey, texture: Texture): void {
+    (this.textures as MaterialTextures)[key] = texture;
+    this.updateState();
   }
 }

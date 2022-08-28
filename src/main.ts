@@ -110,7 +110,7 @@ const renderer = new Renderer(document.getElementById('canvas')!, { antialias: f
 const camera = new PerspectiveCamera(1.5708, 1.777, 0.1, 1000, [0, 2, 0]);
 camera.translation = [0, 2, 0];
 camera.fov = 1.5;
-//camera.frustumCulling = false;
+//camera.setFrustumCulling(false);
 const scene = new Scene();
 
 for (let x = -300; x < 300; x += 2) {
@@ -141,11 +141,11 @@ function appStep() {
     fps = 0;
   }
 
-  camera.translation = [
+  camera.setTranslation([
     camera.translation[0],
     camera.translation[1],
     camera.translation[2] - .01
-  ];
+  ]);
 
   renderer.clear();
   renderer.renderScene(scene, camera);
