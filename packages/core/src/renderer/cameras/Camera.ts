@@ -66,14 +66,25 @@ export abstract class Camera {
     }
 
     for (let i = 0; i < 6; i++) {
-      const plane = this.viewFrustum[i];
+      /*const plane = this.viewFrustum[i];
       const distance =
         Math.max(aabb[0][0] * plane[0], aabb[1][0] * plane[0]) +
         Math.max(aabb[0][1] * plane[1], aabb[1][1] * plane[1]) +
         Math.max(aabb[0][2] * plane[2], aabb[1][2] * plane[2]) +
         plane[3];
 
-      if (distance < 0) {
+      if (distance <= 0) {
+        return false;
+      }*/
+
+      const plane = this.viewFrustum[i];
+      const distance =
+        (aabb[0][0] + aabb[1][0] * Math.sign(plane[0])) * plane[0] +
+        (aabb[0][1] + aabb[1][1] * Math.sign(plane[1])) * plane[1] +
+        (aabb[0][2] + aabb[1][2] * Math.sign(plane[2])) * plane[2] +
+        plane[3];
+
+      if (distance <= 0) {
         return false;
       }
     }

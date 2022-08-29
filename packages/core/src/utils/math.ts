@@ -447,21 +447,18 @@ export function aabbCalculate(vertices: Array<number>): AABB {
     maxZ = Math.max(maxZ, vertices[i + 2]);
   }
 
-  return [
-    [minX, minY, minZ],
-    [maxX, maxY, maxZ],
-  ];
+  const min: Vec3 = [minX, minY, minZ];
+  const max: Vec3 = [maxX, maxY, maxZ];
+
+  const center = vec3Multiply(vec3Add(min, max), [0.5, 0.5, 0.5]);
+  const extent = vec3Subtract(max, center);
+
+  return [center, extent];
 }
 
 export function aabbTransform(aabb: AABB, transform: Mat4): AABB {
-  const center = vec3Multiply(vec3Add(aabb[0], aabb[1]), [0.5, 0.5, 0.5]);
-  const extent = vec3Subtract(aabb[1], center);
+  const nextCenter = vec4MultiplyMat4([...aabb[0], 1.0], transform);
+  const nextExtent = vec3MultiplyMat4(aabb[1], transform);
 
-  const nextCenter = vec4MultiplyMat4([...center, 1.0], transform);
-  const nextExtents = vec3MultiplyMat4(extent, transform);
-
-  const min = vec3Subtract([nextCenter[0], nextCenter[1], nextCenter[2]], nextExtents);
-  const max = vec3Add([nextCenter[0], nextCenter[1], nextCenter[2]], nextExtents);
-
-  return [min, max];
+  return [[nextCenter[0], nextCenter[1], nextCenter[2]], nextExtent];
 }
