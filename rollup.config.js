@@ -1,18 +1,23 @@
-import typescript from '@rollup/plugin-typescript';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
+import typescript from '@rollup/plugin-typescript';
 
-export default {
-  input: 'src/main.ts',
-  output: {
-    file: 'public/main.js',
-    format: 'esm',
-    sourcemap: true,
+export default [
+  {
+    input: 'src/main.ts',
+    output: {
+      dir: 'public',
+      format: 'esm',
+      sourcemap: true,
+      chunkFileNames: 'main.[hash].js',
+    },
+    plugins: [
+      nodeResolve(),
+      replace({
+        'process.env.DEBUG': process.env.DEBUG,
+        preventAssignment: true
+      }),
+      typescript(),
+    ],
   },
-  plugins: [
-    typescript(),
-    replace({
-      'process.env.DEBUG': process.env.DEBUG,
-      preventAssignment: true
-    })
-  ],
-};
+];

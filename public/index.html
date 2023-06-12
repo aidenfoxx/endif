@@ -8,9 +8,22 @@
       margin: 0;
       min-height: 100%;
       background: #111111;
+      color: #ffffff;
     }
 
-    #viewport {
+    #fps {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+    }
+
+    #rendered {
+      position: absolute;
+      top: 30px;
+      left: 10px;
+    }
+
+    #canvas {
       display: block;
       margin: 0 auto;
       background: linear-gradient(0deg, #111111 0%, #333333 100%);
@@ -19,7 +32,9 @@
   </style>
 </head>
 <body>
-  <canvas width="1600" height="900" id="viewport"></canvas>
+  <div id="fps">FPS: 0</div>
+  <div id="rendered">Drawn: 0</div>
+  <canvas width="1600" height="900" id="canvas"></canvas>
   <script type="module" src="./main.js"></script>
 </body>
 </html>

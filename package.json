@@ -11,9 +11,10 @@
     "build:watch": "rollup -c -w",
     "test": "jest",
     "test:watch": "jest --watch",
-    "format": "prettier --write src/**/*.{js,ts}"
+    "format": "prettier --write \"src/**/*.{js,ts}\" \"packages/*/src/**/*.{js,ts}\""
   },
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-replace": "^4.0.0",
     "@rollup/plugin-typescript": "^8.3.2",
     "@types/jest": "^28.1.2",
@@ -22,7 +23,11 @@
     "jest": "^28.1.1",
     "prettier": "^2.7.1",
     "rollup": "^2.75.1",
+    "rollup-plugin-dts": "^4.2.2",
     "ts-jest": "^28.0.5",
     "typescript": "^4.7.4"
-  }
+  },
+  "workspaces": [
+    "./packages/*"
+  ]
 }

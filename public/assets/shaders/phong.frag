@@ -30,7 +30,5 @@ void main() {
     specular = pow(specularAngle, 4.0);
   }
 
-  vec4 diffuse = texture(diffuseTexture, uvPosition);
-  fragColor = diffuse * vec4(ambientColor + lambertian + specular * specularColor, 1.0);
-  //fragColor = vec4(ambientColor + lambertian * diffuseColor + specular * specularColor, 1.0);
+  fragColor = texture(diffuseTexture, uvPosition) * vec4(ambientColor + lambertian + specular * specularColor, 1.0);
 }

@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "name": "@endif/core",
+  "version": "1.0.0",
+  "author": "Aiden Foxx",
+  "license": "UNLICENSED",
+  "main": "./src/main.ts",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch"
+  }
+}
